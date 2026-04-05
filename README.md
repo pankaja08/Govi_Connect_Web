@@ -1,4 +1,4 @@
-# 🌾 GoSCONNECT : Smart Agriculture Platform & AI-Based Diagnostic System
+# 🌾 Govi CONNECT : Smart Agriculture Platform & AI-Based Diagnostic System
 
 <div align="center">
   <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJpbmZ6Z3R6bmZ6Z3R6bmZ6Z3R6bmZ6Z3R6bmZ6Z3R6bmZ6Z3R6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/LpALgGQNZLz9S896vU/giphy.gif" width="600" alt="Smart Agriculture Animation">
