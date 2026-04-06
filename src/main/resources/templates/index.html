@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+    th:replace="~{layout/base(content=~{::main}, extraScripts=~{::#scripts})}">
+
+<body>
+    <main class="w-full">
+        <!-- ===== HERO CAROUSEL ===== -->
+        <section class="relative overflow-hidden" id="carousel">
+            <div id="slides" class="flex transition-transform duration-700 ease-in-out">
+
+                <!-- Slide 1 -->
+                <div class="slide min-w-full relative" style="height: 580px;">
+                    <div class="absolute inset-0 bg-gradient-to-r from-gc-dark via-gc-green to-transparent opacity-95">
+                    </div>
+                    <div class="absolute inset-0 flex flex-col justify-center items-center text-center px-6">
+                        <div class="slide-in-up flex flex-col items-center">
+                            <span
+                                class="inline-block bg-gc-gold text-gc-dark text-xs font-black px-4 py-1.5 rounded-full mb-5 uppercase tracking-widest"
+                                th:text="'🌾 ' + #{home.hero.tag}">🌾
+                                Sri Lanka Agriculture</span>
+                            <h1 class="text-white font-black text-4xl md:text-6xl leading-tight mb-5 drop-shadow-2xl"
+                                data-i18n="hero.subtitle"
+                                th:utext="#{home.hero.subtitle.formatted ?: 'Sri Lanka First all in one<br /><span class=&quot;text-gc-gold&quot;>Agriculture Platform</span>'}">
+                                Sri Lanka First all in one<br />
+                                <span class="text-gc-gold">Agriculture Platform</span>
+                            </h1>
+                            <p class="text-gray-200 text-lg md:text-xl mb-8 max-w-2xl" data-i18n="hero.description"
+                                th:text="#{home.hero.desc}">
+                                Connecting farmers, agricultural officers, and communities across every province of Sri
+                                Lanka.
+                            </p>
+                            <div class="flex gap-4 justify-center flex-wrap">
+                                <a th:href="@{/register}"
+                                    class="bg-gc-gold text-gc-dark font-black px-8 py-3.5 rounded-full text-lg hover:scale-105 transition-all shadow-2xl"
+                                    data-i18n="buttons.start" th:text="#{home.hero.getstarted}">Get
+                                    Started</a>
+                                <a href="#blogs"
+                                    class="border-2 border-white text-white font-bold px-8 py-3.5 rounded-full text-lg hover:bg-white hover:text-gc-dark transition-all"
+                                    data-i18n="buttons.read_blogs" th:text="#{home.hero.readblogs}">Read
+                                    Blogs</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 2 -->
+                <div class="slide min-w-full relative"
+                    style="height: 580px; background: linear-gradient(135deg, #166534, #22c55e, #3b82f6);">
+                    <div class="absolute inset-0 flex flex-col justify-center items-center text-center px-6">
+                        <div class="text-8xl mb-6 animate-bounce">🌾</div>
+                        <h2 class="text-white font-black text-4xl md:text-5xl mb-4" th:text="#{home.hero.expert.title}">
+                            Expert Agricultural Knowledge</h2>
+                        <p class="text-gray-100 text-xl max-w-xl" th:text="#{home.hero.expert.desc}">Access insights
+                            from certified Sri Lankan agricultural
+                            officers. Stay informed, stay productive.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 3 -->
+                <div class="slide min-w-full relative"
+                    style="height: 580px; background: linear-gradient(135deg, #064e3b, #166534, #bbf7d030);">
+                    <div class="absolute inset-0 flex flex-col justify-center items-center text-center px-6">
+                        <div class="text-8xl mb-6">🤝</div>
+                        <h2 class="text-white font-black text-4xl md:text-5xl mb-4" th:text="#{home.hero.grow.title}">
+                            Grow Together</h2>
+                        <p class="text-gray-100 text-xl max-w-xl" th:text="#{home.hero.grow.desc}">Unite farmers and
+                            experts on one platform designed for Sri
+                            Lanka's agricultural future.</p>
+                        <a th:href="@{/register}"
+                            class="mt-8 bg-gc-gold text-gc-dark font-black px-8 py-3.5 rounded-full text-lg hover:scale-105 transition-all shadow-2xl"
+                            data-i18n="buttons.join_now" th:text="#{home.hero.join}">Join
+                            Now</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <button id="prev-btn" onclick="changeSlide(-1)"
+                class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur text-white w-12 h-12 rounded-full flex items-center justify-center hover:bg-white/40 transition-all text-xl z-10">
+                &#8249;
+            </button>
+            <button id="next-btn" onclick="changeSlide(1)"
+                class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur text-white w-12 h-12 rounded-full flex items-center justify-center hover:bg-white/40 transition-all text-xl z-10">
+                &#8250;
+            </button>
+
+            <!-- Dots -->
+            <div class="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+                <button onclick="goToSlide(0)"
+                    class="dot w-3 h-3 rounded-full bg-white/50 hover:bg-gc-gold transition-all"></button>
+                <button onclick="goToSlide(1)"
+                    class="dot w-3 h-3 rounded-full bg-white/50 hover:bg-gc-gold transition-all"></button>
+                <button onclick="goToSlide(2)"
+                    class="dot w-3 h-3 rounded-full bg-white/50 hover:bg-gc-gold transition-all"></button>
+            </div>
+        </section>
+
+        <!-- ===== STATS BAR ===== -->
+        <section class="bg-gc-green py-8">
+            <div class="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                <div class="stat-card">
+                    <div class="text-gc-white font-black text-3xl">
+                        <span class="counter" data-target="9">0</span>+
+                    </div>
+                    <div class="text-gray-100 text-sm mt-1" th:text="#{home.stats.provinces}">Provinces</div>
+                </div>
+                <div class="stat-card">
+                    <div class="text-gc-white font-black text-3xl">
+                        <span class="counter" data-target="25">0</span>+
+                    </div>
+                    <div class="text-gray-100 text-sm mt-1" th:text="#{home.stats.districts}">Districts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="text-gc-white font-black text-3xl">
+                        <span class="counter" th:data-target="${farmerCount ?: 0}">0</span>+
+                    </div>
+                    <div class="text-gray-100 text-sm mt-1" th:text="#{home.stats.farmers}">Farmers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="text-gc-white font-black text-3xl">
+                        <span class="counter" th:data-target="${expertCount ?: 0}">0</span>+
+                    </div>
+                    <div class="text-gray-100 text-sm mt-1" th:text="#{home.stats.experts}">Agri Experts</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== AGRICULTURE NEWS FEED ===== -->
+        <section id="news-feed" class="bg-gray-950 py-14 overflow-hidden">
+            <div class="max-w-7xl mx-auto px-6">
+                <!-- Header -->
+                <div class="flex flex-col md:flex-row md:items-end md:justify-between mb-10 gap-3">
+                    <div>
+                        <span class="inline-flex items-center gap-2 bg-gc-green/20 text-gc-green text-xs font-black px-4 py-1.5 rounded-full uppercase tracking-widest mb-3">
+                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19.01 7.38 20 6.18 20C4.98 20 4 19.01 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z"/></svg>
+                            Live News Feed
+                        </span>
+                        <h2 class="text-3xl md:text-4xl font-black text-white leading-tight">
+                            Global Agriculture <span class="text-gc-green">News</span>
+                        </h2>
+                        <p class="text-gray-400 mt-1 text-sm">Latest updates from <a href="https://www.agweb.com/news/crops" target="_blank" rel="noopener" class="text-gc-green hover:underline">AgWeb.com</a></p>
+                    </div>
+                    <a href="https://www.agweb.com/news/crops" target="_blank" rel="noopener"
+                       class="self-start md:self-auto inline-flex items-center gap-2 bg-gc-green text-white font-bold px-5 py-2.5 rounded-full text-sm hover:bg-green-500 transition-all shadow-lg hover:shadow-gc-green/30 hover:scale-105">
+                        View All News
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    </a>
+                </div>
+
+                <!-- Carousel wrapper -->
+                <div class="relative">
+                    <!-- Cards track -->
+                    <div id="news-track" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 transition-all duration-500">
+                        <!-- JS will populate these -->
+                        <div class="news-skeleton h-72 rounded-2xl bg-gray-800 animate-pulse"></div>
+                        <div class="news-skeleton h-72 rounded-2xl bg-gray-800 animate-pulse hidden sm:block"></div>
+                        <div class="news-skeleton h-72 rounded-2xl bg-gray-800 animate-pulse hidden lg:block"></div>
+                        <div class="news-skeleton h-72 rounded-2xl bg-gray-800 animate-pulse hidden lg:block"></div>
+                    </div>
+
+                    <!-- Prev / Next -->
+                    <button id="news-prev" onclick="slideNews(-1)"
+                        class="absolute -left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-gc-green text-white flex items-center justify-center shadow-xl hover:bg-green-500 transition-all hover:scale-110 disabled:opacity-30"
+                        aria-label="Previous news">&#8249;</button>
+                    <button id="news-next" onclick="slideNews(1)"
+                        class="absolute -right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-gc-green text-white flex items-center justify-center shadow-xl hover:bg-green-500 transition-all hover:scale-110 disabled:opacity-30"
+                        aria-label="Next news">&#8250;</button>
+                </div>
+
+                <!-- Dots -->
+                <div id="news-dots" class="flex justify-center gap-2 mt-6"></div>
+
+                <!-- Error fallback -->
+                <div id="news-error" class="hidden text-center py-10 text-gray-500 text-sm">
+                    Could not load news feed. <a href="https://www.agweb.com/news/crops" target="_blank" rel="noopener" class="text-gc-green hover:underline">Visit AgWeb directly →</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== LATEST BLOGS ===== -->
+        <section id="blogs" class="max-w-7xl mx-auto px-6 py-20">
+            <div class="text-center mb-14">
+                <span
+                    class="bg-gc-gold/20 text-gc-dark font-bold px-4 py-1.5 rounded-full text-sm uppercase tracking-wider"
+                    th:text="#{home.blogs.tag}">Expert
+                    Insights</span>
+                <h2 class="text-4xl md:text-5xl font-black text-gc-dark mt-4" th:text="#{home.blogs.title}">Latest
+                    Agriculture Blogs</h2>
+                <p class="text-gray-500 mt-3 text-lg" th:text="#{home.blogs.subtitle}">Written by certified agricultural
+                    officers across Sri Lanka</p>
+            </div>
+
+            <!-- Layout -->
+            <div class="flex flex-col lg:flex-row gap-8 items-start">
+
+                <!-- Sidebar Filters -->
+                <aside class="w-full lg:w-1/5 bg-white rounded-xl shadow-lg border border-gray-100 p-4 sticky top-24">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-black text-base text-gray-800 flex items-center gap-1.5">
+                            <svg class="w-4 h-4 text-gc-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z">
+                                </path>
+                            </svg>
+                            <span th:text="#{home.blogs.filter.title}">Filter Blogs</span>
+                        </h3>
+                        <a th:href="@{/#blogs}"
+                            class="text-xs text-gray-400 font-bold hover:text-gc-dark transition-colors uppercase"
+                            th:text="#{home.blogs.filter.reset}">Reset</a>
+                    </div>
+
+                    <form id="filterForm">
+                        <!-- Location -->
+                        <div class="mb-3">
+                            <label class="block text-xs font-bold text-gray-700 mb-1"
+                                th:text="#{home.blogs.filter.location}">Location</label>
+                            <select name="location" onchange="submitFilters()"
+                                class="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-700 focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green bg-gray-50 hover:bg-white transition-all outline-none">
+                                <option value="" th:text="'All ' + #{home.blogs.filter.location}">All Locations</option>
+                                <option value="Western" th:selected="${locationFilter == 'Western'}">Western Province
+                                </option>
+                                <option value="Central" th:selected="${locationFilter == 'Central'}">Central Province
+                                </option>
+                                <option value="Southern" th:selected="${locationFilter == 'Southern'}">Southern Province
+                                </option>
+                                <option value="Northern" th:selected="${locationFilter == 'Northern'}">Northern Province
+                                </option>
+                                <option value="Eastern" th:selected="${locationFilter == 'Eastern'}">Eastern Province
+                                </option>
+                                <option value="North Western" th:selected="${locationFilter == 'North Western'}">North
+                                    Western Prov.</option>
+                                <option value="North Central" th:selected="${locationFilter == 'North Central'}">North
+                                    Central Prov.</option>
+                                <option value="Uva" th:selected="${locationFilter == 'Uva'}">Uva Province</option>
+                                <option value="Sabaragamuwa" th:selected="${locationFilter == 'Sabaragamuwa'}">
+                                    Sabaragamuwa
+                                    Prov.</option>
+                            </select>
+                        </div>
+
+                        <!-- Season -->
+                        <div class="mb-3">
+                            <label class="block text-xs font-bold text-gray-700 mb-1"
+                                th:text="#{home.blogs.filter.season}">Season</label>
+                            <select name="season" onchange="submitFilters()"
+                                class="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-700 focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green bg-gray-50 hover:bg-white transition-all outline-none">
+                                <option value="" th:text="'All ' + #{home.blogs.filter.season}">All Seasons</option>
+                                <option value="Yala" th:selected="${seasonFilter == 'Yala'}">Yala Season</option>
+                                <option value="Maha" th:selected="${seasonFilter == 'Maha'}">Maha Season</option>
+                            </select>
+                        </div>
+
+                        <!-- Crop Type -->
+                        <div class="mb-3">
+                            <label class="block text-xs font-bold text-gray-700 mb-1"
+                                th:text="#{home.blogs.filter.crop}">Crop Type</label>
+                            <select name="crop" onchange="submitFilters()"
+                                class="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-700 focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green bg-gray-50 hover:bg-white transition-all outline-none">
+                                <option value="" th:text="'All ' + #{home.blogs.filter.crop}">All Crops</option>
+                                <option value="Paddy" th:selected="${cropFilter == 'Paddy'}">Paddy</option>
+                                <option value="Vegetables" th:selected="${cropFilter == 'Vegetables'}">Vegetables
+                                </option>
+                                <option value="Fruits" th:selected="${cropFilter == 'Fruits'}">Fruits</option>
+                                <option value="Grains" th:selected="${cropFilter == 'Grains'}">Grains</option>
+                                <option value="Export Crops" th:selected="${cropFilter == 'Export Crops'}">Export Crops
+                                </option>
+                                <option value="Spices" th:selected="${cropFilter == 'Spices'}">Spices</option>
+                                <option value="Other" th:selected="${cropFilter == 'Other'}">Other</option>
+                            </select>
+                        </div>
+
+                        <!-- Farming Method -->
+                        <div class="mb-1">
+                            <label class="block text-xs font-bold text-gray-700 mb-1"
+                                th:text="#{home.blogs.filter.method}">Farming Method</label>
+                            <select name="method" onchange="submitFilters()"
+                                class="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-700 focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green bg-gray-50 hover:bg-white transition-all outline-none">
+                                <option value="" th:text="'All ' + #{home.blogs.filter.method}">All Methods</option>
+                                <option value="Traditional" th:selected="${methodFilter == 'Traditional'}">Traditional
+                                </option>
+                                <option value="Organic" th:selected="${methodFilter == 'Organic'}">Organic</option>
+                                <option value="Greenhouse" th:selected="${methodFilter == 'Greenhouse'}">Greenhouse
+                                </option>
+                                <option value="Hydroponics" th:selected="${methodFilter == 'Hydroponics'}">Hydroponics
+                                </option>
+                                <option value="Smart Farming" th:selected="${methodFilter == 'Smart Farming'}">Smart
+                                    Farming
+                                </option>
+                                <option value="Mixed Farming" th:selected="${methodFilter == 'Mixed Farming'}">Mixed
+                                    Farming
+                                </option>
+                                <option value="Other" th:selected="${methodFilter == 'Other'}">Other</option>
+                            </select>
+                        </div>
+                    </form>
+                </aside>
+
+                <!-- Blog Grid -->
+                <div class="flex-1 w-full lg:w-4/5">
+                    <!-- If blogs exist -->
+                    <div th:if="${blogs != null and !blogs.empty}"
+                        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                        <article th:each="blog : ${blogs}"
+                            class="blog-card group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 flex flex-col h-full">
+                            <!-- Image -->
+                            <div
+                                class="relative h-40 overflow-hidden bg-gradient-to-br from-gc-dark to-gc-green shrink-0">
+                                <img th:if="${blog.imageUrl != null}" th:src="${blog.imageUrl}" th:alt="${blog.heading}"
+                                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                <div th:unless="${blog.imageUrl != null}"
+                                    class="w-full h-full flex items-center justify-center text-5xl">🌾</div>
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent flex items-end p-4">
+                                    <!-- Tags on Image -->
+                                    <div class="flex flex-wrap gap-2">
+                                        <span th:if="${blog.cropTag != null and blog.cropTag != ''}"
+                                            th:text="${blog.cropTag}"
+                                            class="bg-white/20 backdrop-blur-md border border-white/40 text-white text-xs font-bold px-2 py-1 rounded-md shadow-sm"></span>
+                                        <span th:if="${blog.locationTag != null and blog.locationTag != ''}"
+                                            th:text="${blog.locationTag}"
+                                            class="bg-gc-gold/90 text-gc-dark text-xs font-black px-2 py-1 rounded-md shadow-sm"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Content -->
+                            <div class="p-4 flex flex-col flex-grow">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span
+                                        class="w-6 h-6 rounded-full bg-gc-green flex items-center justify-center text-white text-[10px] font-bold shrink-0"
+                                        th:text="${#strings.substring(blog.author.fullName, 0, 1)}">A</span>
+                                    <div>
+                                        <p class="text-xs font-semibold text-gc-dark leading-tight"
+                                            th:text="${blog.author.fullName}">Author</p>
+                                        <p class="text-[10px] text-gray-400"
+                                            th:text="${#temporals.format(blog.createdDate, 'dd MMM yyyy')}">Date</p>
+                                    </div>
+                                </div>
+                                <h3 class="font-bold text-sm text-gray-800 mb-2 leading-snug group-hover:text-gc-dark transition-colors line-clamp-2"
+                                    th:text="${blog.heading}">Blog Title</h3>
+                                <div class="text-gray-500 text-xs leading-relaxed line-clamp-2 mb-3 flex-grow"
+                                    th:utext="${#strings.length(blog.textContent) > 100 ? #strings.substring(blog.textContent,0,100)+'...' : blog.textContent}">
+                                    Blog excerpt here...
+                                </div>
+
+                                <div class="mt-auto pt-3 border-t border-gray-100 flex items-center justify-between">
+                                    <a th:href="@{/blog/{id}(id=${blog.id})}"
+                                        class="text-gc-green font-bold text-xs flex items-center gap-1 hover:text-gc-dark transition-colors">
+                                        <span th:text="#{home.blogs.readmore}">Read More</span>
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                                        </svg>
+                                    </a>
+                                    <span class="text-gray-400 text-xs flex items-center gap-1.5 font-medium"
+                                        title="Comments">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03-8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
+                                            </path>
+                                        </svg>
+                                        <span th:text="${blog.comments != null ? blog.comments.size() : 0}">0</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+
+                    <!-- Empty state -->
+                    <div th:if="${blogs == null or blogs.empty}"
+                        class="text-center py-20 bg-white rounded-2xl shadow-sm border border-gray-100 h-full flex flex-col items-center justify-center">
+                        <div class="text-7xl mb-4 opacity-50">🔍</div>
+                        <h3 class="text-2xl font-bold text-gray-500" th:text="#{home.blogs.none}">No blogs found</h3>
+                        <p class="text-gray-400 mt-2 max-w-sm mx-auto" th:text="#{home.blogs.none.desc}">We couldn't
+                            find any articles matching your filters.
+                            Try adjusting or clearing them to see more.</p>
+                        <button onclick="window.location.href='/?#blogs'"
+                            class="mt-6 px-6 py-2 bg-gc-green/10 text-gc-dark font-bold rounded-lg hover:bg-gc-green/20 transition-colors"
+                            th:text="#{home.blogs.none.clear}">Clear
+                            Filters</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="scripts">
+        <script th:src="@{/js/carousel.js}"></script>
+        <script>
+            // ===== AGRICULTURE NEWS CAROUSEL =====
+            (function () {
+                const CARDS_PER_PAGE = 4; // show 4 at a time
+                let allItems = [];
+                let currentPage = 0;
+                let autoTimer = null;
+
+                function getCardsVisible() {
+                    if (window.innerWidth >= 1024) return 4;
+                    if (window.innerWidth >= 640) return 2;
+                    return 1;
+                }
+
+                function totalPages() {
+                    return Math.ceil(allItems.length / getCardsVisible());
+                }
+
+                function buildCard(item) {
+                    const hasBg = item.image && item.image !== '/images/agweb-news-placeholder.jpg';
+                    const bgStyle = hasBg
+                        ? `background-image: url('${item.image}'); background-size: cover; background-position: center;`
+                        : 'background: linear-gradient(135deg, #166534, #22c55e);';
+
+                    const desc = item.description
+                        ? item.description.substring(0, 140) + (item.description.length > 140 ? '...' : '')
+                        : 'Read the full article on AgWeb.';
+
+                    return `
+                        <a href="${item.link}" target="_blank" rel="noopener"
+                           class="news-card group relative rounded-2xl overflow-hidden shadow-xl border border-white/5 flex flex-col cursor-pointer"
+                           style="height: 288px; ${bgStyle}">
+                            <!-- Dark overlay base -->
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/10 transition-all duration-300 group-hover:from-black/95 group-hover:via-black/80 group-hover:to-black/40"></div>
+
+                            <!-- Reference Icon top-right -->
+                            <div class="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center overflow-hidden border border-white/30 shadow-lg">
+                                <img src="/images/global-news-ref.png" class="w-full h-full object-cover" alt="Global News">
+                            </div>
+
+                            <!-- Content (always visible: title + button) -->
+                            <div class="relative z-10 mt-auto p-4 flex flex-col gap-2">
+                                <h3 class="text-white font-black text-sm leading-snug line-clamp-3">${escHtml(item.title)}</h3>
+
+                                <!-- Description - revealed on hover -->
+                                <p class="text-gray-300 text-xs leading-relaxed max-h-0 overflow-hidden group-hover:max-h-24 transition-all duration-500 ease-in-out line-clamp-3">${escHtml(desc)}</p>
+
+                                <div class="pt-1">
+                                    <span class="inline-block bg-gc-green text-white text-[10px] font-black px-3 py-1.5 rounded-lg tracking-wide hover:bg-green-400 transition-colors">
+                                        READ MORE →
+                                    </span>
+                                </div>
+                            </div>
+                        </a>`;
+                }
+
+                function escHtml(str) {
+                    if (!str) return '';
+                    return str
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;');
+                }
+
+                function renderPage(page) {
+                    const visible = getCardsVisible();
+                    const start = page * visible;
+                    const end = Math.min(start + visible, allItems.length);
+                    const track = document.getElementById('news-track');
+                    if (!track) return;
+
+                    // Fade out
+                    track.style.opacity = '0';
+                    track.style.transform = 'translateY(8px)';
+
+                    setTimeout(() => {
+                        track.innerHTML = allItems.slice(start, end).map(buildCard).join('');
+                        track.style.opacity = '1';
+                        track.style.transform = 'translateY(0)';
+                    }, 220);
+
+                    // Update dots
+                    const dotsEl = document.getElementById('news-dots');
+                    if (dotsEl) {
+                        dotsEl.innerHTML = '';
+                        for (let i = 0; i < totalPages(); i++) {
+                            const dot = document.createElement('button');
+                            dot.className = `w-2 h-2 rounded-full transition-all ${i === page ? 'bg-gc-green scale-125' : 'bg-gray-600 hover:bg-gray-400'}`;
+                            dot.onclick = () => goToNewsPage(i);
+                            dotsEl.appendChild(dot);
+                        }
+                    }
+
+                    // Update arrows
+                    const prevBtn = document.getElementById('news-prev');
+                    const nextBtn = document.getElementById('news-next');
+                    if (prevBtn) prevBtn.disabled = page === 0;
+                    if (nextBtn) nextBtn.disabled = page >= totalPages() - 1;
+                }
+
+                function goToNewsPage(page) {
+                    currentPage = Math.max(0, Math.min(page, totalPages() - 1));
+                    renderPage(currentPage);
+                    resetAutoSlide();
+                }
+
+                window.slideNews = function(dir) {
+                    goToNewsPage(currentPage + dir);
+                };
+
+                function resetAutoSlide() {
+                    clearInterval(autoTimer);
+                    autoTimer = setInterval(() => {
+                        const next = (currentPage + 1) % totalPages();
+                        goToNewsPage(next);
+                    }, 7000);
+                }
+
+                // Fetch RSS feed
+                const track = document.getElementById('news-track');
+                if (track) {
+                    track.style.transition = 'opacity 0.22s ease, transform 0.22s ease';
+
+                    fetch('/api/rss-news')
+                        .then(r => r.json())
+                        .then(data => {
+                            // Remove skeletons
+                            document.querySelectorAll('.news-skeleton').forEach(el => el.remove());
+
+                            if (!data || data.length === 0) {
+                                document.getElementById('news-error').classList.remove('hidden');
+                                return;
+                            }
+
+                            allItems = data;
+                            currentPage = 0;
+                            renderPage(0);
+                            resetAutoSlide();
+                        })
+                        .catch(() => {
+                            document.querySelectorAll('.news-skeleton').forEach(el => el.remove());
+                            document.getElementById('news-error').classList.remove('hidden');
+                        });
+                }
+
+                // Re-render on resize (responsive columns)
+                let resizeTimer;
+                window.addEventListener('resize', () => {
+                    clearTimeout(resizeTimer);
+                    resizeTimer = setTimeout(() => {
+                        if (allItems.length > 0) {
+                            currentPage = 0;
+                            renderPage(0);
+                        }
+                    }, 250);
+                });
+            })();
+
+            // Statistics Counter Animation
+            const counters = document.querySelectorAll('.counter');
+            const speed = 1500;
+
+            const animateCounters = () => {
+                counters.forEach(counter => {
+                    const target = +counter.getAttribute('data-target');
+                    if (target === 0) return;
+                    counter.innerText = '0';
+                    const updateCount = () => {
+                        const current = +counter.innerText;
+                        const increment = target / (speed / 16);
+                        if (current < target) {
+                            counter.innerText = Math.ceil(current + increment);
+                            setTimeout(updateCount, 16);
+                        } else {
+                            counter.innerText = target;
+                        }
+                    };
+                    updateCount();
+                });
+            };
+
+            const observerOptions = { threshold: 0.5 };
+            const statsObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        animateCounters();
+                    }
+                });
+            }, observerOptions);
+
+            const statsSection = document.querySelector('.stat-card')?.parentElement;
+            if (statsSection) {
+                statsObserver.observe(statsSection);
+            }
+
+            // Initialize carousel
+            if (typeof showSlide === 'function') {
+                showSlide(0);
+            }
+
+            function submitFilters() {
+                const form = document.getElementById('filterForm');
+                const url = new URL(window.location.origin + '/');
+                if (form.location.value) url.searchParams.set('location', form.location.value);
+                if (form.season.value) url.searchParams.set('season', form.season.value);
+                if (form.crop.value) url.searchParams.set('crop', form.crop.value);
+                if (form.method.value) url.searchParams.set('method', form.method.value);
+                url.hash = 'blogs';
+                window.location.href = url.toString();
+            }
+
+            window.addEventListener('DOMContentLoaded', () => {
+                const urlParams = new URLSearchParams(window.location.search);
+                if ((urlParams.has('location') || urlParams.has('season') || urlParams.has('crop') || urlParams.has('method')) && !window.location.hash) {
+                    window.location.hash = 'blogs';
+                }
+            });
+        </script>
+    </div>
+</body>
+
+</html>
+de(0);
+</script>
+</body>
+
+</html>

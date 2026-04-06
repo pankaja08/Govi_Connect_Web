@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login – GOVI CONNECT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { theme: { extend: { colors: { 'gc-dark': '#166534', 'gc-green': '#22c55e', 'gc-gold': '#eab308', 'gc-tan': '#bbf7d0', 'gc-blue': '#3b82f6' } } } }</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link th:href="@{/css/main.css}" rel="stylesheet" />
+</head>
+
+<body class="font-inter min-h-screen flex items-center justify-center relative overflow-hidden"
+    style="background: linear-gradient(135deg, #166534 0%, #22c55e 50%, #064e3b 100%);">
+
+    <!-- Floating Leaves -->
+    <div class="leaf-bg" aria-hidden="true">
+        <span class="leaf leaf-1">🌿</span><span class="leaf leaf-2">🍃</span><span class="leaf leaf-3">🌱</span>
+        <span class="leaf leaf-4">🍀</span><span class="leaf leaf-5">🌿</span><span class="leaf leaf-6">🍃</span>
+    </div>
+
+    <div class="relative z-10 w-full max-w-md px-6">
+        <!-- Card -->
+        <div class="bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl shadow-2xl p-8">
+
+            <!-- Logo -->
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-gc-gold rounded-full flex items-center justify-center mx-auto mb-4 shadow-xl">
+                    <span class="text-gc-dark font-black text-2xl">G</span>
+                </div>
+                <h1 class="text-white font-black text-3xl">GOVI CONNECT</h1>
+                <p class="text-white mt-1 text-sm">Sign in to your account</p>
+            </div>
+
+            <!-- Flash messages -->
+            <div th:if="${param.logout}"
+                class="bg-green-500/20 border border-green-400 text-green-200 rounded-xl px-4 py-3 text-sm mb-5">
+                You have been logged out successfully.
+            </div>
+            <div th:if="${param.error}"
+                class="bg-red-500/20 border border-red-400 text-red-200 rounded-xl px-4 py-3 text-sm mb-5">
+                Invalid credentials or account not yet approved.
+            </div>
+            <div th:if="${successMessage}"
+                class="bg-green-500/20 border border-green-400 text-green-200 rounded-xl px-4 py-3 text-sm mb-5"
+                th:text="${successMessage}"></div>
+
+            <!-- Login Form -->
+            <form th:action="@{/login}" method="post" class="space-y-5">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+                <div>
+                    <label for="username" class="block text-gc-dark text-sm font-black mb-1.5">Username</label>
+                    <input type="text" id="username" name="username" required autocomplete="username"
+                        placeholder="Enter your username"
+                        class="w-full bg-white/10 border border-white/20 text-white placeholder-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gc-gold transition-all" />
+                </div>
+
+                <div>
+                    <label for="password" class="block text-gc-dark text-sm font-black mb-1.5">Password</label>
+                    <div class="relative">
+                        <input type="password" id="password" name="password" required autocomplete="current-password"
+                            placeholder="Enter your password"
+                            class="w-full bg-white/10 border border-white/20 text-white placeholder-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gc-gold transition-all pr-12" />
+                        <button type="button" onclick="togglePwd()"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 hover:text-white">
+                            <svg id="eye-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit"
+                    class="w-full bg-gc-gold text-gc-dark font-black py-3.5 rounded-xl text-lg hover:bg-yellow-300 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-0.5 mt-2">
+                    Sign In
+                </button>
+            </form>
+
+            <div class="mt-8 text-center space-y-3">
+                <p class="text-white text-sm">
+                    Don't have an account?
+                    <a th:href="@{/register}" class="text-white font-black underline underline-offset-4 decoration-2 hover:text-gc-gold transition-colors">Register here</a>
+                </p>
+                <div class="pt-2">
+                    <a th:href="@{/}" class="text-white/70 hover:text-white text-xs font-semibold uppercase tracking-widest transition-colors flex items-center justify-center gap-2">
+                        <span>Continue as Guest</span>
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function togglePwd() {
+            const pwd = document.getElementById('password');
+            pwd.type = pwd.type === 'password' ? 'text' : 'password';
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,50 @@
+{
+  "nav": {
+    "home": "Home",
+    "market": "Govi Mart",
+    "forum": "Discussion Forum",
+    "register": "Register",
+    "login": "Login",
+    "about": "About",
+    "contact": "Contact",
+    "cropadvisory": "Crop Advisory",
+    "admin": "Admin",
+    "dashboard": "Dashboard"
+  },
+  "hero": {
+    "title": "Empowering Sri Lankan Farmers for a Sustainable Future",
+    "subtitle": "Sri Lanka First all in one<br /><span class=\"text-gc-gold\">Agriculture Platform</span>",
+    "description": "Connecting farmers, agricultural officers, and communities across every province of Sri Lanka."
+  },
+  "buttons": {
+    "ask": "Ask a Question",
+    "search": "Search",
+    "start": "Start Now",
+    "read_blogs": "Read More",
+    "join_now": "Join Now"
+  },
+  "footer": {
+    "description": "Sri Lanka's first all-in-one agriculture platform — connecting farmers, experts, and communities.",
+    "links": "Quick Links",
+    "contact": "Contact",
+    "country": "Sri Lanka 🇱🇰",
+    "rights": "All rights reserved."
+  },
+  "forum": {
+    "title": "Discussion Forum",
+    "search_placeholder": "Search for questions...",
+    "ask_placeholder": "Ask a question...",
+    "button_ask": "Ask",
+    "community_title": "Community Discussions",
+    "suggested_title": "Common questions you can ask"
+  },
+  "advisory": {
+    "modal": {
+      "title": "Join to System",
+      "description": "Please register or login to receive personalized crop recommendations and expert insights.",
+      "register": "Register Now",
+      "login": "Already have an account? Login",
+      "cancel": "Cancel"
+    }
+  }
+}
