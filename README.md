@@ -8,7 +8,7 @@
 [![Tech Stack](https://img.shields.io/badge/Tech%20Stack-Spring%20Boot%20%7C%20FastAPI%20%7C%20MySQL-blue)](#)
 [![Project ID](https://img.shields.io/badge/Project%20ID-DS--01--G11-orange)](#)
 
-**GoSCONNECT** (Govi Connect) is an "all-in-one" digital ecosystem specifically designed to empower small-holder farmers in Sri Lanka. By integrating advanced AI diagnostics with a direct-to-consumer marketplace and expert guidance, the platform aims to reduce crop wastage and enhance financial stability.
+**Govi CONNECT** (Govi Connect) is an "all-in-one" digital ecosystem specifically designed to empower small-holder farmers in Sri Lanka. By integrating advanced AI diagnostics with a direct-to-consumer marketplace and expert guidance, the platform aims to reduce crop wastage and enhance financial stability.
 
 ---
 
@@ -21,7 +21,7 @@ The platform is divided into specialized modules to address every step of the fa
 * **Disease Coverage:** Detects conditions like Bacterial Leaf Blight, Rice Blast, and Brown Spot.
 * **Actionable Advice:** Maps AI outputs to step-by-step treatment and prevention instructions.
 
-### 2. 🛒 GOD Mart (Marketplace)
+### 2. 🛒 Govi Mart (Marketplace)
 * **Direct Access:** A transparent platform where farmers sell products directly to consumers at fair prices.
 * **Management:** Features product listing, category browsing, and a review/rating system to build trust.
 
@@ -40,7 +40,7 @@ The platform is divided into specialized modules to address every step of the fa
 
 ## 🛠️ Tech Stack
 
-**GoSCONNECT** is built using modern, scalable, and open-source technologies:
+**GoviCONNECT** is built using modern, scalable, and open-source technologies:
 
 * **Backend:** Java (Spring Boot) & Python (FastAPI/Flask for AI modules)
 * **Database:** MySQL (Relational Management)
