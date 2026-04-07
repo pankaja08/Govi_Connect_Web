@@ -35,7 +35,7 @@ public class SecurityConfig {
                                                  .requestMatchers("/", "/register", "/login", "/css/**", "/js/**", "/i18n/**",
                                                                 "/images/**", "/uploads/**", "/webjars/**", "/error",
                                                                 "/user/profile/debug/**", "/blog/**", "/market", "/market/product/**", "/forum", "/api/chatbot",
-                                                                "/crop-advisory", "/api/rss-news")
+                                                                "/crop-advisory", "/api/rss-news", "/forgot-password", "/verify-otp", "/reset-password")
                                                 .permitAll()
                                                 // Admin area
                                                 .requestMatchers("/admin/**").hasRole("ADMIN")

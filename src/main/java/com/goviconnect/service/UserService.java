@@ -2,10 +2,12 @@ package com.goviconnect.service;
 
 import com.goviconnect.dto.RegistrationDto;
 import com.goviconnect.entity.AgriOfficerDetails;
+import com.goviconnect.entity.PasswordResetToken;
 import com.goviconnect.entity.User;
 import com.goviconnect.enums.AccountStatus;
 import com.goviconnect.enums.Role;
 import com.goviconnect.repository.AgriOfficerDetailsRepository;
+import com.goviconnect.repository.PasswordResetTokenRepository;
 import com.goviconnect.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +25,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final AgriOfficerDetailsRepository agriOfficerDetailsRepository;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
 
@@ -363,5 +366,72 @@ public class UserService {
                 .distinct()
                 .sorted()
                 .toList();
+    }
+
+    /**
+     * Generates a 6-digit OTP for password reset, saves it, and emails the user.
+     */
+    @Transactional
+    public void generatePasswordResetToken(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("No account found with that email address."));
+
+        // Generate 6-digit OTP
+        String otp = String.format("%06d", new java.util.Random().nextInt(999999));
+
+        // Update existing token if it exists, otherwise create a new one
+        // This avoids "Duplicate Entry" errors on the user_id unique constraint
+        PasswordResetToken token = passwordResetTokenRepository.findByUser(user)
+                .orElse(new PasswordResetToken());
+
+        token.setUser(user);
+        token.setToken(otp);
+        token.setExpiryDate(java.time.LocalDateTime.now().plusMinutes(10)); // 10 minutes expiry
+
+        passwordResetTokenRepository.save(token);
+
+        emailService.sendPasswordResetOtpEmail(user, otp);
+        log.info("Password reset OTP generated for '{}'.", email);
+    }
+
+    /**
+     * Verifies if the provided OTP is valid and not expired.
+     */
+    public boolean verifyOtp(String email, String otp) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid email."));
+
+        PasswordResetToken token = passwordResetTokenRepository.findByUser(user)
+                .orElse(null);
+
+        if (token == null) {
+            return false;
+        }
+
+        if (token.isExpired()) {
+            passwordResetTokenRepository.delete(token);
+            return false;
+        }
+
+        return token.getToken().equals(otp);
+    }
+
+    /**
+     * Updates the password using an OTP, then invalidates the OTP.
+     */
+    @Transactional
+    public void updatePasswordWithOtp(String email, String otp, String newPassword) {
+        if (!verifyOtp(email, otp)) {
+            throw new IllegalArgumentException("Invalid or expired OTP.");
+        }
+
+        User user = userRepository.findByEmail(email).get();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        // Delete the token so it can't be reused
+        passwordResetTokenRepository.deleteByUser(user);
+        
+        log.info("Password successfully reset for user '{}'", email);
     }
 }

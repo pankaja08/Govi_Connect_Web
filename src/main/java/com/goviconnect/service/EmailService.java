@@ -109,4 +109,28 @@ public class EmailService {
             log.error("Failed to send product rejection email to {}: {}", user.getEmail(), e.getMessage());
         }
     }
+    /**
+     * Sends a password reset OTP email.
+     */
+    public void sendPasswordResetOtpEmail(User user, String otp) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(user.getEmail());
+            message.setSubject("GOVI CONNECT \u2013 Password Reset OTP");
+            message.setText(
+                    "Dear " + user.getFullName() + ",\n\n" +
+                    "You have requested to reset your password. \n" +
+                    "Here is your 6-digit One-Time Password (OTP):\n\n" +
+                    "  " + otp + "\n\n" +
+                    "This code will expire in 10 minutes.\n" +
+                    "If you did not request a password reset, please ignore this email or contact support.\n\n" +
+                    "Best regards,\n" +
+                    "GOVI CONNECT Team"
+            );
+            mailSender.send(message);
+            log.info("Password reset OTP email sent to {}", user.getEmail());
+        } catch (Exception e) {
+            log.error("Failed to send password reset OTP email to {}: {}", user.getEmail(), e.getMessage());
+        }
+    }
 }

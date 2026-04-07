@@ -37,8 +37,8 @@
     <link th:href="@{/css/main.css}" rel="stylesheet" />
 
     <!-- CSRF Meta Tags for AJAX -->
-    <meta th:name="_csrf" th:content="${_csrf.token}"/>
-    <meta th:name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <meta th:name="_csrf" th:content="${_csrf.token}" />
+    <meta th:name="_csrf_header" th:content="${_csrf.headerName}" />
 
     <th:block th:if="${extraHead != null}">
         <th:block th:replace="${extraHead}"></th:block>
@@ -73,34 +73,55 @@
                 </a>
 
                 <!-- Nav Links -->
-                <div class="hidden md:flex items-center gap-6">
-                    <a th:href="@{/}" th:classappend="${currentUri != null and (currentUri == '/' or currentUri == '/index') ? 'active' : ''}" class="text-gray-200 font-medium" data-i18n="nav.home" th:text="#{nav.home}">Home</a>
-                    <a th:href="@{/market}" th:classappend="${currentUri != null and currentUri.startsWith('/market') ? 'active' : ''}" class="text-gray-200 font-medium" data-i18n="nav.market" th:text="#{nav.govimart}">Govi Mart</a>
-                    <a th:href="@{/forum}" th:classappend="${currentUri != null and currentUri.startsWith('/forum') ? 'active' : ''}" class="text-gray-200 font-medium" data-i18n="nav.forum" th:text="#{nav.forum}">Discussion Forum</a>
-                    <a th:href="@{/crop-advisory}" th:classappend="${currentUri != null and currentUri.startsWith('/crop-advisory') ? 'active' : ''}" class="text-gray-200 font-medium" data-i18n="nav.cropadvisory" th:text="#{nav.cropadvisory}">Smart Crop Advisory</a>
-                    <a th:href="@{/disease-predictor}" th:classappend="${currentUri != null and currentUri.startsWith('/disease-predictor') ? 'active' : ''}" class="text-gray-200 font-medium" th:text="#{nav.disease_predictor}">AI Disease Predictor</a>
+                <div class="hidden md:flex items-center md:gap-2 lg:gap-3 xl:gap-6">
+                    <a th:href="@{/}"
+                        th:classappend="${currentUri != null and (currentUri == '/' or currentUri == '/index') ? 'active' : ''}"
+                        class="text-gray-200 font-bold hover:text-white transition-colors text-[10px] lg:text-xs xl:text-sm whitespace-nowrap" data-i18n="nav.home" th:text="#{nav.home}">Home</a>
+                    <a th:href="@{/market}"
+                        th:classappend="${currentUri != null and currentUri.startsWith('/market') ? 'active' : ''}"
+                        class="text-gray-200 font-bold hover:text-white transition-colors text-[10px] lg:text-xs xl:text-sm whitespace-nowrap" data-i18n="nav.market" th:text="#{nav.govimart}">Govi Mart</a>
+                    <a th:href="@{/forum}"
+                        th:classappend="${currentUri != null and currentUri.startsWith('/forum') ? 'active' : ''}"
+                        class="text-gray-200 font-bold hover:text-white transition-colors text-[10px] lg:text-xs xl:text-sm whitespace-nowrap" data-i18n="nav.forum" th:text="#{nav.forum}">Discussion
+                        Forum</a>
+                    <a th:href="@{/crop-advisory}"
+                        th:classappend="${currentUri != null and currentUri.startsWith('/crop-advisory') ? 'active' : ''}"
+                        class="text-gray-200 font-bold hover:text-white transition-colors text-[10px] lg:text-xs xl:text-sm whitespace-nowrap" data-i18n="nav.cropadvisory"
+                        th:text="#{nav.cropadvisory}">Smart Crop Advisory</a>
+                    <a th:href="@{/disease-predictor}"
+                        th:classappend="${currentUri != null and currentUri.startsWith('/disease-predictor') ? 'active' : ''}"
+                        class="text-gray-200 font-bold hover:text-white transition-colors text-[10px] lg:text-xs xl:text-sm whitespace-nowrap" th:text="#{nav.disease_predictor}">AI Disease Predictor</a>
 
                     <!-- Language Selector -->
-                    <div class="relative group ml-2" id="lang-selector">
-                        <button class="text-white bg-white/10 px-3 py-1.5 rounded-lg flex items-center gap-2 hover:bg-white/20 transition-all text-sm font-bold border border-white/20">
-                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9c0-2.091-.452-4.074-1.264-5.857M7 20l4-10 4 10M7 20H3m4 0h4m4 0h4m-4 0l4-10"></path>
-                             </svg>
-                             <span id="current-lang-display" th:text="${#locale.language == 'si' ? 'සිංහල' : (#locale.language == 'ta' ? 'தமிழ்' : 'English')}">English</span>
+                    <div class="relative group ml-1 xl:ml-3" id="lang-selector">
+                        <button
+                            class="text-white bg-white/10 px-2 lg:px-2.5 py-1.5 rounded-lg flex items-center gap-1 hover:bg-white/20 transition-all text-[10px] lg:text-xs xl:text-sm font-bold border border-white/20 whitespace-nowrap">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9c0-2.091-.452-4.074-1.264-5.857M7 20l4-10 4 10M7 20H3m4 0h4m4 0h4m-4 0l4-10">
+                                </path>
+                            </svg>
+                            <span id="current-lang-display"
+                                th:text="${#locale.language == 'si' ? 'සිංහල' : (#locale.language == 'ta' ? 'தமிழ்' : 'English')}">English</span>
                         </button>
-                        <div class="absolute right-0 mt-2 w-32 bg-white rounded-xl shadow-2xl py-2 border border-gray-100 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200 z-[60]">
-                            <button onclick="switchLanguage('en')" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-gc-green font-bold">English</button>
-                            <button onclick="switchLanguage('si')" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-gc-green font-bold text-lg">සිංහල</button>
-                            <button onclick="switchLanguage('ta')" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-gc-green font-bold text-lg">தமிழ்</button>
+                        <div
+                            class="absolute right-0 mt-2 w-32 bg-white rounded-xl shadow-2xl py-2 border border-gray-100 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200 z-[60]">
+                            <button onclick="switchLanguage('en')"
+                                class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-gc-green font-bold">English</button>
+                            <button onclick="switchLanguage('si')"
+                                class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-gc-green font-bold text-lg">සිංහල</button>
+                            <button onclick="switchLanguage('ta')"
+                                class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-gc-green font-bold text-lg">தமிழ்</button>
                         </div>
                     </div>
 
                     <!-- Not authenticated -->
-                    <div sec:authorize="!isAuthenticated()" class="flex items-center gap-3">
-                        <a th:href="@{/register}"
-                            class="text-gray-200 hover:text-gc-gold transition-colors font-medium" data-i18n="nav.register" th:text="#{nav.register}">Register</a>
+                    <div sec:authorize="!isAuthenticated()" class="flex items-center gap-2 lg:gap-3">
+                        <a th:href="@{/register}" class="text-gray-200 hover:text-gc-gold transition-colors font-bold text-[10px] lg:text-xs xl:text-sm whitespace-nowrap"
+                            data-i18n="nav.register" th:text="#{nav.register}">Register</a>
                         <a th:href="@{/login}"
-                            class="bg-gc-gold text-gc-dark font-bold px-5 py-2 rounded-full hover:bg-yellow-300 transition-all shadow-lg" data-i18n="nav.login" th:text="#{nav.login}">
+                            class="bg-gc-gold text-gc-dark font-black px-3 lg:px-5 py-2 rounded-full hover:bg-yellow-300 transition-all shadow-lg text-[10px] lg:text-xs xl:text-sm whitespace-nowrap"
+                            data-i18n="nav.login" th:text="#{nav.login}">
                             Login
                         </a>
                     </div>
@@ -109,11 +130,13 @@
                     <div sec:authorize="isAuthenticated()" class="flex items-center gap-4">
                         <span sec:authorize="hasRole('ADMIN')">
                             <a th:href="@{/admin/dashboard}"
-                                class="text-gray-200 hover:text-gc-gold transition-colors font-medium" data-i18n="nav.admin" th:text="#{nav.admin}">Admin</a>
+                                class="text-gray-200 hover:text-gc-gold transition-colors font-medium"
+                                data-i18n="nav.admin" th:text="#{nav.admin}">Admin</a>
                         </span>
                         <span sec:authorize="hasRole('AGRI_OFFICER')">
                             <a th:href="@{/officer/dashboard}"
-                                class="text-gray-200 hover:text-gc-gold transition-colors font-medium" data-i18n="nav.dashboard" th:text="#{nav.dashboard}">Dashboard</a>
+                                class="text-gray-200 hover:text-gc-gold transition-colors font-medium"
+                                data-i18n="nav.dashboard" th:text="#{nav.dashboard}">Dashboard</a>
                         </span>
 
                         <!-- Profile icon with Dropdown -->
@@ -184,30 +207,47 @@
             <div id="mobile-menu" class="hidden md:hidden pb-4">
                 <!-- Mobile Language Switching -->
                 <div class="flex gap-2 py-3 border-b border-white/10 mb-2">
-                    <button onclick="switchLanguage('en')" class="px-3 py-1 bg-white/10 rounded text-xs text-white hover:bg-gc-gold hover:text-gc-dark">EN</button>
-                    <button onclick="switchLanguage('si')" class="px-3 py-1 bg-white/10 rounded text-xs text-white hover:bg-gc-gold hover:text-gc-dark">SI</button>
-                    <button onclick="switchLanguage('ta')" class="px-3 py-1 bg-white/10 rounded text-xs text-white hover:bg-gc-gold hover:text-gc-dark">TA</button>
+                    <button onclick="switchLanguage('en')"
+                        class="px-3 py-1 bg-white/10 rounded text-xs text-white hover:bg-gc-gold hover:text-gc-dark">EN</button>
+                    <button onclick="switchLanguage('si')"
+                        class="px-3 py-1 bg-white/10 rounded text-xs text-white hover:bg-gc-gold hover:text-gc-dark">SI</button>
+                    <button onclick="switchLanguage('ta')"
+                        class="px-3 py-1 bg-white/10 rounded text-xs text-white hover:bg-gc-gold hover:text-gc-dark">TA</button>
                 </div>
-                <a th:href="@{/}" th:classappend="${currentUri != null and (currentUri == '/' or currentUri == '/index') ? 'active' : ''}" class="block py-2 text-gray-200" th:text="#{nav.home}">Home</a>
-                <a th:href="@{/market}" th:classappend="${currentUri != null and currentUri.startsWith('/market') ? 'active' : ''}" class="block py-2 text-gray-200" th:text="#{nav.govimart}">Govi Mart</a>
-                <a th:href="@{/forum}" th:classappend="${currentUri != null and currentUri.startsWith('/forum') ? 'active' : ''}" class="block py-2 text-gray-200" th:text="#{nav.forum}">Discussion Forum</a>
-                <a th:href="@{/crop-advisory}" th:classappend="${currentUri != null and currentUri.startsWith('/crop-advisory') ? 'active' : ''}" class="block py-2 text-gray-200" data-i18n="nav.cropadvisory" th:text="#{nav.cropadvisory}">Smart Crop Advisory</a>
-                <a th:href="@{/disease-predictor}" th:classappend="${currentUri != null and currentUri.startsWith('/disease-predictor') ? 'active' : ''}" class="block py-2 text-gray-200" th:text="#{nav.disease_predictor}">AI Disease Predictor</a>
+                <a th:href="@{/}"
+                    th:classappend="${currentUri != null and (currentUri == '/' or currentUri == '/index') ? 'active' : ''}"
+                    class="block py-2 text-gray-200" th:text="#{nav.home}">Home</a>
+                <a th:href="@{/market}"
+                    th:classappend="${currentUri != null and currentUri.startsWith('/market') ? 'active' : ''}"
+                    class="block py-2 text-gray-200" th:text="#{nav.govimart}">Govi Mart</a>
+                <a th:href="@{/forum}"
+                    th:classappend="${currentUri != null and currentUri.startsWith('/forum') ? 'active' : ''}"
+                    class="block py-2 text-gray-200" th:text="#{nav.forum}">Discussion Forum</a>
+                <a th:href="@{/crop-advisory}"
+                    th:classappend="${currentUri != null and currentUri.startsWith('/crop-advisory') ? 'active' : ''}"
+                    class="block py-2 text-gray-200" data-i18n="nav.cropadvisory" th:text="#{nav.cropadvisory}">Smart
+                    Crop Advisory</a>
+                <a th:href="@{/disease-predictor}"
+                    th:classappend="${currentUri != null and currentUri.startsWith('/disease-predictor') ? 'active' : ''}"
+                    class="block py-2 text-gray-200" th:text="#{nav.disease_predictor}">AI Disease Predictor</a>
                 <div sec:authorize="!isAuthenticated()">
-                    <a th:href="@{/register}" class="block py-2 text-gray-200 hover:text-gc-gold" th:text="#{nav.register}">Register</a>
+                    <a th:href="@{/register}" class="block py-2 text-gray-200 hover:text-gc-gold"
+                        th:text="#{nav.register}">Register</a>
                     <a th:href="@{/login}" class="block py-2 text-gc-gold font-bold" th:text="#{nav.login}">Login</a>
                 </div>
                 <div sec:authorize="isAuthenticated()">
                     <span sec:authorize="hasRole('ADMIN')">
-                        <a th:href="@{/admin/dashboard}" class="block py-2 text-gray-200 hover:text-gc-gold" data-i18n="nav.admin" th:text="#{nav.admin}">Admin</a>
+                        <a th:href="@{/admin/dashboard}" class="block py-2 text-gray-200 hover:text-gc-gold"
+                            data-i18n="nav.admin" th:text="#{nav.admin}">Admin</a>
                     </span>
                     <span sec:authorize="hasRole('AGRI_OFFICER')">
-                        <a th:href="@{/officer/dashboard}"
-                            class="block py-2 text-gray-200 hover:text-gc-gold" data-i18n="nav.dashboard" th:text="#{nav.dashboard}">Dashboard</a>
+                        <a th:href="@{/officer/dashboard}" class="block py-2 text-gray-200 hover:text-gc-gold"
+                            data-i18n="nav.dashboard" th:text="#{nav.dashboard}">Dashboard</a>
                     </span>
                     <form th:action="@{/logout}" method="post">
                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                        <button type="submit" class="block py-2 text-red-400 font-semibold" th:text="#{nav.logout}">Logout</button>
+                        <button type="submit" class="block py-2 text-red-400 font-semibold"
+                            th:text="#{nav.logout}">Logout</button>
                     </form>
                 </div>
             </div>
@@ -224,26 +264,33 @@
         <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-3 gap-8">
             <div>
                 <h3 class="text-gc-gold font-black text-xl mb-3">GOVI CONNECT</h3>
-                <p class="text-sm leading-relaxed text-gray-400" data-i18n="footer.description" th:text="#{footer.description}">
+                <p class="text-sm leading-relaxed text-gray-400" data-i18n="footer.description"
+                    th:text="#{footer.description}">
                     Sri Lanka's first all-in-one agriculture platform — connecting farmers, experts, and communities.
                 </p>
             </div>
             <div>
-                <h4 class="text-white font-semibold mb-3" data-i18n="footer.links" th:text="#{footer.links}">Quick Links</h4>
+                <h4 class="text-white font-semibold mb-3" data-i18n="footer.links" th:text="#{footer.links}">Quick Links
+                </h4>
                 <ul class="space-y-2 text-sm">
-                    <li><a th:href="@{/}" class="hover:text-gc-gold transition-colors" data-i18n="nav.home" th:text="#{nav.home}">Home</a></li>
-                    <li><a th:href="@{/register}" class="hover:text-gc-gold transition-colors" data-i18n="nav.register" th:text="#{nav.register}">Register</a></li>
-                    <li><a th:href="@{/login}" class="hover:text-gc-gold transition-colors" data-i18n="nav.login" th:text="#{nav.login}">Login</a></li>
+                    <li><a th:href="@{/}" class="hover:text-gc-gold transition-colors" data-i18n="nav.home"
+                            th:text="#{nav.home}">Home</a></li>
+                    <li><a th:href="@{/register}" class="hover:text-gc-gold transition-colors" data-i18n="nav.register"
+                            th:text="#{nav.register}">Register</a></li>
+                    <li><a th:href="@{/login}" class="hover:text-gc-gold transition-colors" data-i18n="nav.login"
+                            th:text="#{nav.login}">Login</a></li>
                 </ul>
             </div>
             <div>
-                <h4 class="text-white font-semibold mb-3" data-i18n="footer.contact" th:text="#{footer.contact}">Contact</h4>
+                <h4 class="text-white font-semibold mb-3" data-i18n="footer.contact" th:text="#{footer.contact}">Contact
+                </h4>
                 <p class="text-sm text-gray-400">support@goviconnect.lk</p>
                 <p class="text-sm text-gray-400 mt-1" data-i18n="footer.country">Sri Lanka</p>
             </div>
         </div>
-        <div class="text-center text-xs text-gray-500 mt-10">
-            &copy; 2025 GOVI CONNECT. <span data-i18n="footer.rights" th:text="#{footer.rights}">All rights reserved.</span>
+        <div class="text-center text-xs text-white-700 mt-10">
+            &copy; 2026 GOVI CONNECT. <span data-i18n="footer.rights" th:text="#{footer.rights}">All rights
+                reserved.</span>
         </div>
     </footer>
 
