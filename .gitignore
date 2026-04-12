@@ -22,14 +22,18 @@ buildNumber.properties
 # Logs and Temporary files
 *.log
 *.txt
-*.html
-*.json
+# !*.html # Keep this rule commented out or remove if not needed for specific log files
+# !*.json # Keep this rule commented out or remove if not needed for specific config files
+
 !pom.xml
 
 # System
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# Local properties (sensitive API keys)
+local.properties
 
 # Java
 *.class
