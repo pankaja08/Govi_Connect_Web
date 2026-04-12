@@ -82,4 +82,77 @@ public class AuthController {
         }
         return "redirect:/login";
     }
+    @GetMapping("/forgot-password")
+    public String forgotPasswordPage() {
+        return "auth/forgot-password";
+    }
+
+    @PostMapping("/forgot-password")
+    public String processForgotPassword(@RequestParam("email") String email, RedirectAttributes redirectAttributes) {
+        try {
+            userService.generatePasswordResetToken(email);
+            redirectAttributes.addFlashAttribute("email", email); // pass email to verify form
+            return "redirect:/verify-otp";
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/forgot-password";
+        }
+    }
+
+    @GetMapping("/verify-otp")
+    public String verifyOtpPage(Model model, @ModelAttribute("email") String email) {
+        if (email == null || email.isEmpty()) {
+            return "redirect:/forgot-password";
+        }
+        model.addAttribute("email", email);
+        return "auth/verify-otp";
+    }
+
+    @PostMapping("/verify-otp")
+    public String processVerifyOtp(@RequestParam("email") String email, 
+                                   @RequestParam("otp") String otp, 
+                                   RedirectAttributes redirectAttributes) {
+        if (userService.verifyOtp(email, otp)) {
+            redirectAttributes.addFlashAttribute("email", email);
+            redirectAttributes.addFlashAttribute("otp", otp);
+            return "redirect:/reset-password";
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "Invalid or expired OTP.");
+            redirectAttributes.addFlashAttribute("email", email);
+            return "redirect:/verify-otp";
+        }
+    }
+
+    @GetMapping("/reset-password")
+    public String resetPasswordPage(Model model, @ModelAttribute("email") String email, @ModelAttribute("otp") String otp) {
+        if (email == null || email.isEmpty() || otp == null || otp.isEmpty()) {
+            return "redirect:/forgot-password";
+        }
+        model.addAttribute("email", email);
+        model.addAttribute("otp", otp);
+        return "auth/reset-password";
+    }
+
+    @PostMapping("/reset-password")
+    public String processResetPassword(@RequestParam("email") String email,
+                                       @RequestParam("otp") String otp,
+                                       @RequestParam("newPassword") String newPassword,
+                                       @RequestParam("confirmPassword") String confirmPassword,
+                                       RedirectAttributes redirectAttributes) {
+        if (!newPassword.equals(confirmPassword)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Passwords do not match.");
+            redirectAttributes.addFlashAttribute("email", email);
+            redirectAttributes.addFlashAttribute("otp", otp);
+            return "redirect:/reset-password";
+        }
+
+        try {
+            userService.updatePasswordWithOtp(email, otp, newPassword);
+            redirectAttributes.addFlashAttribute("successMessage", "Password has been reset successfully. You can now login.");
+            return "redirect:/login";
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/forgot-password";
+        }
+    }
 }

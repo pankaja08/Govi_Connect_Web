@@ -9,7 +9,7 @@
             <div id="slides" class="flex transition-transform duration-700 ease-in-out">
 
                 <!-- Slide 1 -->
-                <div class="slide min-w-full relative" style="height: 580px;">
+                <div class="slide min-w-full relative hero-slide" style="height: 580px;">
                     <div class="absolute inset-0 bg-gradient-to-r from-gc-dark via-gc-green to-transparent opacity-95">
                     </div>
                     <div class="absolute inset-0 flex flex-col justify-center items-center text-center px-6">
@@ -18,13 +18,13 @@
                                 class="inline-block bg-gc-gold text-gc-dark text-xs font-black px-4 py-1.5 rounded-full mb-5 uppercase tracking-widest"
                                 th:text="'🌾 ' + #{home.hero.tag}">🌾
                                 Sri Lanka Agriculture</span>
-                            <h1 class="text-white font-black text-4xl md:text-6xl leading-tight mb-5 drop-shadow-2xl"
+                            <h1 class="text-white font-black text-3xl sm:text-4xl md:text-6xl leading-tight mb-5 drop-shadow-2xl"
                                 data-i18n="hero.subtitle"
                                 th:utext="#{home.hero.subtitle.formatted ?: 'Sri Lanka First all in one<br /><span class=&quot;text-gc-gold&quot;>Agriculture Platform</span>'}">
                                 Sri Lanka First all in one<br />
                                 <span class="text-gc-gold">Agriculture Platform</span>
                             </h1>
-                            <p class="text-gray-200 text-lg md:text-xl mb-8 max-w-2xl" data-i18n="hero.description"
+                            <p class="text-gray-200 text-base sm:text-lg md:text-xl mb-8 max-w-2xl" data-i18n="hero.description"
                                 th:text="#{home.hero.desc}">
                                 Connecting farmers, agricultural officers, and communities across every province of Sri
                                 Lanka.
@@ -44,26 +44,26 @@
                 </div>
 
                 <!-- Slide 2 -->
-                <div class="slide min-w-full relative"
+                <div class="slide min-w-full relative hero-slide"
                     style="height: 580px; background: linear-gradient(135deg, #166534, #22c55e, #3b82f6);">
                     <div class="absolute inset-0 flex flex-col justify-center items-center text-center px-6">
-                        <div class="text-8xl mb-6 animate-bounce">🌾</div>
-                        <h2 class="text-white font-black text-4xl md:text-5xl mb-4" th:text="#{home.hero.expert.title}">
+                        <div class="text-6xl sm:text-8xl mb-4 sm:mb-6 animate-bounce">🌾</div>
+                        <h2 class="text-white font-black text-3xl sm:text-4xl md:text-5xl mb-4" th:text="#{home.hero.expert.title}">
                             Expert Agricultural Knowledge</h2>
-                        <p class="text-gray-100 text-xl max-w-xl" th:text="#{home.hero.expert.desc}">Access insights
+                        <p class="text-gray-100 text-lg sm:text-xl max-w-xl" th:text="#{home.hero.expert.desc}">Access insights
                             from certified Sri Lankan agricultural
                             officers. Stay informed, stay productive.</p>
                     </div>
                 </div>
 
                 <!-- Slide 3 -->
-                <div class="slide min-w-full relative"
+                <div class="slide min-w-full relative hero-slide"
                     style="height: 580px; background: linear-gradient(135deg, #064e3b, #166534, #bbf7d030);">
                     <div class="absolute inset-0 flex flex-col justify-center items-center text-center px-6">
-                        <div class="text-8xl mb-6">🤝</div>
-                        <h2 class="text-white font-black text-4xl md:text-5xl mb-4" th:text="#{home.hero.grow.title}">
+                        <div class="text-6xl sm:text-8xl mb-4 sm:mb-6">🤝</div>
+                        <h2 class="text-white font-black text-3xl sm:text-4xl md:text-5xl mb-4" th:text="#{home.hero.grow.title}">
                             Grow Together</h2>
-                        <p class="text-gray-100 text-xl max-w-xl" th:text="#{home.hero.grow.desc}">Unite farmers and
+                        <p class="text-gray-100 text-lg sm:text-xl max-w-xl" th:text="#{home.hero.grow.desc}">Unite farmers and
                             experts on one platform designed for Sri
                             Lanka's agricultural future.</p>
                         <a th:href="@{/register}"
@@ -194,7 +194,7 @@
             <div class="flex flex-col lg:flex-row gap-8 items-start">
 
                 <!-- Sidebar Filters -->
-                <aside class="w-full lg:w-1/5 bg-white rounded-xl shadow-lg border border-gray-100 p-4 sticky top-24">
+                <aside class="w-full lg:w-1/5 bg-white rounded-xl shadow-lg border border-gray-100 p-4 lg:sticky lg:top-24">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="font-black text-base text-gray-800 flex items-center gap-1.5">
                             <svg class="w-4 h-4 text-gc-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -204,11 +204,16 @@
                             </svg>
                             <span th:text="#{home.blogs.filter.title}">Filter Blogs</span>
                         </h3>
-                        <a th:href="@{/#blogs}"
-                            class="text-xs text-gray-400 font-bold hover:text-gc-dark transition-colors uppercase"
-                            th:text="#{home.blogs.filter.reset}">Reset</a>
+                        <div class="flex items-center gap-2">
+                            <a th:href="@{/#blogs}"
+                                class="text-xs text-gray-400 font-bold hover:text-gc-dark transition-colors uppercase"
+                                th:text="#{home.blogs.filter.reset}">Reset</a>
+                            <!-- Mobile filter toggle -->
+                            <button id="filter-toggle-btn" onclick="toggleFilters()"
+                                class="lg:hidden text-xs bg-gc-green text-white px-2 py-1 rounded-lg font-bold">▾ Filters</button>
+                        </div>
                     </div>
-
+                    <div id="filter-content" class="hidden lg:block">
                     <form id="filterForm">
                         <!-- Location -->
                         <div class="mb-3">
@@ -217,31 +222,20 @@
                             <select name="location" onchange="submitFilters()"
                                 class="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-700 focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green bg-gray-50 hover:bg-white transition-all outline-none">
                                 <option value="" th:text="'All ' + #{home.blogs.filter.location}">All Locations</option>
-                                <option value="Western" th:selected="${locationFilter == 'Western'}">Western Province
-                                </option>
-                                <option value="Central" th:selected="${locationFilter == 'Central'}">Central Province
-                                </option>
-                                <option value="Southern" th:selected="${locationFilter == 'Southern'}">Southern Province
-                                </option>
-                                <option value="Northern" th:selected="${locationFilter == 'Northern'}">Northern Province
-                                </option>
-                                <option value="Eastern" th:selected="${locationFilter == 'Eastern'}">Eastern Province
-                                </option>
-                                <option value="North Western" th:selected="${locationFilter == 'North Western'}">North
-                                    Western Prov.</option>
-                                <option value="North Central" th:selected="${locationFilter == 'North Central'}">North
-                                    Central Prov.</option>
+                                <option value="Western" th:selected="${locationFilter == 'Western'}">Western Province</option>
+                                <option value="Central" th:selected="${locationFilter == 'Central'}">Central Province</option>
+                                <option value="Southern" th:selected="${locationFilter == 'Southern'}">Southern Province</option>
+                                <option value="Northern" th:selected="${locationFilter == 'Northern'}">Northern Province</option>
+                                <option value="Eastern" th:selected="${locationFilter == 'Eastern'}">Eastern Province</option>
+                                <option value="North Western" th:selected="${locationFilter == 'North Western'}">North Western Prov.</option>
+                                <option value="North Central" th:selected="${locationFilter == 'North Central'}">North Central Prov.</option>
                                 <option value="Uva" th:selected="${locationFilter == 'Uva'}">Uva Province</option>
-                                <option value="Sabaragamuwa" th:selected="${locationFilter == 'Sabaragamuwa'}">
-                                    Sabaragamuwa
-                                    Prov.</option>
+                                <option value="Sabaragamuwa" th:selected="${locationFilter == 'Sabaragamuwa'}">Sabaragamuwa Prov.</option>
                             </select>
                         </div>
-
                         <!-- Season -->
                         <div class="mb-3">
-                            <label class="block text-xs font-bold text-gray-700 mb-1"
-                                th:text="#{home.blogs.filter.season}">Season</label>
+                            <label class="block text-xs font-bold text-gray-700 mb-1" th:text="#{home.blogs.filter.season}">Season</label>
                             <select name="season" onchange="submitFilters()"
                                 class="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-700 focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green bg-gray-50 hover:bg-white transition-all outline-none">
                                 <option value="" th:text="'All ' + #{home.blogs.filter.season}">All Seasons</option>
@@ -249,50 +243,38 @@
                                 <option value="Maha" th:selected="${seasonFilter == 'Maha'}">Maha Season</option>
                             </select>
                         </div>
-
                         <!-- Crop Type -->
                         <div class="mb-3">
-                            <label class="block text-xs font-bold text-gray-700 mb-1"
-                                th:text="#{home.blogs.filter.crop}">Crop Type</label>
+                            <label class="block text-xs font-bold text-gray-700 mb-1" th:text="#{home.blogs.filter.crop}">Crop Type</label>
                             <select name="crop" onchange="submitFilters()"
                                 class="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-700 focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green bg-gray-50 hover:bg-white transition-all outline-none">
                                 <option value="" th:text="'All ' + #{home.blogs.filter.crop}">All Crops</option>
                                 <option value="Paddy" th:selected="${cropFilter == 'Paddy'}">Paddy</option>
-                                <option value="Vegetables" th:selected="${cropFilter == 'Vegetables'}">Vegetables
-                                </option>
+                                <option value="Vegetables" th:selected="${cropFilter == 'Vegetables'}">Vegetables</option>
                                 <option value="Fruits" th:selected="${cropFilter == 'Fruits'}">Fruits</option>
                                 <option value="Grains" th:selected="${cropFilter == 'Grains'}">Grains</option>
-                                <option value="Export Crops" th:selected="${cropFilter == 'Export Crops'}">Export Crops
-                                </option>
+                                <option value="Export Crops" th:selected="${cropFilter == 'Export Crops'}">Export Crops</option>
                                 <option value="Spices" th:selected="${cropFilter == 'Spices'}">Spices</option>
                                 <option value="Other" th:selected="${cropFilter == 'Other'}">Other</option>
                             </select>
                         </div>
-
                         <!-- Farming Method -->
                         <div class="mb-1">
-                            <label class="block text-xs font-bold text-gray-700 mb-1"
-                                th:text="#{home.blogs.filter.method}">Farming Method</label>
+                            <label class="block text-xs font-bold text-gray-700 mb-1" th:text="#{home.blogs.filter.method}">Farming Method</label>
                             <select name="method" onchange="submitFilters()"
                                 class="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-700 focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green bg-gray-50 hover:bg-white transition-all outline-none">
                                 <option value="" th:text="'All ' + #{home.blogs.filter.method}">All Methods</option>
-                                <option value="Traditional" th:selected="${methodFilter == 'Traditional'}">Traditional
-                                </option>
+                                <option value="Traditional" th:selected="${methodFilter == 'Traditional'}">Traditional</option>
                                 <option value="Organic" th:selected="${methodFilter == 'Organic'}">Organic</option>
-                                <option value="Greenhouse" th:selected="${methodFilter == 'Greenhouse'}">Greenhouse
-                                </option>
-                                <option value="Hydroponics" th:selected="${methodFilter == 'Hydroponics'}">Hydroponics
-                                </option>
-                                <option value="Smart Farming" th:selected="${methodFilter == 'Smart Farming'}">Smart
-                                    Farming
-                                </option>
-                                <option value="Mixed Farming" th:selected="${methodFilter == 'Mixed Farming'}">Mixed
-                                    Farming
-                                </option>
+                                <option value="Greenhouse" th:selected="${methodFilter == 'Greenhouse'}">Greenhouse</option>
+                                <option value="Hydroponics" th:selected="${methodFilter == 'Hydroponics'}">Hydroponics</option>
+                                <option value="Smart Farming" th:selected="${methodFilter == 'Smart Farming'}">Smart Farming</option>
+                                <option value="Mixed Farming" th:selected="${methodFilter == 'Mixed Farming'}">Mixed Farming</option>
                                 <option value="Other" th:selected="${methodFilter == 'Other'}">Other</option>
                             </select>
                         </div>
                     </form>
+                    </div><!-- end filter-content -->
                 </aside>
 
                 <!-- Blog Grid -->
@@ -595,6 +577,18 @@
                 if (form.method.value) url.searchParams.set('method', form.method.value);
                 url.hash = 'blogs';
                 window.location.href = url.toString();
+            }
+
+            function toggleFilters() {
+                const content = document.getElementById('filter-content');
+                const btn = document.getElementById('filter-toggle-btn');
+                if (content.classList.contains('hidden')) {
+                    content.classList.remove('hidden');
+                    btn.textContent = '▴ Filters';
+                } else {
+                    content.classList.add('hidden');
+                    btn.textContent = '▾ Filters';
+                }
             }
 
             window.addEventListener('DOMContentLoaded', () => {
