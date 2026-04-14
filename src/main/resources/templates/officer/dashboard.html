@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Expert Dashboard – GOVI CONNECT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'gc-dark': '#0f5132', // Deeper green for sidebar
+                        'gc-green': '#198754', // Base green
+                        'gc-light-green': '#d1e7dd',
+                        'gc-gold': '#ffc107',
+                        'gc-tan': '#f8f9fa',
+                        'gc-blue': '#0d6efd'
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link th:href="@{/css/main.css}" rel="stylesheet" />
+    <!-- Quill.js -->
+    <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet" />
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        /* Sidebar active link styling */
+        .sidebar-link.active {
+            background-color: #198754;
+            border-left: 4px solid #ffc107;
+            color: white;
+            font-weight: 700;
+        }
+
+        .sidebar-link {
+            border-left: 4px solid transparent;
+        }
+    </style>
+</head>
+
+<body class="font-inter bg-gray-50 flex h-screen overflow-hidden dashboard-layout">
+
+    <!-- ===== SIDEBAR OVERLAY (mobile) ===== -->
+    <div id="sidebar-overlay" class="sidebar-overlay" onclick="closeSidebar()"></div>
+
+    <!-- ===== SIDEBAR (Fixed Width) ===== -->
+    <aside id="dashboard-sidebar" class="dashboard-sidebar w-72 bg-gc-dark flex flex-col text-white flex-shrink-0 h-full shadow-2xl z-40 relative">
+        <!-- Logo Area -->
+        <div class="h-20 flex items-center px-6 border-b border-white/10">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gc-gold rounded-full flex items-center justify-center shadow-lg">
+                    <span class="font-black text-gc-dark text-lg">G</span>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-white font-black text-xl leading-none tracking-tight">GOVI<span
+                            class="text-gc-gold ml-1">CONNECT</span></span>
+                    <span class="text-green-200 text-xs font-semibold tracking-wider uppercase mt-0.5">Expert
+                        Portal</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Links -->
+        <nav class="flex-1 py-6 px-3 space-y-2 overflow-y-auto">
+            <button onclick="switchTab('write-blogs')" id="tab-write-blogs"
+                class="sidebar-link active w-full text-left px-5 py-3.5 text-gray-200 hover:bg-white/10 hover:text-white rounded-lg transition-all flex items-center gap-3 group">
+                <span class="text-xl group-hover:scale-110 transition-transform">✍️</span>
+                <span class="text-base tracking-wide">Write Blogs</span>
+            </button>
+
+            <button onclick="switchTab('my-blogs')" id="tab-my-blogs"
+                class="sidebar-link w-full text-left px-5 py-3.5 text-gray-300 hover:bg-white/10 hover:text-white rounded-lg transition-all flex items-center justify-between group">
+                <div class="flex items-center gap-3">
+                    <span class="text-xl group-hover:scale-110 transition-transform">📚</span>
+                    <span class="text-base tracking-wide font-medium">My Blogs</span>
+                </div>
+                <span class="bg-gc-gold/20 text-gc-gold text-xs font-bold py-1 px-2.5 rounded-full"
+                    th:text="${myBlogs?.size() ?: 0}">0</span>
+            </button>
+
+            <button onclick="switchTab('forum')" id="tab-forum"
+                class="sidebar-link w-full text-left px-5 py-3.5 text-gray-300 hover:bg-white/10 hover:text-white rounded-lg transition-all flex items-center gap-3 group">
+                <span class="text-xl group-hover:scale-110 transition-transform">💬</span>
+                <span class="text-base tracking-wide font-medium">Discussion Forum</span>
+            </button>
+
+            <button onclick="switchTab('crop')" id="tab-crop"
+                class="sidebar-link w-full text-left px-5 py-3.5 text-gray-300 hover:bg-white/10 hover:text-white rounded-lg transition-all flex items-center gap-3 group">
+                <span class="text-xl group-hover:scale-110 transition-transform">🌱</span>
+                <span class="text-base tracking-wide font-medium">Crop Profile</span>
+            </button>
+
+            <a th:href="@{/}"
+                class="sidebar-link w-full text-left px-5 py-3.5 text-gray-300 hover:bg-white/10 hover:text-white rounded-lg transition-all flex items-center gap-3 group mt-4 border-t border-white/10 pt-6">
+                <span class="text-xl group-hover:scale-110 transition-transform">🌐</span>
+                <span class="text-base tracking-wide font-medium">View Website</span>
+            </a>
+        </nav>
+
+        <!-- User Profile (Bottom) -->
+        <div class="p-4 border-t border-white/10 bg-gc-dark mt-auto relative" id="profile-container">
+            <button type="button" id="profile-btn"
+                class="w-full flex items-center gap-3 hover:bg-white/5 p-2 rounded-xl transition-colors text-left focus:outline-none relative">
+                <div
+                    class="w-10 h-10 rounded-full bg-gc-gold flex items-center justify-center flex-shrink-0 border-2 border-white shadow-sm overflow-hidden">
+                    <span class="uppercase font-black text-gc-dark" sec:authentication="name"
+                        th:text="${#authentication.name.substring(0,2)}">US</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-bold text-white truncate" th:text="${officer.fullName}">Expert Name</p>
+                    <p class="text-xs text-green-300 truncate" th:text="${officer.email}">expert@example.com</p>
+                </div>
+                <svg class="w-5 h-5 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                </svg>
+            </button>
+
+            <!-- Popup Profile Menu -->
+            <div id="profile-menu"
+                class="hidden absolute bottom-full left-4 right-4 mb-2 bg-white rounded-xl shadow-2xl py-2 transform opacity-0 translate-y-2 transition-all z-50 overflow-hidden">
+                <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/50">
+                    <p class="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Account Status</p>
+                    <span
+                        class="inline-block bg-green-100 text-green-700 text-xs font-black px-2.5 py-1 rounded-full border border-green-200 shadow-sm">APPROVED</span>
+                </div>
+                <div class="px-4 py-3 border-b border-gray-100">
+                    <p class="text-xs text-gray-500 font-medium">District</p>
+                    <p class="text-sm font-bold text-gray-800" th:text="${officer.district ?: 'All Island'}">Colombo</p>
+                </div>
+                <a th:href="@{/user/profile}"
+                    class="block px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-green-50 hover:text-gc-green transition-colors flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                    Full Profile
+                </a>
+                <form th:action="@{/logout}" method="post" class="w-full">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <button type="submit"
+                        class="w-full text-left px-4 py-3 text-sm font-bold text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                            </path>
+                        </svg>
+                        Sign Out
+                    </button>
+                </form>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ===== MAIN CONTENT AREA ===== -->
+    <main class="flex-1 flex flex-col h-full bg-gray-50 overflow-hidden relative">
+
+        <!-- Mobile Header (Visible only on small screens) -->
+        <header class="lg:hidden h-16 bg-white shadow-sm flex items-center px-4 justify-between z-30 flex-shrink-0">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-gc-gold rounded-full flex items-center justify-center"><span
+                        class="font-black text-gc-dark text-xs">G</span></div>
+                <span class="font-black text-gray-800 text-lg">Expert Portal</span>
+            </div>
+            <!-- Hamburger Toggle -->
+            <button id="sidebar-toggle" onclick="openSidebar()"
+                class="p-2 rounded-lg bg-gc-dark text-white hover:bg-gc-green transition-colors"
+                aria-label="Open menu">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </button>
+        </header>
+
+        <!-- Scrollable Content -->
+        <div class="flex-1 overflow-y-auto w-full p-4 lg:p-10 scroll-smooth">
+
+            <div class="max-w-5xl mx-auto pb-20">
+
+                <!-- Welcome Banner -->
+                <div
+                    class="bg-gradient-to-br from-gc-dark to-gc-green rounded-2xl p-8 mb-8 shadow-lg text-white relative overflow-hidden flex items-center justify-between">
+                    <div class="relative z-10 w-full md:w-2/3">
+                        <p class="text-gc-gold font-bold text-sm uppercase tracking-wider mb-2 drop-shadow-sm">Welcome
+                            back</p>
+                        <h1 class="text-3xl md:text-4xl font-black mb-3 drop-shadow-md"
+                            th:text="'Hello, ' + ${officer.fullName} + '!'">Hello, Expert!</h1>
+                        <p class="text-green-50 text-base md:text-lg opacity-90 leading-relaxed max-w-xl">Share your
+                            agricultural expertise with Sri Lankan farmers through insightful blog posts and direct
+                            forum discussions.</p>
+                    </div>
+                    <div
+                        class="hidden md:block w-32 h-32 opacity-20 text-9xl absolute right-8 -bottom-4 transform rotate-[-10deg] select-none scale-125">
+                        🌾
+                    </div>
+                </div>
+
+                <!-- Flash Messages -->
+                <div th:if="${successMessage}"
+                    class="bg-green-50/80 backdrop-blur-sm border border-green-200 text-green-700 rounded-xl px-5 py-4 mb-8 flex items-center justify-between shadow-sm animate-fade-in-down">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xl">✅</span><span class="font-medium" th:text="${successMessage}"></span>
+                    </div>
+                    <button onclick="this.parentElement.style.display='none'"
+                        class="text-green-600 hover:text-green-800 focus:outline-none"><svg class="w-5 h-5" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
+                        </svg></button>
+                </div>
+                <div th:if="${errorMessage}"
+                    class="bg-red-50/80 backdrop-blur-sm border border-red-200 text-red-700 rounded-xl px-5 py-4 mb-8 flex items-center justify-between shadow-sm animate-fade-in-down">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xl">❌</span><span class="font-medium" th:text="${errorMessage}"></span>
+                    </div>
+                    <button onclick="this.parentElement.style.display='none'"
+                        class="text-red-600 hover:text-red-800 focus:outline-none"><svg class="w-5 h-5" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
+                        </svg></button>
+                </div>
+
+                <!-- Crop Flash Messages -->
+                <div th:if="${cropSuccess}"
+                    class="bg-green-50/80 backdrop-blur-sm border border-green-200 text-green-700 rounded-xl px-5 py-4 mb-8 flex items-center justify-between shadow-sm">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xl">🌱</span><span class="font-medium" th:text="${cropSuccess}"></span>
+                    </div>
+                    <button onclick="this.parentElement.style.display='none'"
+                        class="text-green-600 hover:text-green-800">✕</button>
+                </div>
+                <div th:if="${cropError}"
+                    class="bg-red-50/80 backdrop-blur-sm border border-red-200 text-red-700 rounded-xl px-5 py-4 mb-8 flex items-center justify-between shadow-sm">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xl">❌</span><span class="font-medium" th:text="${cropError}"></span>
+                    </div>
+                    <button onclick="this.parentElement.style.display='none'"
+                        class="text-red-600 hover:text-red-800">✕</button>
+                </div>
+
+                <!-- ==== SECTION: WRITE BLOGS ==== -->
+                <div id="section-write-blogs" class="block animate-fade-in">
+                    <div class="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
+                        <div class="bg-gradient-to-r from-gray-50 to-white px-8 py-6 border-b border-gray-100">
+                            <h2 class="text-gray-800 font-black text-2xl flex items-center gap-3">
+                                <span class="text-3xl">✍️</span> Create New Blog
+                            </h2>
+                            <p class="text-gray-500 text-sm mt-2 ml-10">Craft an insightful article to share with the
+                                GOVI CONNECT farming community</p>
+                        </div>
+                        <div class="p-8">
+                            <form th:action="@{/officer/blog}" method="post" enctype="multipart/form-data"
+                                id="blogForm">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+                                <!-- Error Summary -->
+                                <div id="errorSummary"
+                                    class="hidden mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
+                                    <h3 class="text-red-700 font-bold mb-2 flex items-center gap-2">
+                                        <span>⚠️</span> Please fix the following errors before publishing:
+                                    </h3>
+                                    <ul id="errorList" class="list-disc list-inside text-red-600 text-sm space-y-1">
+                                    </ul>
+                                </div>
+
+                                <!-- Blog Heading -->
+                                <div class="mb-7">
+                                    <label for="heading"
+                                        class="block text-sm font-bold text-gray-700 flex items-center gap-1.5 mb-2">
+                                        Article Title <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" id="heading" name="heading" required
+                                        placeholder="E.g., Effective Paddy Cultivation Techniques for the upcoming Maha Season"
+                                        class="w-full border border-gray-300 rounded-xl px-4 py-3.5 text-gray-800 focus:outline-none focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green transition-all shadow-sm font-medium text-lg placeholder-gray-400" />
+                                    <span id="headingError"
+                                        class="hidden mt-2 text-sm text-red-600 font-semibold"></span>
+                                </div>
+
+                                <!-- Blog Tags Grid -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-7">
+                                    <!-- Location Tag -->
+                                    <div>
+                                        <label for="locationTag"
+                                            class="block text-sm font-bold text-gray-700 mb-2">Location</label>
+                                        <select id="locationTag" name="locationTag"
+                                            class="w-full border border-gray-300 rounded-xl px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green transition-all shadow-sm bg-white">
+                                            <option value="">All Island</option>
+                                            <option value="Western">Western Province</option>
+                                            <option value="Central">Central Province</option>
+                                            <option value="Southern">Southern Province</option>
+                                            <option value="Northern">Northern Province</option>
+                                            <option value="Eastern">Eastern Province</option>
+                                            <option value="North Western">North Western Province</option>
+                                            <option value="North Central">North Central Province</option>
+                                            <option value="Uva">Uva Province</option>
+                                            <option value="Sabaragamuwa">Sabaragamuwa Province</option>
+                                        </select>
+                                        <span id="locationError"
+                                            class="hidden mt-1 text-xs text-red-600 font-semibold"></span>
+                                    </div>
+
+                                    <!-- Season Tag -->
+                                    <div>
+                                        <label for="seasonTag"
+                                            class="block text-sm font-bold text-gray-700 mb-2">Season</label>
+                                        <select id="seasonTag" name="seasonTag"
+                                            class="w-full border border-gray-300 rounded-xl px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green transition-all shadow-sm bg-white">
+                                            <option value="">Any Season</option>
+                                            <option value="Yala">Yala Season</option>
+                                            <option value="Maha">Maha Season</option>
+                                        </select>
+                                        <span id="seasonError"
+                                            class="hidden mt-1 text-xs text-red-600 font-semibold"></span>
+                                    </div>
+
+                                    <!-- Crop Type Tag -->
+                                    <div>
+                                        <label for="cropTag" class="block text-sm font-bold text-gray-700 mb-2">Crop
+                                            Type</label>
+                                        <select id="cropTag" name="cropTag"
+                                            class="w-full border border-gray-300 rounded-xl px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green transition-all shadow-sm bg-white">
+                                            <option value="">Any Crop</option>
+                                            <option value="Paddy">Paddy</option>
+                                            <option value="Vegetables">Vegetables</option>
+                                            <option value="Fruits">Fruits</option>
+                                            <option value="Grains">Grains (Corn, Millet, etc.)</option>
+                                            <option value="Export Crops">Export Crops (Tea, Rubber, Coconut)</option>
+                                            <option value="Spices">Spices</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                        <span id="cropError"
+                                            class="hidden mt-1 text-xs text-red-600 font-semibold"></span>
+                                    </div>
+
+                                    <!-- Farming Method Tag -->
+                                    <div>
+                                        <label for="farmingMethodTag"
+                                            class="block text-sm font-bold text-gray-700 mb-2">Farming Method</label>
+                                        <select id="farmingMethodTag" name="farmingMethodTag"
+                                            class="w-full border border-gray-300 rounded-xl px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green transition-all shadow-sm bg-white">
+                                            <option value="">Any Method</option>
+                                            <option value="Traditional">Traditional</option>
+                                            <option value="Organic">Organic</option>
+                                            <option value="Greenhouse">Greenhouse (Poly-tunnel)</option>
+                                            <option value="Hydroponics">Hydroponics / Aquaponics</option>
+                                            <option value="Smart Farming">Smart Farming (IoT)</option>
+                                            <option value="Mixed Farming">Mixed Farming</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                        <span id="methodError"
+                                            class="hidden mt-1 text-xs text-red-600 font-semibold"></span>
+                                    </div>
+                                </div>
+
+                                <!-- Blog Image -->
+                                <div class="mb-7">
+                                    <label for="image" class="block text-sm font-bold text-gray-700 mb-2">Cover Image
+                                        Upload</label>
+                                    <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-gc-green hover:bg-green-50/30 transition-all cursor-pointer group bg-gray-50/50"
+                                        id="drop-zone">
+                                        <input type="file" id="image" name="image" accept="image/*" class="hidden"
+                                            onchange="previewImage(this)" />
+                                        <label for="image" class="cursor-pointer block w-full h-full">
+                                            <div id="upload-placeholder">
+                                                <div
+                                                    class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm group-hover:shadow group-hover:scale-110 transition-all">
+                                                    <span class="text-3xl text-gc-green">🖼️</span>
+                                                </div>
+                                                <p class="text-gray-700 text-base font-bold">Click to upload a cover
+                                                    image</p>
+                                                <p class="text-gray-500 text-sm mt-1.5">Highest quality display
+                                                    recommended: <span class="font-semibold text-gray-600">800x400 (PNG,
+                                                        JPG, WEBP)</span></p>
+                                            </div>
+                                            <div id="image-preview-container" class="hidden relative max-w-lg mx-auto">
+                                                <img id="image-preview"
+                                                    class="w-full max-h-64 rounded-xl object-cover shadow-md" src=""
+                                                    alt="Preview" />
+                                                <div
+                                                    class="absolute inset-0 bg-black/40 rounded-xl opacity-0 hover:opacity-100 flex items-center justify-center transition-opacity">
+                                                    <span
+                                                        class="text-white font-bold px-4 py-2 bg-black/50 rounded-lg backdrop-blur-sm">Click
+                                                        to change image</span>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                    <div id="image-error"
+                                        class="hidden mt-3 p-3 bg-red-50 rounded-lg text-sm text-red-600 font-semibold flex items-start gap-2 border border-red-100">
+                                        <span class="text-lg leading-none">⚠️</span>
+                                        <span id="image-error-msg" class="leading-tight"></span>
+                                    </div>
+                                </div>
+
+                                <!-- Quill.js Rich Text Editor -->
+                                <div class="mb-8 font-sans">
+                                    <label class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-1.5">
+                                        Blog Content Base <span class="text-red-500">*</span>
+                                    </label>
+                                    <div id="quill-editor"
+                                        class="rounded-xl overflow-hidden border border-gray-300 shadow-sm bg-white"
+                                        style="min-height: 400px; font-size: 16px; font-family: 'Inter', sans-serif;">
+                                    </div>
+                                    <span id="contentError"
+                                        class="hidden mt-2 text-sm text-red-600 font-semibold"></span>
+                                    <input type="hidden" name="textContent" id="textContent" />
+                                </div>
+
+                                <!-- Submit Button -->
+                                <div class="flex flex-col sm:flex-row justify-end pt-4 border-t border-gray-100 gap-3">
+                                    <button type="submit" id="publishBtn" onclick="submitBlog(event)"
+                                        class="w-full sm:w-auto bg-gc-dark hover:bg-gc-green text-white font-black py-4 px-10 rounded-xl text-lg flex items-center justify-center gap-3 transition-all shadow-lg hover:shadow-gc-green/30 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed">
+                                        <span id="btnIcon">🚀</span>
+                                        <span id="btnText">Publish Blog Post</span>
+                                        <div id="btnSpinner"
+                                            class="hidden w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin">
+                                        </div>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==== SECTION: MY BLOGS ==== -->
+                <div id="section-my-blogs" class="hidden animate-fade-in space-y-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <div>
+                            <h2 class="text-3xl font-black text-gray-800 tracking-tight">Manage Your Content</h2>
+                            <p class="text-gray-500 mt-1">View, edit, or delete articles you have published to the
+                                platform.</p>
+                        </div>
+                        <div
+                            class="hidden sm:flex bg-white px-4 py-2 rounded-xl border border-gray-200 shadow-sm items-center gap-3">
+                            <span class="text-3xl font-black text-gc-dark" th:text="${myBlogs?.size() ?: 0}">0</span>
+                            <div class="flex flex-col">
+                                <span
+                                    class="text-xs font-bold text-gray-400 uppercase tracking-widest line-clamp-1">Total
+                                    Posts</span>
+                                <span class="text-sm font-bold text-gray-700">Published</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Blog list -->
+                    <div th:if="${myBlogs != null and !myBlogs.empty}" class="grid gap-6">
+                        <div th:each="blog : ${myBlogs}"
+                            class="bg-white rounded-2xl shadow-sm border border-gray-200 hover:shadow-md hover:border-gc-green/40 transition-all overflow-hidden flex flex-col md:flex-row group">
+                            <!-- Image column -->
+                            <div class="md:w-64 h-48 md:h-auto bg-gray-100 relative overflow-hidden flex-shrink-0">
+                                <img th:if="${blog.imageUrl != null}" th:src="${blog.imageUrl}"
+                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                    th:alt="${blog.heading}" />
+                                <div th:unless="${blog.imageUrl != null}"
+                                    class="absolute inset-0 bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center">
+                                    <span
+                                        class="text-5xl opacity-40 group-hover:scale-110 transition-transform duration-500">📝</span>
+                                </div>
+                                <div class="absolute top-3 left-3">
+                                    <span
+                                        class="bg-white/90 backdrop-blur-sm text-gc-dark text-xs font-black px-2.5 py-1 rounded shadow-sm border border-white/50">BLOG</span>
+                                </div>
+                            </div>
+
+                            <!-- Content column -->
+                            <div class="p-6 flex-1 flex flex-col">
+                                <div class="flex-1">
+                                    <h3 class="text-xl font-bold text-gray-900 leading-tight mb-2 group-hover:text-gc-dark transition-colors"
+                                        th:text="${blog.heading}">Blog Title</h3>
+                                    <!-- Extract text content conceptually, limiting characters -->
+                                    <div class="text-gray-500 text-sm line-clamp-2 mb-4 break-words prose-sm"
+                                        th:utext="${#strings.abbreviate(blog.textContent.replaceAll('<[^>]*>', ''), 150)}">
+                                        ...</div>
+                                </div>
+
+                                <div
+                                    class="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-gray-100 mt-auto">
+                                    <div class="flex items-center gap-2 text-sm text-gray-500 font-medium font-mono">
+                                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                            </path>
+                                        </svg>
+                                        <span
+                                            th:text="${#temporals.format(blog.createdDate, 'dd MMM yyyy')}">Date</span>
+                                    </div>
+
+                                    <div class="flex items-center gap-3">
+                                        <a th:href="@{/blog/{id}(id=${blog.id})}" target="_blank"
+                                            class="flex items-center gap-1.5 px-4 py-2 bg-green-50 text-gc-dark hover:bg-gc-green hover:text-white rounded-lg text-sm font-bold transition-colors">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                                </path>
+                                            </svg>
+                                            View Post
+                                        </a>
+                                        <a th:href="@{/officer/blog/{id}/edit(id=${blog.id})}"
+                                            class="flex items-center gap-1.5 px-4 py-2 bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white rounded-lg text-sm font-bold transition-colors">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
+                                                </path>
+                                            </svg>
+                                            Edit
+                                        </a>
+                                        <form th:action="@{/officer/blog/{id}/delete(id=${blog.id})}" method="post"
+                                            class="inline"
+                                            onsubmit="return confirm('Are you sure you want to permanently delete this blog?');">
+                                            <input type="hidden" th:name="${_csrf.parameterName}"
+                                                th:value="${_csrf.token}" />
+                                            <button type="submit"
+                                                class="flex items-center gap-1.5 px-4 py-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-lg text-sm font-bold transition-colors">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                                    </path>
+                                                </svg>
+                                                Delete
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Empty state -->
+                    <div th:if="${myBlogs == null or myBlogs.empty}"
+                        class="bg-white rounded-2xl shadow-sm border border-gray-200 py-20 px-6 text-center">
+                        <div class="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <span class="text-5xl opacity-50 grayscale">🗂️</span>
+                        </div>
+                        <h3 class="text-2xl font-black text-gray-800 mb-2">No blogs found</h3>
+                        <p class="text-gray-500 text-base max-w-md mx-auto mb-8 leading-relaxed">Your published articles
+                            will appear here. Start sharing your knowledge by creating your first post.</p>
+                        <button onclick="switchTab('write-blogs')"
+                            class="inline-flex items-center gap-2 bg-gc-dark hover:bg-gc-green text-white font-bold px-8 py-3.5 rounded-xl transition-all shadow-md hover:shadow-lg">
+                            <span class="text-xl">✍️</span> Go to Write Blogs
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ==== SECTION: DISCUSSION FORUM ==== -->
+                <div id="section-forum" class="hidden animate-fade-in space-y-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h2 class="text-3xl font-black text-gray-800 tracking-tight">Expert Forum Dashboard</h2>
+                            <p class="text-gray-500 mt-1">Provide official answers to farmer inquiries.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white shadow-sm border border-gray-200 rounded-2xl overflow-hidden">
+                        <div class="p-6">
+                            <!-- Start List -->
+                            <div class="space-y-8">
+                                <div th:each="question : ${questions}"
+                                    class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                                    <!-- Q -->
+                                    <div
+                                        class="p-6 bg-gray-50 border-b border-gray-200 flex flex-col sm:flex-row gap-4">
+                                        <div
+                                            class="flex-shrink-0 flex items-center justify-center w-12 h-12 bg-green-100 text-green-800 rounded-full font-bold text-xl">
+                                            Q</div>
+                                        <div class="flex-grow">
+                                            <div class="flex justify-between items-start">
+                                                <h4 class="text-sm font-bold text-gray-600 mb-2">Asked by <span
+                                                        th:text="${question.author.fullName}">User</span> on <span
+                                                        th:text="${#temporals.format(question.createdDate, 'MMM dd, yyyy')}">Date</span>
+                                                </h4>
+                                            </div>
+                                            <p class="text-gray-800 font-medium text-lg leading-relaxed"
+                                                th:text="${question.content}">The question?</p>
+
+                                            <!-- Question Image (Optional) -->
+                                            <div th:if="${question.imageUrl != null}"
+                                                class="mt-4 overflow-hidden rounded-xl border border-gray-200 bg-white max-w-xl shadow-sm">
+                                                <img th:src="${question.imageUrl}" alt="Question Image"
+                                                    class="w-full h-auto object-cover max-h-[280px]">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Existing Answers -->
+                                    <div th:if="${question.answerCount > 0}"
+                                        class="px-6 py-4 border-b border-gray-100 bg-white">
+                                        <h5 class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">
+                                            Existing Expert Answers</h5>
+                                        <div class="space-y-3">
+                                            <div th:each="ans : ${question.answers}"
+                                                class="flex gap-3 bg-yellow-50 p-4 rounded-lg relative">
+                                                <div
+                                                    class="flex-shrink-0 w-8 h-8 bg-gc-gold rounded-full flex items-center justify-center text-white font-bold text-xs">
+                                                    E</div>
+                                                <div class="flex-grow">
+                                                    <div class="flex justify-between items-start">
+                                                        <p class="text-xs font-bold text-gray-800 mb-1"
+                                                            th:text="${ans.officer.fullName}">Expert</p>
+                                                        <!-- Actions -->
+                                                        <div th:if="${ans.officer.id == officer.id}" class="flex gap-2">
+                                                            <button type="button"
+                                                                th:onclick="'openEditAnswerModal(' + ${ans.id} + ', this.getAttribute(\'data-content\'))'"
+                                                                th:data-content="${ans.content}"
+                                                                class="text-blue-600 hover:text-blue-800 text-xs font-bold bg-blue-100 px-2.5 py-1 rounded transition-colors"
+                                                                title="Edit Answer">✏️ Edit</button>
+                                                            <form
+                                                                th:action="@{/officer/forum/answer/{id}/delete(id=${ans.id})}"
+                                                                method="POST" class="inline">
+                                                                <input type="hidden" th:name="${_csrf.parameterName}"
+                                                                    th:value="${_csrf.token}" />
+                                                                <button type="submit"
+                                                                    onclick="return confirm('Are you sure you want to delete this answer?');"
+                                                                    class="text-red-600 hover:text-red-800 text-xs font-bold bg-red-100 px-2.5 py-1 rounded transition-colors"
+                                                                    title="Delete Answer">🗑️ Delete</button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                    <p class="text-sm text-gray-700 mb-2" th:text="${ans.content}">
+                                                        Answer.</p>
+                                                    <div
+                                                        class="flex items-center gap-1.5 text-xs font-bold text-gray-500">
+                                                        <svg class="w-4 h-4 text-blue-500 fill-current"
+                                                            stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5">
+                                                            </path>
+                                                        </svg>
+                                                        <span th:text="${ans.likes.size()} + ' likes'">0 likes</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Answer Input Form -->
+                                    <div class="p-6 bg-white">
+                                        <form th:action="@{/officer/forum/answer/{id}(id=${question.id})}"
+                                            method="POST">
+                                            <input type="hidden" th:name="${_csrf.parameterName}"
+                                                th:value="${_csrf.token}" />
+                                            <label class="block text-sm font-bold text-gray-700 mb-2">Post your official
+                                                answer</label>
+                                            <textarea name="content" rows="3" required
+                                                class="w-full border border-gray-300 rounded-xl px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green transition-all shadow-sm bg-white"
+                                                placeholder="Type your expert advice here..."></textarea>
+                                            <div class="mt-4 flex justify-end">
+                                                <button type="submit"
+                                                    class="bg-gc-dark hover:bg-gc-green text-white font-bold py-2.5 px-6 rounded-lg transition-all shadow-md hover:shadow-lg flex items-center gap-2">
+                                                    Post Answer
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <div th:if="${questions == null or questions.empty}"
+                                    class="text-center py-12 text-gray-500 font-medium text-lg border-2 border-dashed border-gray-200 rounded-xl">
+                                    No questions in the forum right now!
+                                </div>
+                            </div>
+                            <!-- End List -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==== SECTION: CROP PROFILE ==== -->
+                <div id="section-crop" class="hidden animate-fade-in">
+                    <div class="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
+                        <div class="bg-gradient-to-r from-green-50 to-white px-8 py-6 border-b border-gray-100">
+                            <h2 class="text-gray-800 font-black text-2xl flex items-center gap-3">
+                                <span class="text-3xl">🌱</span> Add New Crop
+                            </h2>
+                            <p class="text-gray-500 text-sm mt-2 ml-10">Create a new crop with image and recommendation
+                                mappings.</p>
+                        </div>
+                        <div class="p-8">
+
+                            <!-- Important Note -->
+                            <div
+                                class="mb-6 flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-800">
+                                <span class="text-lg mt-0.5">📌</span>
+                                <div>
+                                    <span class="font-bold">Image Naming Convention:</span>
+                                    The image filename must match the crop name (lowercase, spaces as underscores).
+                                    E.g., for "Paddy (Rice)" upload <code
+                                        class="bg-amber-100 px-1 rounded">paddy_(rice).jpg</code>.
+                                    Images are saved to: <code
+                                        class="bg-amber-100 px-1 rounded">uploads/crop_images/</code>
+                                </div>
+                            </div>
+
+                            <form th:action="@{/officer/crop}" method="post" enctype="multipart/form-data"
+                                id="cropForm">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+                                <!-- Crop Name -->
+                                <div class="mb-5">
+                                    <label class="block text-sm font-bold text-gray-700 mb-1">Crop Name <span
+                                            class="text-red-500">*</span></label>
+                                    <input type="text" id="cropName" name="cropName" required
+                                        placeholder="e.g., Wheat, Rice"
+                                        class="w-full border border-gray-300 rounded-xl px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green transition-all shadow-sm" />
+                                    <span id="cropNameError"
+                                        class="hidden mt-1 text-xs text-red-600 font-semibold"></span>
+                                </div>
+
+                                <!-- Care Instructions -->
+                                <div class="mb-5">
+                                    <label class="block text-sm font-bold text-gray-700 mb-1">Care Instructions</label>
+                                    <textarea name="careInstructions" id="careInstructions" rows="4"
+                                        placeholder="Describe care requirements..."
+                                        class="w-full border border-gray-300 rounded-xl px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green transition-all shadow-sm resize-y"></textarea>
+                                    <span id="careInstructionsError"
+                                        class="hidden mt-1 text-xs text-red-600 font-semibold"></span>
+                                </div>
+
+                                <!-- Crop Image -->
+                                <div class="mb-5">
+                                    <label class="block text-sm font-bold text-gray-700 mb-1">Crop Image <span
+                                            class="text-red-500">*</span></label>
+                                    <input type="file" name="cropImage" accept="image/*" id="cropImageInput"
+                                        class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm file:mr-4 file:py-1.5 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-green-100 file:text-gc-dark hover:file:bg-green-200 transition-all" />
+                                    <span id="cropImageError"
+                                        class="hidden mt-1 text-xs text-red-600 font-semibold"></span>
+                                    <p class="text-xs text-gray-400 mt-1">PNG, JPG or WEBP · Max 5MB · Filename will be
+                                        auto-set from crop name.</p>
+                                </div>
+
+                                <!-- Locations + Seasons side by side -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 mb-5">
+                                    <!-- Locations -->
+                                    <div>
+                                        <label class="block text-sm font-bold text-gray-700 mb-1">Locations <span
+                                                class="text-red-500">*</span></label>
+                                        <select name="locations" multiple size="3"
+                                            class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green bg-white">
+                                            <option value="Dry Zone">Dry Zone</option>
+                                            <option value="Wet Zone">Wet Zone</option>
+                                            <option value="Intermediate Zone">Intermediate Zone</option>
+                                            <th:block th:each="loc : ${locations}">
+                                                <option
+                                                    th:if="${loc.name != 'Dry Zone' and loc.name != 'Wet Zone' and loc.name != 'Intermediate Zone'}"
+                                                    th:value="${loc.name}" th:text="${loc.name}"></option>
+                                            </th:block>
+                                        </select>
+                                        <span id="locationsError"
+                                            class="hidden mt-1 text-xs text-red-600 font-semibold"></span>
+                                        <p class="text-xs text-gray-400 mt-1">Use Ctrl/Cmd + Click to select multiple
+                                            values.</p>
+                                    </div>
+                                    <!-- Seasons -->
+                                    <div>
+                                        <label class="block text-sm font-bold text-gray-700 mb-1">Seasons <span
+                                                class="text-red-500">*</span></label>
+                                        <select name="seasons" multiple size="3"
+                                            class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green bg-white">
+                                            <option value="Maha">Maha</option>
+                                            <option value="Yala">Yala</option>
+                                            <th:block th:each="s : ${seasons}">
+                                                <option th:if="${s.name != 'Maha' and s.name != 'Yala'}"
+                                                    th:value="${s.name}" th:text="${s.name}"></option>
+                                            </th:block>
+                                        </select>
+                                        <span id="seasonsError"
+                                            class="hidden mt-1 text-xs text-red-600 font-semibold"></span>
+                                        <p class="text-xs text-gray-400 mt-1">Use Ctrl/Cmd + Click to select multiple
+                                            values.</p>
+                                    </div>
+                                </div>
+
+                                <!-- Soil Types -->
+                                <div class="mb-5">
+                                    <label class="block text-sm font-bold text-gray-700 mb-1">Soil Types <span
+                                            class="text-gray-400 font-normal">(optional)</span></label>
+                                    <select name="soilTypes" multiple size="3"
+                                        class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green bg-white">
+                                        <option value="Loamy">Loamy</option>
+                                        <option value="Silty">Silty</option>
+                                        <option value="Sandy">Sandy</option>
+                                        <option value="Clay">Clay</option>
+                                        <th:block th:each="st : ${soilTypes}">
+                                            <option
+                                                th:if="${st.name != 'Loamy' and st.name != 'Silty' and st.name != 'Sandy' and st.name != 'Clay'}"
+                                                th:value="${st.name}" th:text="${st.name}"></option>
+                                        </th:block>
+                                    </select>
+                                    <p class="text-xs text-gray-400 mt-1">Leave empty for any soil type.</p>
+                                </div>
+
+                                <!-- Recommended Fertilizers -->
+                                <div class="mb-5">
+                                    <label class="block text-sm font-bold text-gray-700 mb-2">Recommended Fertilizers
+                                        <span class="text-gray-400 font-normal">(optional)</span></label>
+                                    <div id="fertilizerList" class="space-y-2">
+                                        <div class="flex items-center gap-2">
+                                            <input type="text" name="fertilizers" placeholder="e.g., Urea"
+                                                class="flex-1 border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green" />
+                                            <button type="button" onclick="removeField(this)"
+                                                class="text-red-500 hover:text-red-700 font-bold px-2 py-1 rounded-lg text-lg leading-none">−</button>
+                                        </div>
+                                    </div>
+                                    <button type="button"
+                                        onclick="addField('fertilizerList', 'fertilizers', 'e.g., Urea')"
+                                        class="mt-2 text-gc-dark border-2 border-dashed border-gc-green hover:bg-green-50 text-xs font-bold px-4 py-2 rounded-xl transition-all">+
+                                        Add Fertilizer</button>
+                                    <p class="text-xs text-gray-400 mt-1">Add fertilizer names one by one.</p>
+                                </div>
+
+                                <!-- Common Diseases -->
+                                <div class="mb-7">
+                                    <label class="block text-sm font-bold text-gray-700 mb-2">Common Diseases <span
+                                            class="text-gray-400 font-normal">(optional)</span></label>
+                                    <div id="diseaseList" class="space-y-2">
+                                        <div class="flex items-center gap-2">
+                                            <input type="text" name="diseases" placeholder="e.g., Blast"
+                                                class="flex-1 border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green" />
+                                            <button type="button" onclick="removeField(this)"
+                                                class="text-red-500 hover:text-red-700 font-bold px-2 py-1 rounded-lg text-lg leading-none">−</button>
+                                        </div>
+                                    </div>
+                                    <button type="button" onclick="addField('diseaseList', 'diseases', 'e.g., Blast')"
+                                        class="mt-2 text-gc-dark border-2 border-dashed border-gc-green hover:bg-green-50 text-xs font-bold px-4 py-2 rounded-xl transition-all">+
+                                        Add Disease</button>
+                                    <p class="text-xs text-gray-400 mt-1">Add disease names one by one.</p>
+                                </div>
+
+                                <!-- Submit -->
+                                <div class="flex gap-3 pt-4 border-t border-gray-100">
+                                    <button type="submit" id="saveCropBtn" onclick="validateCropForm(event)"
+                                        class="bg-gc-dark hover:bg-gc-green text-white font-black py-3 px-8 rounded-xl text-base flex items-center gap-2 transition-all shadow-lg hover:shadow-gc-green/30">
+                                        <span>💾</span> Save Crop
+                                    </button>
+                                    <button type="reset"
+                                        class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3 px-6 rounded-xl text-base transition-all">
+                                        Clear
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Edit Answer Modal -->
+        <div id="editAnswerModal"
+            class="fixed inset-0 z-50 hidden bg-gray-900 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
+            <div class="relative bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 overflow-hidden">
+                <div class="bg-gc-dark px-6 py-4 flex justify-between items-center text-white">
+                    <h3 class="font-bold text-lg">Edit Expert Answer</h3>
+                    <button type="button" onclick="closeEditAnswerModal()"
+                        class="text-gray-300 hover:text-white">&times;</button>
+                </div>
+                <form id="editAnswerForm" method="post" class="p-6 space-y-4">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Update your official answer</label>
+                        <textarea id="editAnswerContent" name="content" rows="4" required
+                            class="w-full border border-gray-300 rounded-xl px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green transition-all shadow-sm"></textarea>
+                    </div>
+                    <div class="mt-6 flex justify-end gap-3">
+                        <button type="button" onclick="closeEditAnswerModal()"
+                            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium transition-colors">Cancel</button>
+                        <button type="submit"
+                            class="bg-gc-green hover:bg-gc-dark text-white font-bold py-2 px-6 rounded-lg shadow transition-colors">Save
+                            Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Quill.js CDN -->
+    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+    <script>
+        // Check for success/error parameters in URL or rely on Thymeleaf to determine initial state
+        document.addEventListener("DOMContentLoaded", () => {
+            // Get optional activeTab passed from flash attributes via Thymeleaf
+            const activeTabFlash = "[[${activeTab}]]".replace(/\[\[|\]\]/g, "").trim();
+            const hasSuccessMsg = document.querySelector('.bg-green-50\\/80');
+
+            if (activeTabFlash && activeTabFlash !== 'null') {
+                switchTab(activeTabFlash);
+            } else if (hasSuccessMsg) {
+                switchTab('my-blogs');
+            }
+        });
+
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            // Hide all sections
+            document.getElementById('section-write-blogs').classList.add('hidden');
+            document.getElementById('section-my-blogs').classList.add('hidden');
+            document.getElementById('section-forum').classList.add('hidden');
+            document.getElementById('section-crop').classList.add('hidden');
+
+            // Remove active styles from tabs
+            const tabs = ['tab-write-blogs', 'tab-my-blogs', 'tab-forum', 'tab-crop'];
+            tabs.forEach(id => {
+                const el = document.getElementById(id);
+                el.classList.remove('active', 'text-white');
+                el.classList.add('text-gray-300'); // inactive text color
+            });
+
+            // Show active section 
+            document.getElementById('section-' + tabId).classList.remove('hidden');
+            // Add active styles to clicked tab
+            const activeTab = document.getElementById('tab-' + tabId);
+            activeTab.classList.add('active', 'text-white');
+            activeTab.classList.remove('text-gray-300');
+        }
+
+        // ===== CROP PROFILE JS HELPERS =====
+        function addField(listId, inputName, placeholder) {
+            const list = document.getElementById(listId);
+            const div = document.createElement('div');
+            div.className = 'flex items-center gap-2';
+            div.innerHTML = `<input type="text" name="${inputName}" placeholder="${placeholder}"
+                class="flex-1 border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green"/>
+                <button type="button" onclick="removeField(this)" class="text-red-500 hover:text-red-700 font-bold px-2 py-1 rounded-lg text-lg leading-none">&minus;</button>`;
+            list.appendChild(div);
+        }
+
+        function removeField(btn) {
+            const list = btn.closest('[id$="List"]') || btn.parentElement.parentElement;
+            if (list.children.length > 1) {
+                btn.parentElement.remove();
+            } else {
+                btn.previousElementSibling.value = '';
+            }
+        }
+
+        function validateCropForm(e) {
+            let isValid = true;
+
+            // 1. Crop Name
+            const name = document.getElementById('cropName').value.trim();
+            const nameErr = document.getElementById('cropNameError');
+            nameErr.classList.add('hidden');
+            if (!name) {
+                nameErr.textContent = 'Crop name is required.';
+                nameErr.classList.remove('hidden');
+                isValid = false;
+            } else if (name.length < 2 || name.length > 50) {
+                nameErr.textContent = 'Crop name must be 2–50 characters.';
+                nameErr.classList.remove('hidden');
+                isValid = false;
+            }
+
+            // 2. Care Instructions (Min 20 words)
+            const instructions = document.getElementById('careInstructions').value.trim();
+            const instrErr = document.getElementById('careInstructionsError');
+            instrErr.classList.add('hidden');
+            const words = instructions.split(/\s+/).filter(w => w.length > 0);
+            if (!instructions) {
+                instrErr.textContent = 'Care instructions are required.';
+                instrErr.classList.remove('hidden');
+                isValid = false;
+            } else if (words.length < 20) {
+                instrErr.textContent = 'Care instructions must be at least 20 words. Current: ' + words.length;
+                instrErr.classList.remove('hidden');
+                isValid = false;
+            }
+
+            // 3. Crop Image (Mandatory)
+            const imageInput = document.getElementById('cropImageInput');
+            const imgErr = document.getElementById('cropImageError');
+            imgErr.classList.add('hidden');
+            if (!imageInput.files || imageInput.files.length === 0) {
+                imgErr.textContent = 'Please upload a crop image.';
+                imgErr.classList.remove('hidden');
+                isValid = false;
+            }
+
+            // 4. Locations check
+            const locSel = document.querySelector('[name="locations"]');
+            const locErr = document.getElementById('locationsError');
+            locErr.classList.add('hidden');
+            if (locSel && Array.from(locSel.selectedOptions).length === 0) {
+                locErr.textContent = 'Please select at least one location.';
+                locErr.classList.remove('hidden');
+                isValid = false;
+            }
+
+            // 5. Season check
+            const seaSel = document.querySelector('[name="seasons"]');
+            const seaErr = document.getElementById('seasonsError');
+            seaErr.classList.add('hidden');
+            if (seaSel && Array.from(seaSel.selectedOptions).length === 0) {
+                seaErr.textContent = 'Please select at least one season.';
+                seaErr.classList.remove('hidden');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+            }
+            return isValid;
+        }
+
+        // Edit Answer Form logic
+        function openEditAnswerModal(id, content) {
+            const form = document.getElementById('editAnswerForm');
+            form.action = '/officer/forum/answer/' + id + '/edit';
+            document.getElementById('editAnswerContent').value = content;
+            document.getElementById('editAnswerModal').classList.remove('hidden');
+        }
+        function closeEditAnswerModal() {
+            document.getElementById('editAnswerModal').classList.add('hidden');
+        }
+
+        // Initialize Quill editor
+        const quill = new Quill('#quill-editor', {
+            theme: 'snow',
+            placeholder: 'Write your agricultural blog content here. You can format text, add lists, highlight, and embed links...',
+            modules: {
+                toolbar: [
+                    [{ header: [1, 2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ color: [] }, { background: [] }],
+                    [{ list: 'ordered' }, { list: 'bullet' }],
+                    [{ align: [] }],
+                    [{ indent: '-1' }, { indent: '+1' }],
+                    ['blockquote', 'code-block'],
+                    ['link'],
+                    ['clean']
+                ]
+            }
+        });
+
+        function showError(id, message) {
+            const el = document.getElementById(id + 'Error');
+            if (el) {
+                el.textContent = message;
+                el.classList.remove('hidden');
+            }
+            const input = document.getElementById(id);
+            if (input) input.classList.add('border-red-500');
+            return message;
+        }
+
+        function clearErrors() {
+            document.querySelectorAll('[id$="Error"]').forEach(el => {
+                el.textContent = '';
+                el.classList.add('hidden');
+            });
+            document.querySelectorAll('input, select, .ql-container').forEach(el => {
+                el.classList.remove('border-red-500');
+            });
+            document.getElementById('errorSummary').classList.add('hidden');
+            document.getElementById('errorList').innerHTML = '';
+        }
+
+        async function submitBlog(e) {
+            e.preventDefault();
+            clearErrors();
+            const errors = [];
+
+            const heading = document.getElementById('heading').value.trim();
+            const content = quill.root.innerHTML;
+            const plainText = quill.getText().trim();
+            const wordCount = plainText.split(/\s+/).filter(w => w.length > 0).length;
+            const fileInput = document.getElementById('image');
+            const location = document.getElementById('locationTag').value;
+
+            // 1. Title Validation
+            if (!heading) errors.push(showError('heading', "Please enter an article title."));
+            else if (heading.length < 10) errors.push(showError('heading', "Your title is a bit too short. Please use at least 10 characters."));
+            else if (heading.length > 150) errors.push(showError('heading', "Your title is too long. Please keep it under 150 characters."));
+
+            // 2. Content Validation
+            if (plainText.length === 0) errors.push(showError('content', "Please add content to your blog."));
+            else if (wordCount < 50) errors.push(showError('content', "Your blog post is quite short. Please aim for at least 50 words to provide value to the community."));
+
+            // 3. Image Validation
+            if (fileInput.files && fileInput.files[0]) {
+                const file = fileInput.files[0];
+                const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+                if (!validTypes.includes(file.type)) {
+                    errors.push(showError('image', "Invalid file type. Please upload a PNG, JPG, or WEBP image."));
+                } else if (file.size > 25 * 1024 * 1024) {
+                    errors.push(showError('image', "This image is too large. Please upload a file smaller than 5MB."));
+                }
+            }
+
+            if (errors.length > 0) {
+                const summary = document.getElementById('errorSummary');
+                const list = document.getElementById('errorList');
+                errors.forEach(err => {
+                    const li = document.createElement('li');
+                    li.textContent = err;
+                    list.appendChild(li);
+                });
+                summary.classList.remove('hidden');
+                window.scrollTo({ top: summary.offsetTop - 100, behavior: 'smooth' });
+                return;
+            }
+
+            Swal.fire({
+                title: 'Publish Blog Post?',
+                text: "Are you sure you want to publish this article? It will be visible to all farmers and experts.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#198754',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, publish it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Disable button and show spinner
+                    const btn = document.getElementById('publishBtn');
+                    const icon = document.getElementById('btnIcon');
+                    const text = document.getElementById('btnText');
+                    const spinner = document.getElementById('btnSpinner');
+
+                    btn.disabled = true;
+                    icon.classList.add('hidden');
+                    text.textContent = 'Publishing...';
+                    spinner.classList.remove('hidden');
+
+                    document.getElementById('textContent').value = content;
+                    document.getElementById('blogForm').submit();
+                }
+            });
+        }
+
+        function previewImage(input) {
+            const errorDiv = document.getElementById('image-error');
+            errorDiv.classList.add('hidden');
+
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('upload-placeholder').classList.add('hidden');
+
+                    const previewContainer = document.getElementById('image-preview-container');
+                    const preview = document.getElementById('image-preview');
+
+                    preview.src = e.target.result;
+                    previewContainer.classList.remove('hidden');
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Real-time error clearing for all forms in the dashboard
+        document.querySelectorAll('input, select, textarea').forEach(input => {
+            input.addEventListener('input', () => {
+                // 1. Clear the red border/ring
+                input.classList.remove('border-red-500', 'ring-red-500');
+
+                // 2. Hide specifically linked ID errors
+                const errorEl = document.getElementById(input.id + 'Error');
+                if (errorEl) {
+                    errorEl.classList.add('hidden');
+                    errorEl.textContent = '';
+                }
+
+                // 3. Clear any sibling server-side error spans or generic text-red-600 spans
+                const parent = input.parentElement;
+                if (parent) {
+                    const genericErrors = parent.querySelectorAll('.text-red-600, .text-red-500');
+                    genericErrors.forEach(err => {
+                        if (!err.id || err.id.endsWith('Error')) {
+                            err.classList.add('hidden');
+                            err.textContent = '';
+                        }
+                    });
+                }
+            });
+        });
+
+        // Specialized clearing for Quill editor
+        if (quill) {
+            quill.on('text-change', () => {
+                const contentErr = document.getElementById('contentError');
+                if (contentErr) {
+                    contentErr.classList.add('hidden');
+                    contentErr.textContent = '';
+                }
+                const editorContainer = document.querySelector('.ql-container');
+                if (editorContainer) editorContainer.classList.remove('border-red-500');
+            });
+        }
+
+        // Profile Menu Popup Toggle
+        const profileBtn = document.getElementById('profile-btn');
+        const profileMenu = document.getElementById('profile-menu');
+        const profileContainer = document.getElementById('profile-container');
+
+        if (profileBtn && profileMenu) {
+            profileBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isHidden = profileMenu.classList.contains('hidden');
+
+                if (isHidden) {
+                    profileMenu.classList.remove('hidden');
+                    // Force a small delay for transitions to work after removing hidden
+                    setTimeout(() => {
+                        profileMenu.classList.remove('opacity-0', 'translate-y-2');
+                        profileMenu.classList.add('opacity-100', 'translate-y-0');
+                    }, 10);
+                } else {
+                    profileMenu.classList.remove('opacity-100', 'translate-y-0');
+                    profileMenu.classList.add('opacity-0', 'translate-y-2');
+                    setTimeout(() => profileMenu.classList.add('hidden'), 200);
+                }
+            });
+
+            // Close when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!profileContainer.contains(e.target) && !profileMenu.classList.contains('hidden')) {
+                    profileMenu.classList.remove('opacity-100', 'translate-y-0');
+                    profileMenu.classList.add('opacity-0', 'translate-y-2');
+                    setTimeout(() => profileMenu.classList.add('hidden'), 200);
+                }
+            });
+        }
+    </script>
+
+    <!-- Mobile Sidebar Toggle Script -->
+    <script>
+        function openSidebar() {
+            document.getElementById('dashboard-sidebar').classList.add('open');
+            document.getElementById('sidebar-overlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeSidebar() {
+            document.getElementById('dashboard-sidebar').classList.remove('open');
+            document.getElementById('sidebar-overlay').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        // Auto-close sidebar on tab switch (mobile UX)
+        document.querySelectorAll('[onclick^="switchTab"]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (window.innerWidth < 1024) closeSidebar();
+            });
+        });
+    </script>
+</body>
+
+</html>
