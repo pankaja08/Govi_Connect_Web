@@ -42,6 +42,7 @@ public interface BlogRepository extends JpaRepository<Blog, Long> {
     @EntityGraph(attributePaths = {"author"})
     @Query("SELECT b FROM Blog b WHERE " +
             "b.approvalStatus = :status AND " +
+            "(:keyword IS NULL OR :keyword = '' OR b.heading LIKE :keyword OR b.textContent LIKE :keyword) AND " +
             "(:location IS NULL OR :location = '' OR b.locationTag = :location) AND " +
             "(:season IS NULL OR :season = '' OR b.seasonTag = :season) AND " +
             "(:crop IS NULL OR :crop = '' OR b.cropTag = :crop) AND " +
@@ -49,6 +50,7 @@ public interface BlogRepository extends JpaRepository<Blog, Long> {
             "ORDER BY b.createdDate DESC")
     List<Blog> findFilteredBlogs(
             @Param("status") BlogStatus status,
+            @Param("keyword") String keyword,
             @Param("location") String location,
             @Param("season") String season,
             @Param("crop") String crop,
