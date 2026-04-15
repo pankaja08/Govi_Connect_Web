@@ -195,7 +195,7 @@
                 </div>
 
                 <!-- Mobile hamburger -->
-                <button id="mobile-menu-btn" class="md:hidden text-white focus:outline-none">
+                <button id="mobile-menu-btn" class="md:hidden text-white focus:outline-none p-2 rounded-lg hover:bg-white/10 transition-colors">
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M4 6h16M4 12h16M4 18h16" />
@@ -216,24 +216,23 @@
                 </div>
                 <a th:href="@{/}"
                     th:classappend="${currentUri != null and (currentUri == '/' or currentUri == '/index') ? 'active' : ''}"
-                    class="block py-2 text-gray-200" th:text="#{nav.home}">Home</a>
+                    class="block py-3 px-2 text-gray-200 font-semibold border-b border-white/10" th:text="#{nav.home}">Home</a>
                 <a th:href="@{/market}"
                     th:classappend="${currentUri != null and currentUri.startsWith('/market') ? 'active' : ''}"
-                    class="block py-2 text-gray-200" th:text="#{nav.govimart}">Govi Mart</a>
+                    class="block py-3 px-2 text-gray-200 font-semibold border-b border-white/10" th:text="#{nav.govimart}">Govi Mart</a>
                 <a th:href="@{/forum}"
                     th:classappend="${currentUri != null and currentUri.startsWith('/forum') ? 'active' : ''}"
-                    class="block py-2 text-gray-200" th:text="#{nav.forum}">Discussion Forum</a>
+                    class="block py-3 px-2 text-gray-200 font-semibold border-b border-white/10" th:text="#{nav.forum}">Discussion Forum</a>
                 <a th:href="@{/crop-advisory}"
                     th:classappend="${currentUri != null and currentUri.startsWith('/crop-advisory') ? 'active' : ''}"
-                    class="block py-2 text-gray-200" data-i18n="nav.cropadvisory" th:text="#{nav.cropadvisory}">Smart
-                    Crop Advisory</a>
+                    class="block py-3 px-2 text-gray-200 font-semibold border-b border-white/10" data-i18n="nav.cropadvisory" th:text="#{nav.cropadvisory}">Smart Crop Advisory</a>
                 <a th:href="@{/disease-predictor}"
                     th:classappend="${currentUri != null and currentUri.startsWith('/disease-predictor') ? 'active' : ''}"
-                    class="block py-2 text-gray-200" th:text="#{nav.disease_predictor}">AI Disease Predictor</a>
-                <div sec:authorize="!isAuthenticated()">
-                    <a th:href="@{/register}" class="block py-2 text-gray-200 hover:text-gc-gold"
+                    class="block py-3 px-2 text-gray-200 font-semibold border-b border-white/10" th:text="#{nav.disease_predictor}">AI Disease Predictor</a>
+                <div sec:authorize="!isAuthenticated()" class="flex gap-3 pt-3">
+                    <a th:href="@{/register}" class="flex-1 text-center py-2.5 border border-white/30 rounded-xl text-gray-200 hover:text-gc-gold font-bold"
                         th:text="#{nav.register}">Register</a>
-                    <a th:href="@{/login}" class="block py-2 text-gc-gold font-bold" th:text="#{nav.login}">Login</a>
+                    <a th:href="@{/login}" class="flex-1 text-center py-2.5 bg-gc-gold text-gc-dark font-black rounded-xl" th:text="#{nav.login}">Login</a>
                 </div>
                 <div sec:authorize="isAuthenticated()">
                     <span sec:authorize="hasRole('ADMIN')">
