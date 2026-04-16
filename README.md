@@ -24,7 +24,7 @@ A dedicated space for knowledge sharing and real-time updates:
 
 ### 3. 🔍 AI Plant Disease Detection
 The core intelligence module designed to solve early disease identification struggles:
-* **CNN Diagnostics:** Utilizes Convolutional Neural Network (CNN) models to provide instant diagnostics from leaf images.
+* **CNN Diagnostics:** Utilizes Residual Network Version 2 (ResNetV2) models to provide instant diagnostics from leaf images.
 * **Treatment Mapping:** Automatically maps detected diseases to a rule-based knowledge system for specific prevention and treatment advice.
 
 ### 4. 🛒 Marketplace (Govi Mart)
