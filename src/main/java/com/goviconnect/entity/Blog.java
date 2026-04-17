@@ -65,5 +65,12 @@ public class Blog {
             this.approvalStatus = BlogStatus.PENDING;
         }
     }
+
+    @Transient
+    public int getEstimatedReadingTime() {
+        if (textContent == null || textContent.trim().isEmpty()) return 1;
+        int wordCount = textContent.trim().split("\\s+").length;
+        return Math.max(1, (int) Math.ceil((double) wordCount / 200));
+    }
 }
 

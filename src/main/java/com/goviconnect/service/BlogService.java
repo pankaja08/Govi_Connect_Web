@@ -71,8 +71,9 @@ public class BlogService {
     /**
      * Returns filtered APPROVED blogs based on optional tags.
      */
-    public List<Blog> getFilteredBlogs(String location, String season, String crop, String method) {
-        return blogRepository.findFilteredBlogs(BlogStatus.APPROVED, location, season, crop, method);
+    public List<Blog> getFilteredBlogs(String keyword, String location, String season, String crop, String method) {
+        String pattern = (keyword == null || keyword.trim().isEmpty()) ? null : "%" + keyword.trim().toLowerCase() + "%";
+        return blogRepository.findFilteredBlogs(BlogStatus.APPROVED, pattern, location, season, crop, method);
     }
 
     /**
