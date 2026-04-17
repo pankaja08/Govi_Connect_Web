@@ -58,6 +58,9 @@ public class Blog {
     @Column(length = 500)
     private String rejectionReason;
 
+    @Column
+    private LocalDateTime scheduledDate;
+
     @PrePersist
     public void prePersist() {
         this.createdDate = LocalDateTime.now();
