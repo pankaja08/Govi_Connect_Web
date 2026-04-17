@@ -1562,20 +1562,17 @@
 
             function toggleSidebar() {
                 const sidebar = document.getElementById('sidebar');
-                const mainContent = document.querySelector('.dashboard-main');
                 const icon = document.getElementById('sidebarToggleIcon');
                 
                 if (sidebar.classList.contains('md:flex')) {
-                    // Hide sidebar → expand main to full width
+                    // Hide
                     sidebar.classList.replace('md:flex', 'md:hidden');
                     sidebar.classList.add('hidden');
-                    if (mainContent) mainContent.classList.add('sidebar-collapsed');
                     icon.setAttribute('d', 'M9 5l7 7-7 7'); // Chevron right
                 } else {
-                    // Show sidebar → restore main margin
+                    // Show
                     sidebar.classList.replace('md:hidden', 'md:flex');
                     sidebar.classList.remove('hidden');
-                    if (mainContent) mainContent.classList.remove('sidebar-collapsed');
                     icon.setAttribute('d', 'M4 6h16M4 12h16M4 18h16'); // Hamburger
                 }
                 
