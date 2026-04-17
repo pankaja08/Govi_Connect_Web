@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Product | Govi Mart</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'gc-dark': '#166534',
+                        'gc-green': '#22c55e',
+                        'gc-gold': '#eab308',
+                        'gc-tan': '#bbf7d0',
+                    },
+                    fontFamily: { 'inter': ['Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+</head>
+
+<body class="font-inter bg-slate-50 text-gray-800 antialiased selection:bg-gc-green selection:text-white pb-20">
+
+<!-- NAVBAR (minimal) -->
+<nav class="sticky top-0 z-50 bg-gc-dark shadow-xl mb-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+            <!-- Logo -->
+            <a th:href="@{/}" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 bg-gc-gold rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                    <span class="text-gc-dark font-black text-lg">G</span>
+                </div>
+                <span class="text-white font-black text-xl tracking-wide">GOVI<span class="text-gc-gold"> CONNECT</span></span>
+            </a>
+            <div class="flex items-center gap-4">
+                <a th:href="@{/user/profile}" class="text-gray-200 hover:text-gc-gold font-medium hidden md:inline">Profile</a>
+                <a th:href="@{/market}" class="text-gc-gold font-semibold hidden md:inline">Govi Mart</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- FORM -->
+<section class="max-w-2xl mx-auto px-6 py-6 relative z-10">
+    <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
+        <div class="mb-8">
+            <h2 class="text-2xl font-black text-gray-800">Edit Product: <span class="text-gc-green" th:text="${product.name}">Product Name</span></h2>
+            <p class="text-gray-500 text-sm mt-1">Update your product details below. Note that name and category cannot be changed.</p>
+        </div>
+
+        <!-- Messages -->
+        <div th:if="${errorMessage}" class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm font-medium mb-6">
+            <span th:text="${errorMessage}">Error Message</span>
+        </div>
+
+        <form th:action="@{/market/{id}/edit(id=${product.id})}" method="post" class="space-y-6" id="editProductForm">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+            <!-- Error Summary -->
+            <div id="errorSummary" class="hidden mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
+                <h3 class="text-red-700 font-bold mb-2 flex items-center gap-2">
+                    <span>⚠️</span> Please fix the following errors:
+                </h3>
+                <ul id="errorList" class="list-disc list-inside text-red-600 text-sm space-y-1"></ul>
+            </div>
+
+            <!-- Description -->
+            <div>
+                <label class="block text-sm font-bold text-gray-700 mb-1">Description</label>
+                <textarea id="description" name="description" rows="4" placeholder="Describe your product..." th:text="${product.description}"
+                          class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green outline-none resize-none transition-all"></textarea>
+                <span id="descriptionError" class="hidden mt-1 text-xs text-red-600 font-semibold"></span>
+            </div>
+
+            <!-- Price + Quantity Row -->
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Price (Rs.) *</label>
+                    <input type="number" id="price" name="price" required min="0" step="0.01" th:value="${product.price}"
+                           class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green outline-none transition-all" />
+                    <span id="priceError" class="hidden mt-1 text-xs text-red-600 font-semibold"></span>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Quantity * (<span th:text="${product.unit}"></span>)</label>
+                    <input type="number" id="quantity" name="quantity" required min="0" th:value="${product.quantity}"
+                           class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green outline-none transition-all" />
+                    <span id="quantityError" class="hidden mt-1 text-xs text-red-600 font-semibold"></span>
+                </div>
+            </div>
+
+            <!-- Stock Status -->
+            <div>
+                <label class="block text-sm font-bold text-gray-700 mb-1">Stock Status *</label>
+                <select name="stockStatus" required
+                        class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green outline-none bg-white">
+                    <option th:each="status : ${stockStatuses}"
+                            th:value="${status.name()}"
+                            th:text="${status.name().replace('_', ' ')}"
+                            th:selected="${product.stockStatus == status}">Status</option>
+                </select>
+                <span id="stockStatusError" class="hidden mt-1 text-xs text-red-600 font-semibold"></span>
+            </div>
+
+            <!-- Submit -->
+            <button type="submit" id="submitBtn" onclick="validateEditForm(event)"
+                    class="w-full bg-gc-dark text-white font-black py-3.5 rounded-xl text-lg hover:bg-gc-green transition-all shadow-lg hover:shadow-xl mt-4 flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed">
+                <span id="btnIcon">💾</span>
+                <span id="btnText">Save Changes</span>
+                <div id="btnSpinner" class="hidden w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+            </button>
+
+            <a th:href="@{/user/profile}" class="block text-center text-sm text-gray-400 hover:text-gc-dark font-medium mt-4">
+                ← Cancel and back to Profile
+            </a>
+        </form>
+    </div>
+</section>
+
+
+<script>
+    function showError(id, message) {
+        const el = document.getElementById(id + 'Error');
+        if (el) {
+            el.textContent = message;
+            el.classList.remove('hidden');
+        }
+        const input = document.getElementById(id);
+        if (input) input.classList.add('border-red-500');
+        return message;
+    }
+
+    function clearErrors() {
+        document.querySelectorAll('[id$="Error"]').forEach(el => {
+            el.textContent = '';
+            el.classList.add('hidden');
+        });
+        document.querySelectorAll('input, select, textarea').forEach(el => {
+            el.classList.remove('border-red-500');
+        });
+        document.getElementById('errorSummary').classList.add('hidden');
+        document.getElementById('errorList').innerHTML = '';
+    }
+
+    function validateEditForm(e) {
+        e.preventDefault();
+        clearErrors();
+        const errors = [];
+
+        const description = document.getElementById('description').value.trim();
+        const price = document.getElementById('price').value;
+        const quantity = document.getElementById('quantity').value;
+        const stockStatus = document.querySelector('select[name="stockStatus"]').value;
+
+        // 1. Description
+        if (description.length > 1000) errors.push(showError('description', "Description is too long. Max 1000 characters."));
+
+        // 2. Price
+        if (!price || isNaN(price) || parseFloat(price) <= 0) {
+            errors.push(showError('price', "Please enter a valid price greater than zero."));
+        } else {
+            const parts = price.split('.');
+            if (parts.length > 1 && parts[1].length > 2) {
+                errors.push(showError('price', "Price cannot have more than 2 decimal places."));
+            }
+        }
+
+        // 3. Quantity
+        if (!quantity || isNaN(quantity) || parseFloat(quantity) < 0) {
+            errors.push(showError('quantity', "Please enter a valid quantity."));
+        }
+
+        // 4. Stock Status
+        if (!stockStatus) errors.push(showError('stockStatus', "Please select a stock status."));
+
+        if (errors.length > 0) {
+            const summary = document.getElementById('errorSummary');
+            const list = document.getElementById('errorList');
+            errors.forEach(err => {
+                const li = document.createElement('li');
+                li.textContent = err;
+                list.appendChild(li);
+            });
+            summary.classList.remove('hidden');
+            window.scrollTo({ top: summary.offsetTop - 100, behavior: 'smooth' });
+            return;
+        }
+
+        // Double submission prevention
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        document.getElementById('btnIcon').classList.add('hidden');
+        document.getElementById('btnText').textContent = 'Saving...';
+        document.getElementById('btnSpinner').classList.remove('hidden');
+
+        document.getElementById('editProductForm').submit();
+    }
+
+    // Real-time error clearing
+    document.querySelectorAll('input, select, textarea').forEach(input => {
+        input.addEventListener('input', () => {
+            // Clear the immediate red border
+            input.classList.remove('border-red-500');
+
+            // Find and hide the specific error message for this field
+            const errorEl = document.getElementById(input.id + 'Error');
+            if (errorEl) {
+                errorEl.classList.add('hidden');
+                errorEl.textContent = '';
+            }
+
+            // Also clear any sibling server-side error spans (if any)
+            const parent = input.parentElement;
+            if (parent) {
+                const serverErrors = parent.querySelectorAll('.text-red-500:not([id$="Error"])');
+                serverErrors.forEach(err => {
+                    err.classList.add('hidden');
+                    err.textContent = '';
+                });
+            }
+
+            // If this was a select without an ID, try to find error by name
+            if (!input.id && input.name) {
+                const nameError = document.getElementById(input.name + 'Error');
+                if (nameError) nameError.classList.add('hidden');
+            }
+        });
+    });
+</script>
+</body>
+</html>
