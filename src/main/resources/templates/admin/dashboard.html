@@ -203,19 +203,23 @@
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-4">
                     <div class="bg-white rounded-xl shadow p-4 border-l-4 border-gc-gold">
                         <div class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Total Users</div>
-                        <div class="text-2xl font-black text-gc-dark mt-1" id="totalUsersCount" th:text="${allUsers?.size() ?: 0}">0</div>
+                        <div class="text-2xl font-black text-gc-dark mt-1" id="totalUsersCount"
+                            th:text="${allUsers?.size() ?: 0}">0</div>
                     </div>
                     <div class="bg-white rounded-xl shadow p-4 border-l-4 border-blue-400">
                         <div class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Farmers</div>
-                        <div class="text-2xl font-black text-gc-dark mt-1" id="farmersCount" th:text="${normalUsers?.size() ?: 0}">0</div>
+                        <div class="text-2xl font-black text-gc-dark mt-1" id="farmersCount"
+                            th:text="${normalUsers?.size() ?: 0}">0</div>
                     </div>
                     <div class="bg-white rounded-xl shadow p-4 border-l-4 border-gc-green">
                         <div class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Agri Officers</div>
-                        <div class="text-2xl font-black text-gc-dark mt-1" id="officersCount" th:text="${officers?.size() ?: 0}">0</div>
+                        <div class="text-2xl font-black text-gc-dark mt-1" id="officersCount"
+                            th:text="${officers?.size() ?: 0}">0</div>
                     </div>
                     <div class="bg-white rounded-xl shadow p-4 border-l-4 border-red-400">
                         <div class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Pending</div>
-                        <div class="text-2xl font-black text-gc-dark mt-1" id="pendingOfficersCount" th:text="${pendingOfficers?.size() ?: 0}">0
+                        <div class="text-2xl font-black text-gc-dark mt-1" id="pendingOfficersCount"
+                            th:text="${pendingOfficers?.size() ?: 0}">0
                         </div>
                     </div>
                 </div>
@@ -234,8 +238,10 @@
                         <p class="text-[11px] text-gray-500 mb-3 leading-relaxed">Shows the concentration of farmers
                             across different districts, highlighting regions with the highest platform adoption.</p>
                         <!-- Date Range Filter for District Chart only -->
-                        <div class="flex items-center gap-2 bg-gray-50 p-2 rounded-lg border border-gray-200 mb-3 w-fit">
-                            <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Date Range:</span>
+                        <div
+                            class="flex items-center gap-2 bg-gray-50 p-2 rounded-lg border border-gray-200 mb-3 w-fit">
+                            <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Date
+                                Range:</span>
                             <input type="date" id="districtStartDate"
                                 class="text-xs border-none bg-transparent focus:ring-0 p-1" />
                             <span class="text-gray-300 text-xs">to</span>
@@ -1726,11 +1732,11 @@
                     // 1. Update Top KPI Boxes
                     const userCounts = data.userCounts || {};
                     const total = (userCounts.farmers || 0) + (userCounts.officers || 0) + (userCounts.admins || 0);
-                    
+
                     const totalBox = document.getElementById('totalUsersCount');
                     const farmersBox = document.getElementById('farmersCount');
                     const officersBox = document.getElementById('officersCount');
-                    
+
                     if (totalBox) totalBox.textContent = total;
                     if (farmersBox) farmersBox.textContent = userCounts.farmers || 0;
                     if (officersBox) officersBox.textContent = userCounts.officers || 0;

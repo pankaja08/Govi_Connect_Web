@@ -51,7 +51,7 @@ public class AdminController {
         model.addAttribute("officers", userService.getApprovedOfficers());
         model.addAttribute("admins", userService.getUsersByRole(Role.ADMIN));
         model.addAttribute("moderators", userService.getUsersByRole(Role.BLOG_MODERATOR));
-        
+
         model.addAttribute("pendingProducts", marketProductService.getPendingProducts());
         model.addAttribute("farmerDistricts", userService.getFarmerCountByDistrict());
         model.addAttribute("allCrops", cropService.getUniqueCropNames());
@@ -120,45 +120,47 @@ public class AdminController {
         try {
             StringBuilder csvBuilder = new StringBuilder();
             csvBuilder.append("ID,Full Name,Username,Email,NIC,Role,Account Status,District,Province,Contact Number\n");
-            
+
             // Define roles in order of priority
-            Role[] roles = {Role.ADMIN, Role.AGRI_OFFICER, Role.BLOG_MODERATOR, Role.USER};
-            String[] sectionHeaders = {"ADMINISTRATORS", "AGRI OFFICERS / EXPERTS", "BLOG MODERATORS", "FARMERS / USERS"};
-            
+            Role[] roles = { Role.ADMIN, Role.AGRI_OFFICER, Role.BLOG_MODERATOR, Role.USER };
+            String[] sectionHeaders = { "ADMINISTRATORS", "AGRI OFFICERS / EXPERTS", "BLOG MODERATORS",
+                    "FARMERS / USERS" };
+
             for (int i = 0; i < roles.length; i++) {
                 Role role = roles[i];
                 List<User> usersInRole = userService.getUsersByRole(role);
-                
+
                 if (!usersInRole.isEmpty()) {
                     csvBuilder.append("\n--- ").append(sectionHeaders[i]).append(" ---\n");
                     for (User user : usersInRole) {
                         csvBuilder.append((user.getId() != null ? user.getId() : "")).append(",")
-                                  .append(escapeCsv(user.getFullName())).append(",")
-                                  .append(escapeCsv(user.getUsername())).append(",")
-                                  .append(escapeCsv(user.getEmail())).append(",")
-                                  .append(escapeCsv(user.getNic())).append(",")
-                                  .append(user.getRole() != null ? user.getRole().name() : "").append(",")
-                                  .append(user.getAccountStatus() != null ? user.getAccountStatus().name() : "").append(",")
-                                  .append(escapeCsv(user.getDistrict())).append(",")
-                                  .append(escapeCsv(user.getProvince())).append(",")
-                                  .append(escapeCsv(user.getContactNumber())).append("\n");
+                                .append(escapeCsv(user.getFullName())).append(",")
+                                .append(escapeCsv(user.getUsername())).append(",")
+                                .append(escapeCsv(user.getEmail())).append(",")
+                                .append(escapeCsv(user.getNic())).append(",")
+                                .append(user.getRole() != null ? user.getRole().name() : "").append(",")
+                                .append(user.getAccountStatus() != null ? user.getAccountStatus().name() : "")
+                                .append(",")
+                                .append(escapeCsv(user.getDistrict())).append(",")
+                                .append(escapeCsv(user.getProvince())).append(",")
+                                .append(escapeCsv(user.getContactNumber())).append("\n");
                     }
                 }
             }
-            
+
             byte[] csvBytes = csvBuilder.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8);
-            
+
             org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
             headers.setContentType(org.springframework.http.MediaType.parseMediaType("text/csv"));
             headers.setContentDispositionFormData("attachment", "goviconnect_users_organized.csv");
-            
+
             return new ResponseEntity<>(csvBytes, headers, org.springframework.http.HttpStatus.OK);
         } catch (Exception e) {
             log.error("Failed to export users CSV", e);
             return ResponseEntity.internalServerError().build();
         }
     }
-    
+
     private String escapeCsv(String value) {
         if (value == null) {
             return "";
@@ -222,24 +224,32 @@ public class AdminController {
             @RequestParam(value = "startDate", required = false) String startDateStr,
             @RequestParam(value = "endDate", required = false) String endDateStr) {
         try {
-            LocalDate startDate = (startDateStr != null && !startDateStr.isEmpty()) ? LocalDate.parse(startDateStr) : null;
+            LocalDate startDate = (startDateStr != null && !startDateStr.isEmpty()) ? LocalDate.parse(startDateStr)
+                    : null;
             LocalDate endDate = (endDateStr != null && !endDateStr.isEmpty()) ? LocalDate.parse(endDateStr) : null;
 
-            Map<String, List<Map<String, Object>>> bestCrops = cropService.calculateBestCropsPerSeason(province, null, null, startDate, endDate);
-            Map<String, Double> distribution = cropService.calculateCropDistribution(province, null, null, startDate, endDate);
-            
+            Map<String, List<Map<String, Object>>> bestCrops = cropService.calculateBestCropsPerSeason(province, null,
+                    null, startDate, endDate);
+            Map<String, Double> distribution = cropService.calculateCropDistribution(province, null, null, startDate,
+                    endDate);
+
             // Add user counts based on same filters
             List<User> filteredUsers = userService.getAllUsers().stream()
-                .filter(u -> province == null || province.equalsIgnoreCase("all") || (u.getProvince() != null && u.getProvince().equalsIgnoreCase(province)))
-                .filter(u -> {
-                    if (startDate == null && endDate == null) return true;
-                    if (u.getCreatedAt() == null) return true; // Include old users if they have no date
-                    if (startDate != null && u.getCreatedAt().isBefore(startDate)) return false;
-                    if (endDate != null && u.getCreatedAt().isAfter(endDate)) return false;
-                    return true;
-                })
-                .toList();
-            
+                    .filter(u -> province == null || province.equalsIgnoreCase("all")
+                            || (u.getProvince() != null && u.getProvince().equalsIgnoreCase(province)))
+                    .filter(u -> {
+                        if (startDate == null && endDate == null)
+                            return true;
+                        if (u.getCreatedAt() == null)
+                            return true; // Include old users if they have no date
+                        if (startDate != null && u.getCreatedAt().isBefore(startDate))
+                            return false;
+                        if (endDate != null && u.getCreatedAt().isAfter(endDate))
+                            return false;
+                        return true;
+                    })
+                    .toList();
+
             Map<String, Long> userCounts = new HashMap<>();
             userCounts.put("farmers", filteredUsers.stream().filter(u -> u.getRole() == Role.USER).count());
             userCounts.put("officers", filteredUsers.stream().filter(u -> u.getRole() == Role.AGRI_OFFICER).count());
@@ -253,12 +263,12 @@ public class AdminController {
             });
 
             filteredUsers.stream()
-                .filter(u -> u.getRole() == Role.USER)
-                .forEach(u -> {
-                    String d = toTitleCase(u.getDistrict());
-                    districtCounts.put(d, districtCounts.getOrDefault(d, 0L) + 1);
-                });
-            
+                    .filter(u -> u.getRole() == Role.USER)
+                    .forEach(u -> {
+                        String d = toTitleCase(u.getDistrict());
+                        districtCounts.put(d, districtCounts.getOrDefault(d, 0L) + 1);
+                    });
+
             // Remove "Unknown" if it has zero counts to clean up the chart
             if (districtCounts.containsKey("Unknown") && districtCounts.get("Unknown") == 0) {
                 districtCounts.remove("Unknown");
@@ -269,7 +279,7 @@ public class AdminController {
             response.put("distribution", distribution);
             response.put("userCounts", userCounts);
             response.put("districtCounts", districtCounts);
-            
+
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("Failed to fetch crop analytics", e);
@@ -357,21 +367,25 @@ public class AdminController {
             // 3. Contact Validation
             if (contactNumber != null && !contactNumber.isBlank()) {
                 if (!java.util.regex.Pattern.matches("^0\\d{9}$", contactNumber.trim())) {
-                    redirectAttributes.addFlashAttribute("errorMessage", "Enter valid contact number (10 digits starting with 0).");
+                    redirectAttributes.addFlashAttribute("errorMessage",
+                            "Enter valid contact number (10 digits starting with 0).");
                     return "redirect:/admin/dashboard";
                 }
             }
 
             // 4. NIC Validation
             if (!nic.trim().matches("^([0-9]{9}[a-zA-Z]|[0-9]{12})$")) {
-                redirectAttributes.addFlashAttribute("errorMessage", "Invalid NIC format. Must be 12 digits or 10 characters (9 digits + 1 letter).");
+                redirectAttributes.addFlashAttribute("errorMessage",
+                        "Invalid NIC format. Must be 12 digits or 10 characters (9 digits + 1 letter).");
                 return "redirect:/admin/dashboard";
             }
 
             Role role = Role.valueOf(roleStr);
-            userService.createUser(fullName, username, email, nic, password, role, contactNumber, address, district, province, 
-                    LocalDate.parse(dob), registrationNumber, designation, specializationArea, assignedArea, officialEmail);
-            
+            userService.createUser(fullName, username, email, nic, password, role, contactNumber, address, district,
+                    province,
+                    LocalDate.parse(dob), registrationNumber, designation, specializationArea, assignedArea,
+                    officialEmail);
+
             redirectAttributes.addFlashAttribute("successMessage", "User created successfully.");
         } catch (Exception e) {
             log.error("Failed to create user: {}", username, e);
@@ -381,14 +395,16 @@ public class AdminController {
     }
 
     private String toTitleCase(String str) {
-        if (str == null || str.isBlank()) return "Unknown";
+        if (str == null || str.isBlank())
+            return "Unknown";
         String[] words = str.trim().split("\\s+");
         StringBuilder sb = new StringBuilder();
         for (String word : words) {
-            if (word.isEmpty()) continue;
+            if (word.isEmpty())
+                continue;
             sb.append(Character.toUpperCase(word.charAt(0)))
-              .append(word.substring(1).toLowerCase())
-              .append(" ");
+                    .append(word.substring(1).toLowerCase())
+                    .append(" ");
         }
         return sb.toString().trim();
     }
