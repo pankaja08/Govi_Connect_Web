@@ -415,6 +415,28 @@
                                     <input type="hidden" name="textContent" id="textContent" />
                                 </div>
 
+                                <!-- Scheduling Toggle -->
+                                <div class="mb-8 p-6 border border-gray-200 rounded-xl bg-gray-50/50">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h3 class="text-gray-800 font-bold text-base flex items-center gap-2">
+                                                <span>🕒</span> Scheduling blog
+                                            </h3>
+                                            <p class="text-gray-500 text-sm mt-1">Plan your content release for a future date</p>
+                                        </div>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" id="scheduleToggle" class="sr-only peer" onchange="toggleScheduleInput()">
+                                            <div class="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gc-green"></div>
+                                        </label>
+                                    </div>
+                                    <div id="scheduleInputContainer" class="hidden mt-4 pt-4 border-t border-gray-200">
+                                        <label for="scheduledDate" class="block text-sm font-bold text-gray-700 mb-2">Publish Date & Time <span class="text-red-500">*</span></label>
+                                        <input type="datetime-local" id="scheduledDate" name="scheduledDate" class="w-full sm:w-1/2 border border-gray-300 rounded-xl px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green shadow-sm bg-white" />
+                                        <p class="text-xs text-gray-500 mt-2">Note: Must be at least 24 hours from now.</p>
+                                        <span id="scheduleError" class="hidden mt-1 text-xs text-red-600 font-semibold"></span>
+                                    </div>
+                                </div>
+
                                 <!-- Submit Button -->
                                 <div class="flex flex-col sm:flex-row justify-end pt-4 border-t border-gray-100 gap-3">
                                     <button type="submit" id="publishBtn" onclick="submitBlog(event)"
@@ -465,9 +487,27 @@
                                     <span
                                         class="text-5xl opacity-40 group-hover:scale-110 transition-transform duration-500">📝</span>
                                 </div>
-                                <div class="absolute top-3 left-3">
-                                    <span
-                                        class="bg-white/90 backdrop-blur-sm text-gc-dark text-xs font-black px-2.5 py-1 rounded shadow-sm border border-white/50">BLOG</span>
+                                <div class="absolute top-3 left-3 flex flex-col gap-1.5">
+                                    <span class="bg-white/90 backdrop-blur-sm text-gc-dark text-xs font-black px-2.5 py-1 rounded shadow-sm border border-white/50 w-fit">BLOG</span>
+                                    
+                                    <!-- Status Badge -->
+                                    <span th:if="${blog.approvalStatus.name() == 'PENDING'}" 
+                                          class="bg-amber-500/90 backdrop-blur-sm text-white text-[10px] font-black px-2 py-0.5 rounded shadow-sm border border-amber-400/50 flex items-center gap-1 w-fit uppercase">
+                                        ⏳ PENDING
+                                    </span>
+                                    <span th:if="${blog.approvalStatus.name() == 'APPROVED'}" 
+                                          class="bg-emerald-500/90 backdrop-blur-sm text-white text-[10px] font-black px-2 py-0.5 rounded shadow-sm border border-emerald-400/50 flex items-center gap-1 w-fit uppercase">
+                                        ✅ APPROVED
+                                    </span>
+                                    <span th:if="${blog.approvalStatus.name() == 'REJECTED'}" 
+                                          class="bg-red-500/90 backdrop-blur-sm text-white text-[10px] font-black px-2 py-0.5 rounded shadow-sm border border-red-400/50 flex items-center gap-1 w-fit uppercase">
+                                        ❌ DECLINED
+                                    </span>
+
+                                    <!-- Scheduled Badge -->
+                                    <span th:if="${blog.scheduledDate != null}" class="bg-blue-500/90 backdrop-blur-sm text-white text-[10px] font-black px-2 py-0.5 rounded shadow-sm border border-blue-400/50 flex items-center gap-1 w-fit">
+                                        <span>🕒</span> SCHEDULED
+                                    </span>
                                 </div>
                             </div>
 
@@ -484,15 +524,18 @@
 
                                 <div
                                     class="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-gray-100 mt-auto">
-                                    <div class="flex items-center gap-2 text-sm text-gray-500 font-medium font-mono">
+                                    <div class="flex items-center gap-2 text-sm text-gray-500 font-medium font-mono flex-wrap">
                                         <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
                                             </path>
                                         </svg>
-                                        <span
-                                            th:text="${#temporals.format(blog.createdDate, 'dd MMM yyyy')}">Date</span>
+                                        <span>Created: <span th:text="${#temporals.format(blog.createdDate, 'dd MMM yyyy')}">Date</span></span>
+                                        <span th:if="${blog.scheduledDate != null}" class="ml-2 text-blue-600 flex items-center gap-1">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                            Publishes: <span th:text="${#temporals.format(blog.scheduledDate, 'dd MMM yyyy HH:mm')}">Date</span>
+                                        </span>
                                     </div>
 
                                     <div class="flex items-center gap-3">
@@ -1067,6 +1110,22 @@
             document.getElementById('errorList').innerHTML = '';
         }
 
+        function toggleScheduleInput() {
+            const toggle = document.getElementById('scheduleToggle');
+            const container = document.getElementById('scheduleInputContainer');
+            if (toggle.checked) {
+                container.classList.remove('hidden');
+            } else {
+                container.classList.add('hidden');
+                document.getElementById('scheduledDate').value = '';
+                const err = document.getElementById('scheduleError');
+                if (err) {
+                    err.classList.add('hidden');
+                    err.textContent = '';
+                }
+            }
+        }
+
         async function submitBlog(e) {
             e.preventDefault();
             clearErrors();
@@ -1088,7 +1147,6 @@
             if (plainText.length === 0) errors.push(showError('content', "Please add content to your blog."));
             else if (wordCount < 50) errors.push(showError('content', "Your blog post is quite short. Please aim for at least 50 words to provide value to the community."));
 
-            // 3. Image Validation
             if (fileInput.files && fileInput.files[0]) {
                 const file = fileInput.files[0];
                 const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
@@ -1096,6 +1154,22 @@
                     errors.push(showError('image', "Invalid file type. Please upload a PNG, JPG, or WEBP image."));
                 } else if (file.size > 25 * 1024 * 1024) {
                     errors.push(showError('image', "This image is too large. Please upload a file smaller than 5MB."));
+                }
+            }
+
+            // 4. Scheduling date validation
+            const isScheduled = document.getElementById('scheduleToggle').checked;
+            if (isScheduled) {
+                const dateStr = document.getElementById('scheduledDate').value;
+                if (!dateStr) {
+                    errors.push(showError('schedule', "Please select a date and time for scheduling."));
+                } else {
+                    const selectedDate = new Date(dateStr);
+                    const now = new Date();
+                    const diffTime = selectedDate - now;
+                    if (diffTime < 24 * 60 * 60 * 1000) {
+                        errors.push(showError('schedule', "Scheduled date and time must have at least a 24-hour gap from the current time."));
+                    }
                 }
             }
 
