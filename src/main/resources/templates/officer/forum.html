@@ -36,12 +36,7 @@
                                 </div>
                                 <p class="text-gray-800 font-medium text-lg leading-relaxed" th:text="${question.content}">The question?</p>
                                 
-                                <!-- Question Image (Optional) -->
-                                <div th:if="${question.imageUrl != null}" class="mt-4 overflow-hidden rounded-xl border border-gray-200 bg-white max-w-xl shadow-sm">
-                                    <img th:src="${question.imageUrl}" alt="Question Image" class="w-full h-auto object-cover max-h-[280px]">
-                                </div>
-                            </div>
-                        </div>
+
 
                         <!-- Existing Answers -->
                         <div th:if="${question.answerCount > 0}" class="px-6 py-4 border-b border-gray-100 bg-white">
