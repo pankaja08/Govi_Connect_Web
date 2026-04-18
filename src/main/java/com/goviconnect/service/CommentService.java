@@ -88,4 +88,17 @@ public class CommentService {
         comment.setExpertReplyDate(java.time.LocalDateTime.now());
         commentRepository.save(comment);
     }
+
+    @Transactional
+    public void deleteComment(Long commentId, User currentUser) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
+
+        // Only the author can delete their comment
+        if (!comment.getAuthor().getId().equals(currentUser.getId())) {
+            throw new SecurityException("You are not authorized to delete this comment.");
+        }
+
+        commentRepository.delete(comment);
+    }
 }
