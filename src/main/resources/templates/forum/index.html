@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+    th:replace="~{layout/base(content=~{::main}, pageTitle='Discussion Forum - GOVI CONNECT')}">
+
+<body>
+    <main class="w-full flex-grow pt-10 pb-20 bg-white relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+            <!-- Header Section -->
+            <div class="mb-8">
+                <h1 class="text-4xl font-extrabold text-gray-800 tracking-tight" data-i18n="forum.title"
+                    th:text="#{nav.forum}">Discussion Forum</h1>
+            </div>
+
+            <div class="max-w-4xl mx-auto flex flex-col gap-8 relative items-start">
+
+                <!-- Main Column: Posts -->
+                <div class="w-full flex flex-col gap-6" id="questions-list">
+
+                    <!-- Search -->
+                    <form th:action="@{/forum}" method="GET" class="flex items-center gap-3 w-full">
+                        <input type="text" name="search" data-i18n="forum.search_placeholder"
+                            th:placeholder="#{forum.search.placeholder}" th:value="${searchQuery}"
+                            class="flex-grow px-4 py-2.5 rounded-full border border-green-200 bg-white focus:outline-none focus:ring-2 focus:ring-green-300 text-sm text-gray-700 shadow-sm" />
+                        <button type="submit"
+                            class="bg-white border border-green-200 text-green-600 rounded-full w-10 h-10 flex items-center justify-center hover:bg-green-50 shadow-sm transition">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </button>
+
+                        <!-- Sort Options -->
+                        <div class="flex items-center gap-2">
+                            <a th:href="@{/forum(search=${searchQuery}, sort=${currentSort}, filter=${currentFilter == 'my_questions' ? '' : 'my_questions'})}"
+                                class="border px-4 py-2.5 rounded-full text-sm font-semibold transition shadow-sm flex items-center gap-1"
+                                th:classappend="${currentFilter == 'my_questions'} ? 'bg-green-600 text-white border-green-600 hover:bg-green-700' : 'bg-white text-green-700 border-green-200 hover:bg-green-50'">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                </svg>
+                                <span th:text="#{forum.filter.my_questions}">My Questions</span>
+                            </a>
+
+                            <div class="relative inline-block text-left" id="sortDropdown">
+                                <button type="button"
+                                    onclick="document.getElementById('sortMenu').classList.toggle('hidden')"
+                                    class="bg-green-50 text-green-700 border border-green-200 px-4 py-2.5 rounded-full text-sm font-semibold hover:bg-green-100 transition shadow-sm flex items-center gap-1">
+                                    <span
+                                        th:text="${currentSort == 'recent' ? #messages.msg('forum.sort.recent') : (currentSort == 'oldest' ? #messages.msg('forum.sort.oldest') : #messages.msg('forum.sort.popular'))}">Recents</span>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </button>
+                                <div id="sortMenu"
+                                    class="hidden origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20">
+                                    <div class="py-1">
+                                        <a th:href="@{/forum(search=${searchQuery}, sort='recent', filter=${currentFilter})}"
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50"
+                                            th:text="#{forum.sort.newest_first}">Newest First</a>
+                                        <a th:href="@{/forum(search=${searchQuery}, sort='oldest', filter=${currentFilter})}"
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50"
+                                            th:text="#{forum.sort.oldest_first}">Oldest First</a>
+                                        <a th:href="@{/forum(search=${searchQuery}, sort='popular', filter=${currentFilter})}"
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50"
+                                            th:text="#{forum.sort.most_answered}">Most Answered</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Suggested Questions -->
+                    <div class="flex flex-col gap-3 mt-2">
+                        <h3 class="text-xs font-extrabold text-gray-500 uppercase tracking-wider ml-1"
+                            data-i18n="forum.suggested_title" th:text="#{forum.suggested.title}">Common questions</h3>
+                        <div class="tabs-scroller px-1">
+                            <button type="button"
+                                th:onclick="|document.querySelector('input[name=content]').value = '#{forum.suggested.q1}'; document.querySelector('input[name=content]').focus();|"
+                                class="bg-white border border-green-200 text-green-700 px-4 py-2 rounded-2xl text-sm font-semibold hover:bg-green-50 hover:border-green-300 transition shadow-sm text-left shrink-0"
+                                th:text="#{forum.suggested.q1}">
+                                Q1
+                            </button>
+                            <button type="button"
+                                th:onclick="|document.querySelector('input[name=content]').value = '#{forum.suggested.q2}'; document.querySelector('input[name=content]').focus();|"
+                                class="bg-white border border-green-200 text-green-700 px-4 py-2 rounded-2xl text-sm font-semibold hover:bg-green-50 hover:border-green-300 transition shadow-sm text-left shrink-0"
+                                th:text="#{forum.suggested.q2}">
+                                Q2
+                            </button>
+                            <button type="button"
+                                th:onclick="|document.querySelector('input[name=content]').value = '#{forum.suggested.q3}'; document.querySelector('input[name=content]').focus();|"
+                                class="bg-white border border-green-200 text-green-700 px-4 py-2 rounded-2xl text-sm font-semibold hover:bg-green-50 hover:border-green-300 transition shadow-sm text-left shrink-0"
+                                th:text="#{forum.suggested.q3}">
+                                Q3
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Input Box -->
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-3">
+                        <div
+                            class="text-xs text-orange-600 bg-orange-50 px-3 py-2 rounded-lg border border-orange-100 flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span th:text="#{forum.note.hour_limit}">Note: You can edit or delete your question within 1
+                                hour of posting.</span>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="w-12 h-12 rounded-full bg-green-100 flex-shrink-0 flex items-center justify-center overflow-hidden">
+                                <span class="text-green-800 font-bold" th:if="${currentUser != null}"
+                                    th:text="${#strings.substring(currentUser.fullName, 0, 1)}">U</span>
+                                <span class="text-green-800 font-bold" th:unless="${currentUser != null}">?</span>
+                            </div>
+                            <form th:action="@{/forum/ask}" method="POST" enctype="multipart/form-data"
+                                class="flex-grow flex flex-col gap-4 w-full">
+                                <div class="flex flex-col md:flex-row items-center gap-3 w-full">
+                                    <select name="category" required th:disabled="${currentUser == null}"
+                                        class="bg-white border border-green-200 text-gray-700 px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-green-400 focus:ring-1 focus:ring-green-400 w-full md:w-auto transition-all shadow-sm">
+                                        <option value="" disabled selected th:text="#{forum.category.select}">Category
+                                        </option>
+                                        <option value="General Farming">General Farming</option>
+                                        <option value="Pest & Disease Management">Pest & Disease</option>
+                                        <option value="Fertilizer Usage">Fertilizer</option>
+                                        <option value="Crop Cultivation">Crop</option>
+                                    </select>
+                                    <input type="text" name="content"
+                                        th:placeholder="${currentUser != null ? #messages.msg('forum.ask.placeholder', currentUser.fullName) : #messages.msg('forum.ask.login')}"
+                                        th:disabled="${currentUser == null}" required
+                                        class="flex-grow bg-white border border-green-200 text-gray-700 px-5 py-3 rounded-full text-sm focus:outline-none focus:border-green-400 focus:ring-1 focus:ring-green-400 w-full shadow-sm" />
+
+                                    <div class="flex items-center gap-2 w-full md:w-auto justify-end">
+                                        <label th:if="${currentUser != null}" for="image-upload"
+                                            class="cursor-pointer bg-white border border-green-200 text-green-700 p-3 rounded-full hover:bg-green-50 transition shadow-sm">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                                </path>
+                                            </svg>
+                                        </label>
+                                        <input type="file" id="image-upload" name="image" accept="image/*"
+                                            class="hidden" onchange="previewImage(this)">
+
+                                        <button type="submit" th:if="${currentUser != null}"
+                                            class="bg-gc-green text-white px-8 py-3 rounded-full text-sm font-bold hover:bg-green-600 transition shadow-md">Ask</button>
+                                        <a th:href="@{/login}" th:unless="${currentUser != null}"
+                                            class="bg-gc-green text-white px-8 py-3 rounded-full text-sm font-bold hover:bg-green-600 transition shadow-md">Login</a>
+                                    </div>
+                                </div>
+                                <!-- Image Preview Container -->
+                                <div id="image-preview-container"
+                                    class="hidden relative mt-4 group/preview animate-fadeIn max-w-[240px]">
+                                    <div
+                                        class="relative rounded-2xl overflow-hidden border-2 border-green-200 shadow-lg bg-white aspect-square flex items-center justify-center transition-all duration-300 hover:border-green-400">
+                                        <img id="image-preview" src="#" alt="Preview"
+                                            class="max-h-full max-w-full object-cover transition-transform duration-700 group-hover/preview:scale-110">
+
+                                        <!-- Hover Overlay -->
+                                        <div
+                                            class="absolute inset-0 bg-black/40 opacity-0 group-hover/preview:opacity-100 transition-opacity duration-300 flex items-center justify-center p-4">
+                                            <button type="button" onclick="removeImage()"
+                                                class="bg-red-500 text-white p-3 rounded-full shadow-xl hover:bg-red-600 hover:scale-110 active:scale-95 transition-all flex items-center justify-center">
+                                                <svg class="w-6 h-6" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                                    </path>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-2 mt-3 px-1">
+                                        <div
+                                            class="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]">
+                                        </div>
+                                        <p class="text-[11px] text-gray-500 font-extrabold uppercase tracking-[0.1em]"
+                                            th:text="#{forum.preview.image}">Image Preview</p>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between mt-4 mb-2">
+                        <h2 class="text-xl font-extrabold text-gray-800" data-i18n="forum.community_title"
+                            th:text="#{forum.community.title}">Community Discussions</h2>
+                    </div>
+
+                    <!-- Posts List -->
+                    <div th:each="question, iterStat : ${questions}" th:id="'question-card-' + ${iterStat.index}"
+                        class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden group relative hover:shadow-md transition duration-300">
+
+
+                        <!-- Post Header / Body -->
+                        <div class="p-6 relative z-10">
+                            <div class="flex gap-4">
+                                <!-- Left: Author Info -->
+                                <div class="flex flex-col items-center flex-shrink-0 w-20">
+                                    <div
+                                        class="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center text-green-700 font-extrabold text-lg mb-2 group-hover:bg-green-100 group-hover:text-green-800 transition shadow-sm border border-green-100">
+                                        <span th:text="${#strings.substring(question.author.fullName, 0, 1)}">U</span>
+                                    </div>
+                                    <span
+                                        class="text-xs font-bold text-gray-700 text-center leading-tight truncate w-full"
+                                        th:text="${question.author.fullName}">User Name</span>
+                                    <span
+                                        class="text-[9px] bg-green-100 text-green-700 mt-1 px-2 py-0.5 rounded-full font-bold uppercase tracking-wide"
+                                        th:text="${question.author.role.name().replace('ROLE_', '')}">ROLE</span>
+                                    <span class="text-[9px] text-gray-400 mt-2 text-center font-medium"
+                                        th:text="${#temporals.format(question.createdDate, 'dd MMM yyyy')}">Date</span>
+                                </div>
+
+                                <!-- Right: Content -->
+                                <div class="flex-grow">
+                                    <p class="text-lg font-bold text-green-700 leading-relaxed mb-4"
+                                        th:text="${question.content}">
+                                        Full question content.</p>
+
+                                    <!-- Question Image (Optional) -->
+                                    <div th:if="${question.imageUrl != null}"
+                                        class="mb-5 overflow-hidden rounded-2xl border border-gray-100 shadow-sm transition-transform hover:scale-[1.01] duration-300 max-w-xl">
+                                        <img th:src="${question.imageUrl}" alt="Question Image"
+                                            class="w-full h-auto object-cover max-h-[280px]">
+                                    </div>
+
+                                    <!-- Tags dynamic -->
+                                    <div class="flex gap-2 mb-4">
+                                        <span
+                                            class="text-[10px] font-bold bg-green-600/10 text-green-700 px-3 py-1 rounded-md"
+                                            th:text="${question.category == null ? 'General' : question.category}">Category</span>
+                                    </div>
+
+                                    <!-- Meta icons -->
+                                    <div
+                                        class="flex items-center justify-between gap-4 text-gray-400 text-xs font-bold border-t border-gray-50 pt-3">
+                                        <!-- Edit and Delete Buttons -->
+                                        <div th:if="${currentUser != null and currentUser.id == question.author.id and question.createdDate.isAfter(T(java.time.LocalDateTime).now().minusHours(1))}"
+                                            class="flex gap-2">
+                                            <button type="button" th:data-id="${question.id}"
+                                                th:data-content="${question.content}"
+                                                th:data-category="${question.category}"
+                                                onclick="openEditModal(this.getAttribute('data-id'), this.getAttribute('data-content'), this.getAttribute('data-category'))"
+                                                class="flex items-center gap-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50 px-2 py-1 rounded-md transition">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                                    </path>
+                                                </svg>
+                                                <span th:text="#{forum.button.edit}">Edit</span>
+                                            </button>
+                                            <form th:action="@{'/forum/delete/' + ${question.id}}" method="POST"
+                                                class="inline"
+                                                onsubmit="return confirm('Are you sure you want to delete your question?');">
+                                                <button type="submit"
+                                                    class="flex items-center gap-1 text-red-600 hover:text-red-700 hover:bg-red-50 px-2 py-1 rounded-md transition">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                                        </path>
+                                                    </svg>
+                                                    <span th:text="#{forum.button.delete}">Delete</span>
+                                                </button>
+                                            </form>
+                                        </div>
+                                        <div
+                                            th:unless="${currentUser != null and currentUser.id == question.author.id and question.createdDate.isAfter(T(java.time.LocalDateTime).now().minusHours(1))}">
+                                        </div>
+
+                                        <span
+                                            class="flex items-center gap-1 text-green-600 bg-green-50/80 px-2.5 py-1 rounded-full border border-green-100">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03-8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
+                                                </path>
+                                            </svg>
+                                            <span
+                                                th:text="${#messages.msg('forum.answers.count', question.answerCount)}">0
+                                                answers</span>
+                                        </span>
+                                    </div>
+
+                                    <!-- Inline Answers Section -->
+                                    <div class="mt-8 pt-6 border-t border-gray-100 responses-container">
+                                        <h4 class="text-sm font-extrabold text-gray-800 mb-4 flex items-center gap-2">
+                                            <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z">
+                                                </path>
+                                            </svg>
+                                            <span th:text="#{forum.answers.title}">Expert Responses</span>
+                                        </h4>
+                                        <div th:if="${question.answerCount > 0}" class="flex flex-col gap-6">
+                                            <!-- Answers List -->
+                                            <div th:each="answer : ${question.answers}" class="flex gap-4">
+                                                <!-- Left: Expert Info -->
+                                                <div class="flex flex-col items-center flex-shrink-0 w-16">
+                                                    <div
+                                                        class="w-10 h-10 rounded-full bg-gc-gold flex items-center justify-center text-white font-extrabold text-sm mb-1 shadow-sm border border-yellow-200">
+                                                        <span
+                                                            th:text="${#strings.substring(answer.officer.fullName, 0, 1)}">E</span>
+                                                    </div>
+                                                    <span
+                                                        class="text-[10px] font-bold text-gray-800 text-center leading-tight w-full"
+                                                        th:text="${answer.officer.fullName}">Expert Name</span>
+                                                    <span
+                                                        class="text-[8px] bg-yellow-100 text-yellow-700 mt-1 px-2 py-0.5 rounded-full font-bold uppercase tracking-wide"
+                                                        th:text="#{forum.role.expert}">EXPERT</span>
+                                                    <span class="text-[9px] text-gray-400 mt-1 text-center font-medium"
+                                                        th:text="${#temporals.format(answer.createdDate, 'MMM dd')}">Date</span>
+                                                </div>
+                                                <!-- Right: Answer Content -->
+                                                <div
+                                                    class="flex-grow bg-white p-5 rounded-[1.5rem] border border-green-100 shadow-sm relative group-answer">
+                                                    <!-- Verified Check -->
+                                                    <div
+                                                        class="absolute -right-2 -top-2 w-7 h-7 bg-white rounded-full flex items-center justify-center shadow-md border border-green-50">
+                                                        <div
+                                                            class="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center text-white">
+                                                            <svg class="w-3 h-3" fill="none" stroke="currentColor"
+                                                                viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="3" d="M5 13l4 4L19 7"></path>
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                    <p class="text-sm text-gray-700 leading-relaxed font-medium mb-3"
+                                                        th:text="${answer.content}">Answer content goes here.</p>
+                                                    <div class="flex items-center gap-2 mt-auto">
+                                                        <button th:if="${currentUser != null}"
+                                                            th:onclick="'toggleAnswerLike(' + ${answer.id} + ')'"
+                                                            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all border shadow-sm group"
+                                                            th:classappend="${likedAnswerIds != null and likedAnswerIds.contains(answer.id)} ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-gray-100 text-gray-500 hover:bg-gray-50 hover:text-gray-700'">
+                                                            <svg class="w-4 h-4 transition-transform group-active:scale-95"
+                                                                th:classappend="${likedAnswerIds != null and likedAnswerIds.contains(answer.id)} ? 'fill-blue-600 text-blue-600' : 'fill-none text-gray-400'"
+                                                                stroke="currentColor" viewBox="0 0 24 24"
+                                                                stroke-width="2">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5">
+                                                                </path>
+                                                            </svg>
+                                                            <span th:id="'ans-like-count-' + ${answer.id}"
+                                                                th:text="${answer.likes.size()}">0</span>
+                                                        </button>
+                                                        <div th:unless="${currentUser != null}"
+                                                            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-white border border-gray-100 text-gray-500 shadow-sm cursor-help"
+                                                            title="Login to like">
+                                                            <svg class="w-4 h-4 fill-none text-gray-400"
+                                                                stroke="currentColor" viewBox="0 0 24 24"
+                                                                stroke-width="2">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5">
+                                                                </path>
+                                                            </svg>
+                                                            <span th:text="${answer.likes.size()}">0</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div th:unless="${question.answerCount > 0}"
+                                            class="text-center py-6 bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
+                                            <p class="text-gray-500 text-xs font-medium" th:text="#{forum.noanswers}">No
+                                                responses yet. Be the first
+                                                to provide an expert answer.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div th:if="${questions.empty}"
+                        class="bg-white p-8 rounded-2xl border border-gray-100 text-center shadow-sm">
+                        <p class="text-gray-500 font-medium text-sm"
+                            th:if="${searchQuery != null && !searchQuery.isEmpty()}"
+                            th:text="${#messages.msg('forum.noresults', searchQuery)}">
+                            No questions matching "<span th:text="${searchQuery}"></span>" were found.
+                        </p>
+                        <p class="text-gray-500 font-medium text-sm"
+                            th:unless="${searchQuery != null && !searchQuery.isEmpty()}" th:text="#{forum.noquestions}">
+                            No questions asked yet. Be the first to start a discussion!
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Chatbot Tool -->
+        <div id="chatbot-container" class="fixed bottom-6 right-6 z-50">
+            <!-- Chat Button -->
+            <button id="chatbot-toggle"
+                class="bg-gc-green text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center hover:bg-green-600 transition-all duration-300 transform hover:scale-110">
+                <svg id="chat-icon" class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z">
+                    </path>
+                </svg>
+                <svg id="close-icon" class="w-7 h-7 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
+            </button>
+
+            <!-- Chat Window -->
+            <div id="chatbot-window"
+                class="hidden absolute bottom-20 right-0 w-80 md:w-96 h-[500px] bg-white rounded-2xl shadow-2xl border border-gray-100 flex flex-col overflow-hidden transition-all duration-300 transform translate-y-4 opacity-0">
+                <!-- Header -->
+                <div class="bg-gc-green p-4 text-white flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                                </path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-sm" th:text="#{forum.chatbot.title}">GoviConnect AI</h3>
+                            <p class="text-[10px] opacity-80" th:text="#{forum.chatbot.status}">Online | Agri Expert</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Messages Container -->
+                <div id="chatbot-messages" class="flex-grow p-4 overflow-y-auto bg-gray-50 flex flex-col gap-3">
+                    <!-- Welcome Message -->
+                    <div
+                        class="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm border border-gray-100 max-w-[85%] self-start">
+                        <p class="text-sm text-gray-700" th:text="#{forum.chatbot.welcome}">Hello! I'm your GoviConnect
+                            assistant. How can I help you with
+                            your farming needs today?</p>
+                    </div>
+                </div>
+
+                <!-- Input Area -->
+                <div class="p-4 bg-white border-t border-gray-100">
+                    <form id="chatbot-form" class="flex gap-2">
+                        <input type="text" id="chatbot-input" th:placeholder="#{forum.chatbot.placeholder}"
+                            class="flex-grow px-4 py-2 bg-gray-100 border-none rounded-full text-sm focus:ring-2 focus:ring-green-400 focus:outline-none"
+                            required>
+                        <button type="submit"
+                            class="bg-gc-green text-white p-2 rounded-full hover:bg-green-600 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <style>
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(10px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .message-animate {
+                animation: fadeIn 0.3s ease-out forwards;
+            }
+
+            .animate-fadeIn {
+                animation: fadeIn 0.4s ease-out forwards;
+            }
+
+            .group-preview:hover img {
+                border-color: #10b981;
+            }
+        </style>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const sortDropdown = document.getElementById('sortDropdown');
+                const sortMenu = document.getElementById('sortMenu');
+
+                window.addEventListener('click', function (e) {
+                    if (sortDropdown && !sortDropdown.contains(e.target)) {
+                        if (sortMenu) sortMenu.classList.add('hidden');
+                    }
+                });
+
+                const toggleBtn = document.getElementById('chatbot-toggle');
+                const chatWindow = document.getElementById('chatbot-window');
+                const chatIcon = document.getElementById('chat-icon');
+                const closeIcon = document.getElementById('close-icon');
+                const chatForm = document.getElementById('chatbot-form');
+                const chatInput = document.getElementById('chatbot-input');
+                const messagesContainer = document.getElementById('chatbot-messages');
+
+                if (toggleBtn) {
+                    toggleBtn.addEventListener('click', () => {
+                        const isHidden = chatWindow.classList.contains('hidden');
+                        if (isHidden) {
+                            chatWindow.classList.remove('hidden');
+                            setTimeout(() => {
+                                chatWindow.classList.remove('translate-y-4', 'opacity-0');
+                            }, 10);
+                            chatIcon.classList.add('hidden');
+                            closeIcon.classList.remove('hidden');
+                        } else {
+                            chatWindow.classList.add('translate-y-4', 'opacity-0');
+                            setTimeout(() => {
+                                chatWindow.classList.add('hidden');
+                            }, 300);
+                            chatIcon.classList.remove('hidden');
+                            closeIcon.classList.add('hidden');
+                        }
+                    });
+                }
+
+                if (chatForm) {
+                    chatForm.addEventListener('submit', async (e) => {
+                        e.preventDefault();
+                        const question = chatInput.value.trim();
+                        if (!question) return;
+
+                        addMessage(question, 'user');
+                        chatInput.value = '';
+
+                        const loadingId = 'loading-' + Date.now();
+                        addLoadingMessage(loadingId);
+
+                        try {
+                            const response = await fetch('/api/chatbot', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ question: question })
+                            });
+
+                            const data = await response.json();
+                            removeLoadingMessage(loadingId);
+                            addMessage(data.response, 'ai');
+                        } catch (error) {
+                            removeLoadingMessage(loadingId);
+                            const errorMessage = /*[[#{forum.chatbot.error}]]*/ 'Sorry, I am having trouble connecting right now. Please try again later.';
+                            addMessage(errorMessage, 'ai');
+                        }
+                    });
+                }
+
+                function addMessage(text, sender) {
+                    const div = document.createElement('div');
+                    div.className = sender === 'user'
+                        ? 'bg-gc-green text-white p-3 rounded-2xl rounded-tr-none shadow-sm max-w-[85%] self-end message-animate'
+                        : 'bg-white text-gray-700 p-3 rounded-2xl rounded-tl-none shadow-sm border border-gray-100 max-w-[85%] self-start message-animate';
+                    div.innerHTML = `<p class="text-sm">${text}</p>`;
+                    messagesContainer.appendChild(div);
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }
+
+                function addLoadingMessage(id) {
+                    const div = document.createElement('div');
+                    div.id = id;
+                    div.className = 'bg-white text-gray-400 p-3 rounded-2xl rounded-tl-none shadow-sm border border-gray-100 max-w-[85%] self-start flex items-center gap-1';
+                    div.innerHTML = `
+                        <span class="w-1.5 h-1.5 bg-gray-300 rounded-full animate-bounce"></span>
+                        <span class="w-1.5 h-1.5 bg-gray-300 rounded-full animate-bounce" style="animation-delay: 0.2s"></span>
+                        <span class="w-1.5 h-1.5 bg-gray-300 rounded-full animate-bounce" style="animation-delay: 0.4s"></span>
+                    `;
+                    messagesContainer.appendChild(div);
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }
+
+                function removeLoadingMessage(id) {
+                    const el = document.getElementById(id);
+                    if (el) el.remove();
+                }
+            });
+        </script>
+        <!-- Edit Modal -->
+        <div id="editModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-[100]">
+            <div class="bg-white rounded-2xl w-full max-w-lg p-6 m-4 shadow-xl">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-gray-800" th:text="#{forum.modal.edit_title}">Edit Question</h3>
+                    <button type="button" onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <form id="editForm" method="POST" action="">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1"
+                            th:text="#{forum.category.select}">Category</label>
+                        <select id="editCategory" name="category" required
+                            class="w-full bg-white border border-gray-300 text-gray-700 px-4 py-2.5 rounded-lg text-sm focus:outline-none focus:border-green-400 focus:ring-1 focus:ring-green-400">
+                            <option value="General Farming" th:text="#{forum.category.general}">General Farming</option>
+                            <option value="Pest & Disease Management" th:text="#{forum.category.pest}">Pest & Disease
+                                Management</option>
+                            <option value="Fertilizer Usage" th:text="#{forum.category.fertilizer}">Fertilizer Usage
+                            </option>
+                            <option value="Crop Cultivation" th:text="#{forum.category.crop}">Crop Cultivation</option>
+                            <option value="Weather & Irrigation" th:text="#{forum.category.weather}">Weather &
+                                Irrigation</option>
+                            <option value="Market Prices" th:text="#{forum.category.market}">Market Prices</option>
+                        </select>
+                    </div>
+                    <div class="mb-5">
+                        <label class="block text-sm font-medium text-gray-700 mb-1"
+                            th:text="#{forum.ask.placeholder}">Question Details</label>
+                        <textarea id="editContent" name="content" required rows="4"
+                            class="w-full bg-white border border-gray-300 text-gray-700 px-4 py-2.5 rounded-lg text-sm focus:outline-none focus:border-green-400 focus:ring-1 focus:ring-green-400"></textarea>
+                    </div>
+                    <div class="flex justify-end gap-3">
+                        <button type="button" onclick="closeEditModal()"
+                            class="px-4 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-lg transition"
+                            th:text="#{forum.button.cancel}">Cancel</button>
+                        <button type="submit"
+                            class="bg-gc-green text-white px-5 py-2 rounded-lg font-bold hover:bg-green-600 transition shadow-sm"
+                            th:text="#{forum.button.save}">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Crop Advisory Modal -->
+        <div id="cropModal" th:if="${cropAdvisory == 'true'}"
+            class="fixed inset-0 bg-black/60 shadow flex items-center justify-center z-[110] px-4 backdrop-blur-sm">
+            <div
+                class="bg-white rounded-[2rem] w-full max-w-lg overflow-hidden shadow-2xl transform transition-all animate-fadeIn">
+                <div
+                    class="bg-gradient-to-r from-green-700 to-emerald-600 p-5 text-white flex justify-between items-center relative overflow-hidden">
+                    <div
+                        class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjIiIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIi8+PC9zdmc+')] opacity-30">
+                    </div>
+                    <h3 class="text-xl font-black relative z-10 flex items-center gap-2">
+                        <svg class="w-6 h-6 text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z">
+                            </path>
+                        </svg>
+                        Ask an Expert
+                    </h3>
+                    <button type="button"
+                        onclick="document.getElementById('cropModal').remove(); window.history.replaceState({}, document.title, '/forum');"
+                        class="relative z-10 text-white/70 hover:text-white transition bg-black/10 hover:bg-black/20 p-2 rounded-full">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <form action="/forum/ask-crop" method="POST" class="p-8 flex flex-col gap-6">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <input type="hidden" name="content" id="finalCropContent">
+                    <input type="hidden" name="imageUrl"
+                        th:value="${cropImage != null and cropImage != '' ? '/uploads/crop_images/' + cropImage : ''}">
+
+                    <!-- Crop Details display -->
+                    <div class="flex gap-5 bg-green-50/50 p-4 rounded-2xl border border-green-100/50 shadow-sm">
+                        <div
+                            class="w-24 h-24 rounded-2xl bg-white overflow-hidden flex-shrink-0 border border-green-100 flex shadow-sm">
+                            <img th:if="${cropImage != null and cropImage != ''}"
+                                th:src="@{'/uploads/crop_images/' + ${cropImage}}"
+                                class="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+                            <div th:unless="${cropImage != null and cropImage != ''}"
+                                class="w-full h-full flex items-center justify-center text-4xl bg-green-50">🌾</div>
+                        </div>
+                        <div class="flex flex-col justify-center">
+                            <p class="text-[10px] text-green-600 font-extrabold uppercase tracking-widest mb-1">
+                                Recommended Crop</p>
+                            <h4 class="text-2xl font-black text-gray-900 leading-tight mb-2.5 drop-shadow-sm"
+                                id="modalCropName" th:text="${cropName}">Crop Name</h4>
+                            <div class="flex flex-wrap gap-1.5">
+                                <span
+                                    class="bg-blue-50 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-md border border-blue-100 shadow-sm"
+                                    id="modalCropSeason" th:text="${season}">Season</span>
+                                <span
+                                    class="bg-amber-50 text-amber-700 text-[10px] font-bold px-2 py-0.5 rounded-md border border-amber-100 shadow-sm"
+                                    id="modalCropSoil" th:text="${soil}">Soil</span>
+                                <span
+                                    class="bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded-md border border-emerald-100 shadow-sm"
+                                    id="modalCropLocation" th:text="${location}">Location</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-gray-100/80 pt-5">
+                        <label class="block text-sm font-black text-gray-800 mb-2">Topic Category</label>
+                        <select name="category" required
+                            class="w-full bg-white border border-gray-200 text-gray-800 px-4 py-3.5 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 font-bold transition-all shadow-sm">
+                            <option value="" disabled selected>Select Category</option>
+                            <option value="General Farming">General Farming</option>
+                            <option value="Crop Cultivation" selected>Crop Cultivation</option>
+                            <option value="Pest & Disease Management">Pest & Disease Management</option>
+                            <option value="Fertilizer Usage">Fertilizer Usage</option>
+                            <option value="Weather & Irrigation">Weather & Irrigation</option>
+                            <option value="Market Prices">Market Prices</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-black text-gray-800 mb-2 flex justify-between items-center">
+                            Your Specific Question
+                            <span
+                                class="text-[10px] font-medium text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Required</span>
+                        </label>
+                        <textarea id="cropUserText" required rows="4"
+                            placeholder="E.g., I have slightly angled land, is this crop completely suitable for my layout?"
+                            class="w-full bg-white border border-gray-200 text-gray-800 placeholder-gray-400 px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 font-medium transition-all shadow-sm leading-relaxed"></textarea>
+                    </div>
+
+                    <button type="button" onclick="submitCropModal()"
+                        class="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-black py-4 rounded-xl shadow-xl transition-all shadow-green-500/30 transform hover:-translate-y-0.5 mt-2 flex items-center justify-center gap-2">
+                        <span>Post Question</span>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                        </svg>
+                    </button>
+
+                    <script>
+                        function submitCropModal() {
+                            const userText = document.getElementById('cropUserText').value.trim();
+                            if (!userText) {
+                                alert("Please enter your question.");
+                                return;
+                            }
+
+                            const cropName = document.getElementById('modalCropName').innerText;
+                            const season = document.getElementById('modalCropSeason').innerText;
+                            const soil = document.getElementById('modalCropSoil').innerText;
+                            const location = document.getElementById('modalCropLocation').innerText;
+
+                            const fullContent = `Regarding my recommended crop **${cropName}** (Season: ${season}, Soil: ${soil}, Location: ${location}):\n\n${userText}`;
+
+                            document.getElementById('finalCropContent').value = fullContent;
+                            document.getElementById('finalCropContent').closest('form').submit();
+                        }
+                    </script>
+                </form>
+            </div>
+        </div>
+
+        <script>
+            function openEditModal(id, content, category) {
+                document.getElementById('editForm').action = '/forum/edit/' + id;
+                document.getElementById('editContent').value = content;
+                const catSelect = document.getElementById('editCategory');
+                if (category) {
+                    for (let i = 0; i < catSelect.options.length; i++) {
+                        if (catSelect.options[i].value === category) {
+                            catSelect.selectedIndex = i;
+                            break;
+                        }
+                    }
+                }
+                const evt = new Event('change');
+                catSelect.dispatchEvent(evt);
+                document.getElementById('editModal').classList.remove('hidden');
+            }
+            function closeEditModal() {
+                document.getElementById('editModal').classList.add('hidden');
+            }
+
+            async function toggleAnswerLike(answerId) {
+                const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+                const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+                try {
+                    const response = await fetch(`/api/forum/answer/${answerId}/like`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            [header]: token
+                        }
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        const btn = document.querySelector(`button[onclick*="toggleAnswerLike(${answerId})"]`);
+                        if (btn) {
+                            const svg = btn.querySelector('svg');
+                            const countSpan = document.getElementById(`ans-like-count-${answerId}`);
+
+                            countSpan.textContent = data.likesCount;
+
+                            if (data.liked) {
+                                btn.classList.remove('bg-white', 'border-gray-100', 'text-gray-500', 'hover:bg-gray-50', 'hover:text-gray-700');
+                                btn.classList.add('bg-blue-50', 'border-blue-200', 'text-blue-700');
+                                svg.classList.remove('fill-none', 'text-gray-400');
+                                svg.classList.add('fill-blue-600', 'text-blue-600');
+                            } else {
+                                btn.classList.remove('bg-blue-50', 'border-blue-200', 'text-blue-700');
+                                btn.classList.add('bg-white', 'border-gray-100', 'text-gray-500', 'hover:bg-gray-50', 'hover:text-gray-700');
+                                svg.classList.remove('fill-blue-600', 'text-blue-600');
+                                svg.classList.add('fill-none', 'text-gray-400');
+                            }
+                        }
+                    } else if (response.status === 401) {
+                        window.location.href = '/login';
+                    }
+                } catch (error) {
+                    console.error('Error toggling like:', error);
+                }
+            }
+
+            function previewImage(input) {
+                const previewContainer = document.getElementById('image-preview-container');
+                const preview = document.getElementById('image-preview');
+
+                if (input.files && input.files[0]) {
+                    const reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        preview.setAttribute('src', e.target.result);
+                        previewContainer.classList.remove('hidden');
+                    }
+
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+
+            function removeImage() {
+                const input = document.getElementById('image-upload');
+                const previewContainer = document.getElementById('image-preview-container');
+                const preview = document.getElementById('image-preview');
+
+                input.value = "";
+                preview.setAttribute('src', '#');
+                previewContainer.classList.add('hidden');
+            }
+        </script>
+    </main>
+
+</body>
+
+</html>
