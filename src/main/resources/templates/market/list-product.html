@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>List a Product – Govi Mart | GOVI CONNECT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'gc-dark': '#166534',
+                        'gc-green': '#22c55e',
+                        'gc-gold': '#eab308',
+                    },
+                    fontFamily: { 'inter': ['Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+</head>
+
+<body class="font-inter bg-gray-50 text-gray-800">
+
+    <!-- NAVBAR -->
+    <nav class="sticky top-0 z-50 bg-gc-dark shadow-xl">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a th:href="@{/}" class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gc-gold rounded-full flex items-center justify-center shadow-lg">
+                        <span class="text-gc-dark font-black text-lg">G</span>
+                    </div>
+                    <span class="text-white font-black text-xl">GOVI<span class="text-gc-gold"> CONNECT</span></span>
+                </a>
+                <div class="flex items-center gap-4">
+                    <a th:href="@{/}" class="text-gray-200 hover:text-gc-gold font-medium hidden md:inline">Home</a>
+                    <a th:href="@{/market}" class="text-gc-gold font-semibold hidden md:inline">Govi Mart</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- FORM -->
+    <section class="max-w-2xl mx-auto px-6 py-12 relative z-10 -mt-10">
+        <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
+            <div class="mb-8">
+                <h2 class="text-2xl font-black text-gray-800">List the Product</h2>
+                <p class="text-gray-500 text-sm mt-1">Fill in the details of the product you want to sell.</p>
+            </div>
+
+            <!-- Approval Notice -->
+            <div
+                class="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-xl text-sm font-medium mb-8 flex items-start gap-3">
+                <svg class="w-5 h-5 text-blue-500 mt-0.5 shrink-0" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div>
+                    <span class="block font-bold mb-0.5">Approval Required</span>
+                    Your product listing will be reviewed by an administrator before it appears on Govi Mart. You will
+                    receive an email notification once approved.
+                </div>
+            </div>
+
+            <form th:action="@{/market/list}" method="post" enctype="multipart/form-data" class="space-y-6"
+                id="productForm">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+                <!-- Error Summary -->
+                <div id="errorSummary" class="hidden mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
+                    <h3 class="text-red-700 font-bold mb-2 flex items-center gap-2">
+                        <span>⚠️</span> Please fix the following errors:
+                    </h3>
+                    <ul id="errorList" class="list-disc list-inside text-red-600 text-sm space-y-1"></ul>
+                </div>
+
+                <!-- Product Name -->
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Product Name *</label>
+                    <input type="text" id="name" name="name" required placeholder="e.g. Fresh Tomatoes (Hybrid)"
+                        class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green outline-none transition-all" />
+                    <span id="nameError" class="hidden mt-1 text-xs text-red-600 font-semibold"></span>
+                </div>
+
+                <!-- Description -->
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Description</label>
+                    <textarea id="description" name="description" rows="3" placeholder="Describe your product..."
+                        class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green outline-none resize-none transition-all"></textarea>
+                    <span id="descriptionError" class="hidden mt-1 text-xs text-red-600 font-semibold"></span>
+                </div>
+
+                <!-- Price + Quantity Row -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Price (Rs.) *</label>
+                        <input type="number" id="price" name="price" required min="0" step="0.01" placeholder="350.00"
+                            class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green outline-none transition-all" />
+                        <span id="priceError" class="hidden mt-1 text-xs text-red-600 font-semibold"></span>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Quantity *</label>
+                        <input type="number" id="quantity" name="quantity" required min="1" placeholder="100"
+                            class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green outline-none transition-all" />
+                        <span id="quantityError" class="hidden mt-1 text-xs text-red-600 font-semibold"></span>
+                    </div>
+                </div>
+
+                <!-- Category + Unit Row -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Category *</label>
+                        <select name="category" required
+                            class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green outline-none bg-white">
+                            <option value="">Select category</option>
+                            <option th:each="cat : ${categories}" th:value="${cat.name()}"
+                                th:text="${#strings.capitalize(#strings.toLowerCase(cat.name()))}">Category</option>
+                        </select>
+                        <span id="categoryError" class="hidden mt-1 text-xs text-red-600 font-semibold"></span>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Unit</label>
+                        <select id="unit" name="unit"
+                            class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green outline-none bg-white transition-all">
+                            <option value="kg">Kg</option>
+                            <option value="pieces">Pieces</option>
+                            <option value="liters">Liters</option>
+                            <option value="bags">Bags</option>
+                            <option value="packets">Packets</option>
+                            <option value="units">Units</option>
+                        </select>
+                        <span id="unitError" class="hidden mt-1 text-xs text-red-600 font-semibold"></span>
+                    </div>
+                </div>
+
+                <!-- Sale Type -->
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Sale Type *</label>
+                    <select name="saleType" required
+                        class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green outline-none bg-white">
+                        <option th:each="st : ${saleTypes}" th:value="${st.name()}" th:text="${st.displayName}"
+                            th:selected="${st.name() == 'BOTH'}">Retail &amp; Wholesale</option>
+                    </select>
+                    <p class="text-xs text-gray-400 mt-1">Choose whether you sell retail quantities, bulk wholesale, or
+                        both.</p>
+                </div>
+
+                <!-- Image -->
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Product Image</label>
+                    <input type="file" name="image" accept="image/*"
+                        class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-gc-green/10 file:text-gc-dark hover:file:bg-gc-green/20" />
+                    <span id="imageError" class="hidden mt-1 text-xs text-red-600 font-semibold"></span>
+                </div>
+
+                <!-- Contact + Location Row -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Contact Number</label>
+                        <input type="text" id="contactNumber" name="contactNumber"
+                            th:placeholder="${user.contactNumber}"
+                            class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green outline-none transition-all" />
+                        <span id="contactNumberError" class="hidden mt-1 text-xs text-red-600 font-semibold"></span>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Location</label>
+                        <input type="text" id="location" name="location" th:placeholder="${user.district}"
+                            class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green outline-none transition-all" />
+                        <span id="locationError" class="hidden mt-1 text-xs text-red-600 font-semibold"></span>
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" id="submitBtn" onclick="validateProductForm(event)"
+                    class="w-full bg-gc-dark text-white font-black py-3.5 rounded-xl text-lg hover:bg-gc-green transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed">
+                    <span id="btnIcon">🚀</span>
+                    <span id="btnText">List Product</span>
+                    <div id="btnSpinner"
+                        class="hidden w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                </button>
+
+                <a th:href="@{/market}"
+                    class="block text-center text-sm text-gray-400 hover:text-gc-dark font-medium mt-2">
+                    ← Back to Govi Mart
+                </a>
+            </form>
+        </div>
+    </section>
+
+
+    <script>
+        function showError(id, message) {
+            const el = document.getElementById(id + 'Error');
+            if (el) {
+                el.textContent = message;
+                el.classList.remove('hidden');
+            }
+            const input = document.getElementById(id);
+            if (input) input.classList.add('border-red-500');
+            return message;
+        }
+
+        function clearErrors() {
+            document.querySelectorAll('[id$="Error"]').forEach(el => {
+                el.textContent = '';
+                el.classList.add('hidden');
+            });
+            document.querySelectorAll('input, select, textarea').forEach(el => {
+                el.classList.remove('border-red-500');
+            });
+            document.getElementById('errorSummary').classList.add('hidden');
+            document.getElementById('errorList').innerHTML = '';
+        }
+
+        function validateProductForm(e) {
+            e.preventDefault();
+            clearErrors();
+            const errors = [];
+
+            const name = document.getElementById('name').value.trim();
+            const description = document.getElementById('description').value.trim();
+            const price = document.getElementById('price').value;
+            const quantity = document.getElementById('quantity').value;
+            const category = document.querySelector('select[name="category"]').value;
+            const contact = document.getElementById('contactNumber').value.trim();
+            const location = document.getElementById('location').value.trim();
+            const imageInput = document.querySelector('input[name="image"]');
+
+            // 1. Name
+            if (!name) errors.push(showError('name', "Please enter a product name."));
+            else if (name.length < 3) errors.push(showError('name', "Product name is too short. Please use at least 3 characters."));
+            else if (name.length > 100) errors.push(showError('name', "Product name is too long. Max 100 characters."));
+
+            // 2. Description
+            if (description.length > 1000) errors.push(showError('description', "Description is too long. Max 1000 characters."));
+
+            // 3. Price
+            if (!price || isNaN(price) || parseFloat(price) <= 0) {
+                errors.push(showError('price', "Please enter a valid price greater than zero."));
+            } else {
+                const parts = price.split('.');
+                if (parts.length > 1 && parts[1].length > 2) {
+                    errors.push(showError('price', "Price cannot have more than 2 decimal places."));
+                }
+            }
+
+            // 4. Quantity
+            if (!quantity || isNaN(quantity) || parseFloat(quantity) <= 0) {
+                errors.push(showError('quantity', "Please enter a valid quantity greater than zero."));
+            }
+
+            // 5. Category
+            if (!category) errors.push(showError('category', "Please select a category for your product."));
+
+            // 6. Contact Number
+            if (contact && !/^0\d{9}$/.test(contact)) {
+                errors.push(showError('contactNumber', "Please enter a valid 10-digit phone number (e.g., 0712345699)."));
+            }
+
+            // 7. Location
+            if (location.length > 50) errors.push(showError('location', "Location name is too long. Max 50 characters."));
+
+            // 8. Image
+            if (imageInput.files && imageInput.files[0]) {
+                const file = imageInput.files[0];
+                const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+                if (!validTypes.includes(file.type)) {
+                    errors.push(showError('image', "Please upload a valid image file (JPG, PNG, or WEBP)."));
+                } else if (file.size > 5 * 1024 * 1024) {
+                    errors.push(showError('image', "This image is too large. Please keep it under 5MB."));
+                }
+            }
+
+            if (errors.length > 0) {
+                const summary = document.getElementById('errorSummary');
+                const list = document.getElementById('errorList');
+                errors.forEach(err => {
+                    const li = document.createElement('li');
+                    li.textContent = err;
+                    list.appendChild(li);
+                });
+                summary.classList.remove('hidden');
+                window.scrollTo({ top: summary.offsetTop - 100, behavior: 'smooth' });
+                return;
+            }
+
+            // Double submission prevention
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            document.getElementById('btnIcon').classList.add('hidden');
+            document.getElementById('btnText').textContent = 'Listing Product...';
+            document.getElementById('btnSpinner').classList.remove('hidden');
+
+            document.getElementById('productForm').submit();
+        }
+
+        // Real-time error clearing
+        document.querySelectorAll('input, select, textarea').forEach(input => {
+            input.addEventListener('input', () => {
+                // Clear the immediate red border
+                input.classList.remove('border-red-500');
+                
+                // Find and hide the specific error message for this field
+                const errorEl = document.getElementById(input.id + 'Error');
+                if (errorEl) {
+                    errorEl.classList.add('hidden');
+                    errorEl.textContent = '';
+                }
+
+                // Also clear any sibling server-side error spans (if any)
+                const parent = input.parentElement;
+                if (parent) {
+                    const serverErrors = parent.querySelectorAll('.text-red-500:not([id$="Error"])');
+                    serverErrors.forEach(err => {
+                        err.classList.add('hidden');
+                        err.textContent = '';
+                    });
+                }
+
+                // If this was a select without an ID, try to find error by name
+                if (!input.id && input.name) {
+                    const nameError = document.getElementById(input.name + 'Error');
+                    if (nameError) nameError.classList.add('hidden');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

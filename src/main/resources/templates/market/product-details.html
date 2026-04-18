@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="${product.name} + ' | Govi Mart'">Product Details | Govi Mart</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'gc-dark': '#166534',
+                        'gc-green': '#22c55e',
+                        'gc-gold': '#eab308',
+                        'gc-tan': '#bbf7d0',
+                    },
+                    fontFamily: { 'inter': ['Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+</head>
+
+<body class="font-inter bg-white text-gray-800 antialiased flex flex-col min-h-screen">
+
+    <!-- NAVBAR (Same as index) -->
+    <nav class="sticky top-0 z-50 bg-gc-dark shadow-xl">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a th:href="@{/}" class="flex items-center gap-3 group">
+                    <div class="w-10 h-10 bg-gc-gold rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                        <span class="text-gc-dark font-black text-lg">G</span>
+                    </div>
+                    <span class="text-white font-black text-xl tracking-wide">GOVI<span class="text-gc-gold"> CONNECT</span></span>
+                </a>
+                <div class="hidden md:flex items-center gap-6">
+                    <a th:href="@{/}" class="text-gray-200 hover:text-gc-gold transition-colors font-medium">Home</a>
+                    <a th:href="@{/market}" class="text-gc-gold font-semibold">Govi Mart</a>
+                    <div sec:authorize="!isAuthenticated()" class="flex items-center gap-3">
+                        <a th:href="@{/register}" class="text-gray-200 hover:text-gc-gold transition-colors font-medium">Register</a>
+                        <a th:href="@{/login}" class="bg-gc-gold text-gc-dark font-bold px-5 py-2 rounded-full hover:bg-yellow-300 transition-all shadow-lg">Login</a>
+                    </div>
+                    <div sec:authorize="isAuthenticated()" class="flex items-center gap-4">
+                        <span sec:authorize="hasRole('ADMIN')"><a th:href="@{/admin/dashboard}" class="text-gray-200 hover:text-gc-gold font-medium">Admin</a></span>
+                        <span sec:authorize="hasRole('AGRI_OFFICER')"><a th:href="@{/officer/dashboard}" class="text-gray-200 hover:text-gc-gold font-medium">Dashboard</a></span>
+                        <a th:href="@{/user/profile}" class="text-gray-200 hover:text-gc-gold font-medium">Profile</a>
+                        <form th:action="@{/logout}" method="post" class="inline">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                            <button type="submit" class="text-red-300 hover:text-red-100 font-medium">Logout</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN PRODUCT SECTION -->
+    <main class="flex-grow max-w-6xl mx-auto px-6 py-12 lg:py-20 w-full">
+        <!-- Breadcrumb -->
+        <nav class="flex text-sm text-gray-400 mb-8" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li class="inline-flex items-center">
+                    <a th:href="@{/market}" class="hover:text-gc-dark transition-colors">Govi Mart</a>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <span class="mx-2">/</span>
+                        <a th:href="@{/market(category=${product.category.name()})}" class="capitalize hover:text-gc-dark transition-colors"
+                           th:text="${#strings.capitalize(#strings.toLowerCase(product.category.name()))}">Category</a>
+                    </div>
+                </li>
+                <li aria-current="page">
+                    <div class="flex items-center">
+                        <span class="mx-2">/</span>
+                        <span class="text-gray-600 font-medium" th:text="${product.name}">Product Name</span>
+                    </div>
+                </li>
+            </ol>
+        </nav>
+
+        <div class="flex flex-col md:flex-row gap-12 lg:gap-20">
+            <!-- Left: Product Image -->
+            <div class="w-full md:w-1/2 flex justify-center items-start">
+                <div class="relative w-full aspect-square bg-gray-50 rounded-2xl overflow-hidden shadow-sm border border-gray-100 group">
+                    <img th:if="${product.imageUrl != null}" th:src="${product.imageUrl}" th:alt="${product.name}"
+                        class="w-full h-full object-contain p-8 group-hover:scale-105 transition-transform duration-500" />
+                    <div th:unless="${product.imageUrl != null}"
+                        class="w-full h-full flex items-center justify-center text-8xl text-gray-300 bg-gray-50">
+                        🌿
+                    </div>
+                    
+                    <!-- Heart Favorite Button (Authenticated) -->
+                    <button sec:authorize="isAuthenticated()" th:data-id="${product.id}" onclick="toggleFavorite(event, this)"
+                        class="absolute top-4 right-4 p-2 rounded-full bg-white/90 backdrop-blur-sm shadow hover:scale-110 transition-transform flex items-center gap-1.5 z-10"
+                        title="Favorite this product">
+                        <svg class="w-6 h-6 favorite-icon transition-colors duration-300" 
+                             th:classappend="${isFavorite} ? 'fill-red-500 text-red-500' : 'fill-none text-gray-500'" 
+                             stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                        </svg>
+                        <span class="text-xs font-bold text-gray-700 favorite-count" th:text="${product.favoriteCount}">0</span>
+                    </button>
+                    <!-- Heart Favorite Button (Unauthenticated) -->
+                    <a sec:authorize="!isAuthenticated()" th:href="@{/login}"
+                        class="absolute top-4 right-4 p-2 rounded-full bg-white/90 backdrop-blur-sm shadow hover:scale-110 transition-transform flex items-center gap-1.5 z-10"
+                        title="Login to favorite this product">
+                        <svg class="w-6 h-6 favorite-icon transition-colors duration-300 fill-none text-gray-500" 
+                             stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                        </svg>
+                        <span class="text-xs font-bold text-gray-700 favorite-count" th:text="${product.favoriteCount}">0</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right: Product Details -->
+            <div class="w-full md:w-1/2 flex flex-col">
+                <div class="mb-3 space-x-2">
+                    <span th:if="${product.stockStatus.name() == 'OUT_OF_STOCK'}" class="bg-red-100 text-red-700 font-bold px-3 py-1 rounded-full text-xs uppercase tracking-wider">Out of Stock</span>
+                    <span th:if="${product.stockStatus.name() == 'SOLD_OUT'}" class="bg-gray-200 text-gray-700 font-bold px-3 py-1 rounded-full text-xs uppercase tracking-wider">Sold Out</span>
+                    <span th:if="${product.stockStatus.name() == 'IN_STOCK'}" class="bg-green-100 text-green-800 font-bold px-3 py-1 rounded-full text-xs uppercase tracking-wider">In Stock</span>
+                </div>
+                <h1 class="text-4xl lg:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight" th:text="${product.name}">
+                    Product Name
+                </h1>
+                
+                <p class="text-3xl font-black text-gray-800 mb-8">
+                    Rs. <span th:text="${#numbers.formatDecimal(product.price, 1, 2)}">0.00</span>
+                    <span th:if="${product.unit != null and product.unit != ''}" class="text-lg font-medium text-gray-400"
+                          th:text="'/ ' + ${product.unit}">/ kg</span>
+                </p>
+
+                <div class="prose prose-sm text-gray-500 mb-8 leading-relaxed max-w-none" th:text="${product.description != null ? product.description : 'No description provided for this product.'}">
+                    Product Description details go here.
+                </div>
+
+                <!-- Weight / Quantity Display -->
+                <div class="mb-8">
+                    <h3 class="text-sm font-bold text-gray-900 mb-3">Available Quantity</h3>
+                    <div class="inline-flex border border-gray-200 rounded-lg px-4 py-2 bg-gray-50">
+                        <span class="font-semibold text-gray-800" th:text="${product.quantity}">0</span>
+                        <span class="ml-1 text-gray-600" th:text="${product.unit != null ? product.unit : 'items'}">items</span>
+                    </div>
+                </div>
+
+                <!-- Actions (Rate and Contact Seller) -->
+                <div class="flex flex-col sm:flex-row gap-4 mb-10 pt-4 border-t border-gray-100">
+                    <!-- Rate Item Interactive UI -->
+                    <div class="flex flex-col items-center flex-1 bg-white border-2 border-gray-200 py-2.5 px-4 rounded-xl shadow-sm">
+                        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Rate this item</span>
+                        <!-- Authenticated Stars -->
+                        <div class="flex items-center gap-1 rating-stars" sec:authorize="isAuthenticated()" th:data-id="${product.id}">
+                            <button th:each="i : ${#numbers.sequence(1, 5)}" type="button" th:aria-label="'Rate ' + ${i} + ' stars'"
+                                    th:onclick="'submitRating(' + ${i} + ', this)'"
+                                    class="star-btn transition-transform hover:scale-125 focus:outline-none">
+                                <svg class="w-6 h-6 star-svg transition-colors duration-300" 
+                                     th:classappend="${i <= product.averageRating + 0.5 ? 'text-gc-gold' : 'text-gray-300 hover:text-yellow-200'}" 
+                                     th:data-rating="${i}" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <!-- Unauthenticated Stars -->
+                        <div class="flex items-center gap-1 rating-stars" sec:authorize="!isAuthenticated()">
+                            <a th:href="@{/login}" th:each="i : ${#numbers.sequence(1, 5)}" class="star-btn transition-transform hover:scale-125" title="Login to rate">
+                                <svg class="w-6 h-6 star-svg text-gray-300 hover:text-yellow-200" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                            </a>
+                        </div>
+                        <div class="text-[10px] text-gray-500 mt-1.5 font-medium"><span class="avg-rating-display" th:text="${#numbers.formatDecimal(product.averageRating, 1, 1)}">0.0</span> avg (<span class="rating-count-display" th:text="${product.ratingCount}">0</span> ratings)</div>
+                        <!-- Success Message Container -->
+                        <div id="rating-success-message" class="text-xs font-bold text-green-600 mt-1.5 hidden transition-opacity duration-300 opacity-0">Thank you for rating!</div>
+                    </div>
+                    
+                    <!-- Chat with Seller Button -->
+                    <button sec:authorize="isAuthenticated()" type="button"
+                       id="chat-with-seller-btn"
+                       th:data-product-id="${product.id}"
+                       th:data-product-name="${product.name}"
+                       th:data-product-price="${#numbers.formatDecimal(product.price, 1, 2)}"
+                       th:data-product-image="${product.imageUrl}"
+                       th:data-seller-id="${product.seller.id}"
+                       th:data-seller-name="${product.sellerName}"
+                       th:data-is-own="${#authentication.name == product.seller.username}"
+                       onclick="openChatModal(this)"
+                       class="flex-1 bg-gc-dark hover:bg-gc-green text-white font-bold py-3.5 px-6 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-green-900/20 text-center">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                        </svg>
+                        Chat with Seller
+                    </button>
+                    <a sec:authorize="!isAuthenticated()" th:href="@{/login}"
+                       class="flex-1 bg-gc-dark hover:bg-gc-green text-white font-bold py-3.5 px-6 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-green-900/20 text-center">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                        </svg>
+                        Chat with Seller
+                    </a>
+                </div>
+
+                <!-- Meta Information -->
+                <div class="space-y-3 text-sm flex flex-col mt-auto pt-6 border-t border-gray-100">
+                    <div class="flex">
+                        <span class="w-24 font-bold text-gray-900">Seller:</span>
+                        <span class="text-gray-600 flex items-center gap-2">
+                            <span class="w-5 h-5 rounded-full bg-gc-green flex items-center justify-center text-white text-[10px] font-bold"
+                                th:text="${#strings.substring(product.sellerName, 0, 1)}">S</span>
+                            <span th:text="${product.sellerName}">Seller Name</span>
+                        </span>
+                    </div>
+                    <div class="flex" th:if="${product.location != null}">
+                        <span class="w-24 font-bold text-gray-900">Location:</span>
+                        <span class="text-gray-600" th:text="${product.location}">District/City</span>
+                    </div>
+                    <div class="flex">
+                        <span class="w-24 font-bold text-gray-900">Category:</span>
+                        <a th:href="@{/market(category=${product.category.name()})}" class="text-gc-dark hover:underline capitalize"
+                           th:text="${#strings.capitalize(#strings.toLowerCase(product.category.name()))}">Category</a>
+                    </div>
+                    <div class="flex">
+                        <span class="w-24 font-bold text-gray-900">Listing Date:</span>
+                        <span class="text-gray-600" th:text="${#temporals.format(product.createdDate, 'dd MMM yyyy')}">01 Jan 2025</span>
+                    </div>
+                </div>
+
+                <!-- Dummy Share options (as in design) -->
+                <div class="flex items-center gap-4 mt-6 text-sm">
+                    <span class="font-bold text-gray-900">Share:</span>
+                    <div class="flex gap-3 text-gray-400">
+                        <a href="#" class="hover:text-blue-600 transition-colors">Facebook</a>
+                        <a href="#" class="hover:text-blue-400 transition-colors">Twitter</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-gc-dark text-gray-300 py-10 mt-auto">
+        <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-3 gap-8">
+            <div>
+                <h3 class="text-gc-gold font-black text-xl mb-3">GOVI CONNECT</h3>
+                <p class="text-sm text-gray-400 leading-relaxed" data-i18n="footer.description" th:text="#{footer.description}">Sri Lanka's first all-in-one agriculture platform, connecting farmers, experts, and communities.</p>
+            </div>
+            <div>
+                <h4 class="text-white font-semibold mb-3" data-i18n="footer.links" th:text="#{footer.links}">Quick Links</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a th:href="@{/}" class="hover:text-gc-gold transition-colors" data-i18n="nav.home" th:text="#{nav.home}">Home</a></li>
+                    <li><a th:href="@{/market}" class="hover:text-gc-gold transition-colors" data-i18n="nav.govimart" th:text="#{nav.govimart}">Govi Mart</a></li>
+                    <li><a th:href="@{/register}" class="hover:text-gc-gold transition-colors" data-i18n="nav.register" th:text="#{nav.register}">Register</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-semibold mb-3" data-i18n="footer.contact" th:text="#{footer.contact}">Contact</h4>
+                <p class="text-sm text-gray-400">support@goviconnect.lk</p>
+                <p class="text-sm text-gray-400 mt-1" data-i18n="footer.country">Sri Lanka 🇱🇰</p>
+            </div>
+        </div>
+        <div class="text-center text-xs text-gray-500 mt-8">&copy; 2025 GOVI CONNECT. <span data-i18n="footer.rights" th:text="#{footer.rights}">All rights reserved.</span></div>
+    </footer>
+
+    <!-- CSRF Token for exact POST API -->
+    <th:block sec:authorize="isAuthenticated()">
+        <meta name="_csrf" th:content="${_csrf.token}" />
+        <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+    </th:block>
+
+    <script>
+        function toggleFavorite(event, button) {
+            event.preventDefault(); 
+            event.stopPropagation();
+            
+            const productId = button.getAttribute('data-id');
+            const tokenMeta = document.querySelector('meta[name="_csrf"]');
+            const headerMeta = document.querySelector('meta[name="_csrf_header"]');
+            
+            if (!tokenMeta || !headerMeta) {
+                window.location.href = '/login';
+                return;
+            }
+            
+            const token = tokenMeta.getAttribute('content');
+            const header = headerMeta.getAttribute('content');
+            
+            fetch(`/market/api/favorite/${productId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [header]: token
+                }
+            })
+            .then(response => {
+                if(response.status === 401) {
+                    window.location.href = '/login';
+                    return Promise.reject('Unauthorized');
+                }
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(data => {
+                const svg = button.querySelector('.favorite-icon');
+                const countSpan = button.querySelector('.favorite-count');
+                
+                if (data.isFavorite) {
+                    svg.classList.remove('fill-none', 'text-gray-500');
+                    svg.classList.add('fill-red-500', 'text-red-500');
+                    countSpan.innerText = parseInt(countSpan.innerText) + 1;
+                } else {
+                    svg.classList.remove('fill-red-500', 'text-red-500');
+                    svg.classList.add('fill-none', 'text-gray-500');
+                    countSpan.innerText = Math.max(0, parseInt(countSpan.innerText) - 1);
+                }
+            })
+            .catch(error => {
+                if (error !== 'Unauthorized') console.error('Error toggling favorite:', error);
+            });
+        }
+
+        function submitRating(rating, button) {
+            const container = button.closest('.rating-stars');
+            if(!container) return;
+            const productId = container.getAttribute('data-id');
+
+            const tokenMeta = document.querySelector('meta[name="_csrf"]');
+            const headerMeta = document.querySelector('meta[name="_csrf_header"]');
+            if (!tokenMeta || !headerMeta) {
+                window.location.href = '/login';
+                return;
+            }
+            const token = tokenMeta.getAttribute('content');
+            const header = headerMeta.getAttribute('content');
+
+            const formData = new URLSearchParams();
+            formData.append('rating', rating);
+
+            fetch(`/market/api/rate/${productId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    [header]: token
+                },
+                body: formData.toString()
+            })
+            .then(response => {
+                if(response.status === 401) {
+                    window.location.href = '/login';
+                    return Promise.reject('Unauthorized');
+                }
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Update star colors to reflect the newly selected rating immediately
+                    const stars = container.querySelectorAll('.star-svg');
+                    stars.forEach((star, index) => {
+                        if (index < rating) {
+                            star.classList.add('text-gc-gold');
+                            star.classList.remove('text-gray-300');
+                        } else {
+                            star.classList.remove('text-gc-gold');
+                            star.classList.add('text-gray-300');
+                        }
+                    });
+                    
+                    // Show an inline success message instead of alert
+                    const msgDiv = document.getElementById('rating-success-message');
+                    if(msgDiv) {
+                        msgDiv.classList.remove('hidden');
+                        // Small timeout to allow display:block to apply before animating opacity
+                        setTimeout(() => msgDiv.classList.remove('opacity-0'), 10);
+                        setTimeout(() => {
+                            msgDiv.classList.add('opacity-0');
+                            setTimeout(() => msgDiv.classList.add('hidden'), 300); // Wait for fade out
+                        }, 3000);
+                    }
+                }
+            })
+            .catch(error => {
+                if (error !== 'Unauthorized') console.error('Error submitting rating:', error);
+            });
+        }
+    </script>
+    <!-- ===================== CHAT MODAL ===================== -->
+    <div id="chatModal" class="fixed inset-0 z-50 hidden flex items-end sm:items-center justify-center p-4"
+         style="background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);">
+        <div id="chatModalPanel"
+             class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col sm:flex-row transform translate-y-10 opacity-0 transition-all duration-300"
+             style="max-height: 80vh; min-height: 480px;">
+
+            <!-- Left: Product Info Panel -->
+            <div id="chatProductPanel" class="sm:w-64 shrink-0 flex flex-col p-6 text-white"
+                 style="background: linear-gradient(160deg, #166534 60%, #15803d);">
+                <div class="w-full aspect-square rounded-xl overflow-hidden mb-4 bg-white/10 flex items-center justify-center">
+                    <img id="chatProductImg" src="" alt="Product" class="w-full h-full object-cover hidden"/>
+                    <span id="chatProductImgPlaceholder" class="text-5xl">🌿</span>
+                </div>
+                <h3 id="chatProductName" class="font-black text-lg leading-tight mb-1">Product Name</h3>
+                <p class="text-green-200 font-bold text-sm mb-3">Rs. <span id="chatProductPrice">0.00</span></p>
+                <p class="text-green-100 text-xs mt-auto">Seller: <span id="chatProductSeller" class="font-bold text-white"></span></p>
+            </div>
+
+            <!-- Right: Chat Panel -->
+            <div class="flex flex-col flex-1 min-h-0">
+                <!-- Chat Header -->
+                <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-full bg-gc-dark flex items-center justify-center text-white font-black text-sm" id="chatSellerAvatar">S</div>
+                        <div>
+                            <p class="font-bold text-gray-900 text-sm" id="chatSellerName">Seller</p>
+                            <p class="text-gray-400 text-xs">About: <span id="chatAbout">Product</span></p>
+                        </div>
+                    </div>
+                    <button onclick="closeChatModal()" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 hover:text-gray-700 transition-colors font-bold">
+                        ✕
+                    </button>
+                </div>
+
+                <!-- Messages Area -->
+                <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-3"
+                     style="min-height: 200px; scroll-behavior: smooth;">
+                    <div id="chatLoading" class="text-center py-10">
+                        <div class="inline-block w-6 h-6 border-2 border-gc-dark border-t-transparent rounded-full animate-spin"></div>
+                        <p class="text-gray-400 text-xs mt-2">Loading messages...</p>
+                    </div>
+                    <div id="chatEmpty" class="hidden text-center py-10">
+                        <div class="text-4xl mb-2">💬</div>
+                        <p class="text-gray-400 text-sm font-medium">No messages yet.</p>
+                        <p class="text-gray-300 text-xs mt-1">Start the conversation below!</p>
+                    </div>
+                </div>
+
+                <!-- Input Area -->
+                <div class="px-4 py-3 border-t border-gray-100 flex gap-2">
+                    <input type="text" id="chatInput"
+                           placeholder="Type a message..."
+                           maxlength="2000"
+                           class="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-gc-dark/30 focus:border-gc-dark outline-none transition-all"
+                           onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();sendChatMessage();}"/>
+                    <button onclick="sendChatMessage()" id="chatSendBtn"
+                            class="bg-gc-dark hover:bg-gc-green text-white font-bold px-5 py-2.5 rounded-xl flex items-center gap-1.5 text-sm transition-all hover:shadow-lg disabled:opacity-50">
+                        Send
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat JS -->
+    <style>
+        .chat-bubble-in {
+            animation: bubbleIn 0.25s cubic-bezier(0,0,0.3,1) both;
+        }
+        @keyframes bubbleIn {
+            from { opacity:0; transform: translateY(8px) scale(0.96); }
+            to   { opacity:1; transform: none; }
+        }
+        #chatModal.active { display:flex; }
+    </style>
+    <script>
+        let _chatProductId = null, _chatReceiverId = null;
+
+        function openChatModal(btn) {
+            const isOwn = btn.getAttribute('data-is-own') === 'true';
+            if (isOwn) {
+                alert("You cannot chat with yourself about your own product.");
+                return;
+            }
+            _chatProductId = btn.getAttribute('data-product-id');
+            _chatReceiverId = btn.getAttribute('data-seller-id');
+            const sellerName = btn.getAttribute('data-seller-name');
+            const productName = btn.getAttribute('data-product-name');
+            const productPrice = btn.getAttribute('data-product-price');
+            const productImage = btn.getAttribute('data-product-image');
+
+            // Populate modal
+            document.getElementById('chatProductName').textContent = productName;
+            document.getElementById('chatProductPrice').textContent = productPrice;
+            document.getElementById('chatProductSeller').textContent = sellerName;
+            document.getElementById('chatSellerName').textContent = sellerName;
+            document.getElementById('chatAbout').textContent = productName;
+            const avatarLetter = sellerName ? sellerName.charAt(0).toUpperCase() : 'S';
+            document.getElementById('chatSellerAvatar').textContent = avatarLetter;
+
+            if (productImage) {
+                document.getElementById('chatProductImg').src = productImage;
+                document.getElementById('chatProductImg').classList.remove('hidden');
+                document.getElementById('chatProductImgPlaceholder').classList.add('hidden');
+            } else {
+                document.getElementById('chatProductImg').classList.add('hidden');
+                document.getElementById('chatProductImgPlaceholder').classList.remove('hidden');
+            }
+
+            // Show modal with animation
+            const modal = document.getElementById('chatModal');
+            const panel = document.getElementById('chatModalPanel');
+            modal.classList.remove('hidden');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            requestAnimationFrame(() => {
+                panel.classList.remove('translate-y-10', 'opacity-0');
+                panel.classList.add('translate-y-0', 'opacity-100');
+            });
+
+            loadMessages();
+        }
+
+        function closeChatModal() {
+            const modal = document.getElementById('chatModal');
+            const panel = document.getElementById('chatModalPanel');
+            panel.classList.add('translate-y-10', 'opacity-0');
+            panel.classList.remove('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+                _chatProductId = null;
+                _chatReceiverId = null;
+                document.getElementById('chatMessages').innerHTML = `
+                    <div id="chatLoading" class="text-center py-10">
+                        <div class="inline-block w-6 h-6 border-2 border-gc-dark border-t-transparent rounded-full animate-spin"></div>
+                        <p class="text-gray-400 text-xs mt-2">Loading messages...</p>
+                    </div>`;
+                document.getElementById('chatInput').value = '';
+            }, 280);
+        }
+
+        // Close on backdrop click
+        document.getElementById('chatModal').addEventListener('click', function(e) {
+            if (e.target === this) closeChatModal();
+        });
+
+        async function loadMessages() {
+            if (!_chatProductId || !_chatReceiverId) return;
+            try {
+                const res = await fetch(`/market/api/message/conversation/${_chatProductId}/${_chatReceiverId}`);
+                if (res.status === 401) { window.location.href = '/login'; return; }
+                const messages = await res.json();
+                renderMessages(messages);
+            } catch(e) {
+                console.error('Failed to load messages', e);
+            }
+        }
+
+        function renderMessages(messages) {
+            const container = document.getElementById('chatMessages');
+            if (!messages || messages.length === 0) {
+                container.innerHTML = `
+                    <div id="chatEmpty" class="text-center py-10">
+                        <div class="text-4xl mb-2">💬</div>
+                        <p class="text-gray-400 text-sm font-medium">No messages yet.</p>
+                        <p class="text-gray-300 text-xs mt-1">Start the conversation below!</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = '';
+            messages.forEach((msg, i) => {
+                appendMessageBubble(msg.isMine, msg.message, msg.sentAt, false);
+            });
+            scrollChatBottom();
+        }
+
+        function appendMessageBubble(isMine, text, time, animate = true) {
+            const container = document.getElementById('chatMessages');
+            const empty = document.getElementById('chatEmpty');
+            if (empty) empty.remove();
+
+            const wrapper = document.createElement('div');
+            wrapper.className = `flex ${isMine ? 'justify-end' : 'justify-start'} ${animate ? 'chat-bubble-in' : ''}`;
+
+            wrapper.innerHTML = `
+                <div class="max-w-[70%] group">
+                    <div class="px-4 py-2.5 rounded-2xl text-sm leading-relaxed shadow-sm
+                        ${isMine
+                            ? 'bg-gc-dark text-white rounded-br-sm'
+                            : 'bg-gray-100 text-gray-800 rounded-bl-sm'}">
+                        ${escapeHtml(text)}
+                    </div>
+                    <p class="text-[10px] text-gray-400 mt-1 ${isMine ? 'text-right' : 'text-left'}">${time}</p>
+                </div>`;
+
+            container.appendChild(wrapper);
+            if (animate) scrollChatBottom();
+        }
+
+        function scrollChatBottom() {
+            const c = document.getElementById('chatMessages');
+            c.scrollTop = c.scrollHeight;
+        }
+
+        function escapeHtml(text) {
+            const d = document.createElement('div');
+            d.appendChild(document.createTextNode(text));
+            return d.innerHTML;
+        }
+
+        async function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const btn = document.getElementById('chatSendBtn');
+            const text = input.value.trim();
+            if (!text || !_chatProductId || !_chatReceiverId) return;
+
+            const tokenMeta = document.querySelector('meta[name="_csrf"]');
+            const headerMeta = document.querySelector('meta[name="_csrf_header"]');
+            if (!tokenMeta) { window.location.href = '/login'; return; }
+
+            btn.disabled = true;
+            input.disabled = true;
+
+            try {
+                const res = await fetch('/market/api/message/send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        [headerMeta.content]: tokenMeta.content
+                    },
+                    body: JSON.stringify({
+                        productId: parseInt(_chatProductId),
+                        receiverId: parseInt(_chatReceiverId),
+                        message: text
+                    })
+                });
+
+                if (res.status === 401) { window.location.href = '/login'; return; }
+                const data = await res.json();
+
+                if (data.success) {
+                    input.value = '';
+                    const now = new Date().toLocaleTimeString('en-US', {hour:'2-digit',minute:'2-digit'});
+                    appendMessageBubble(true, text, now, true);
+                } else {
+                    alert(data.error || 'Failed to send message.');
+                }
+            } catch(e) {
+                alert('Network error. Please try again.');
+            } finally {
+                btn.disabled = false;
+                input.disabled = false;
+                input.focus();
+            }
+        }
+    </script>
+</body>
+</html>
