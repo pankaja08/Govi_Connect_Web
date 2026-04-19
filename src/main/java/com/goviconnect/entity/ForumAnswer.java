@@ -36,8 +36,5 @@ public class ForumAnswer {
     @Builder.Default
     private java.util.Set<ForumAnswerLike> likes = new java.util.HashSet<>();
 
-    @PrePersist
-    public void prePersist() {
-        this.createdDate = LocalDateTime.now();
-    }
+   
 }
