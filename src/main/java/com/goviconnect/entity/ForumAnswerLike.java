@@ -30,8 +30,5 @@ public class ForumAnswerLike {
     @Column(nullable = false)
     private LocalDateTime createdDate;
 
-    @PrePersist
-    public void prePersist() {
-        this.createdDate = LocalDateTime.now();
-    }
+   
 }
