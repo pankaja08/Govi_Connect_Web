@@ -29,16 +29,18 @@ public class HomeController {
 
     @GetMapping("/")
     public String home(
+            @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "location", required = false) String location,
             @RequestParam(value = "season", required = false) String season,
             @RequestParam(value = "crop", required = false) String crop,
             @RequestParam(value = "method", required = false) String method,
             Model model) {
-        model.addAttribute("blogs", blogService.getFilteredBlogs(location, season, crop, method));
+        model.addAttribute("blogs", blogService.getFilteredBlogs(keyword, location, season, crop, method));
         model.addAttribute("farmerCount", userService.getFarmerCount());
         model.addAttribute("expertCount", userService.getExpertCount());
 
         // Pass filter parameters back to the view to show active state
+        model.addAttribute("keywordFilter", keyword);
         model.addAttribute("locationFilter", location);
         model.addAttribute("seasonFilter", season);
         model.addAttribute("cropFilter", crop);
