@@ -34,9 +34,13 @@ public class AgriOfficerController {
     @GetMapping("/dashboard")
     public String dashboard(Authentication authentication, Model model) {
         User officer = userService.findByUsername(authentication.getName());
+        List<com.goviconnect.entity.ForumQuestion> questions = forumService.getAllActiveQuestions();
+        long unansweredCount = questions.stream().filter(q -> q.getAnswerCount() == 0).count();
+
         model.addAttribute("officer", officer);
         model.addAttribute("myBlogs", blogService.getBlogsByAuthor(officer));
-        model.addAttribute("questions", forumService.getAllActiveQuestions());
+        model.addAttribute("questions", questions);
+        model.addAttribute("unansweredCount", unansweredCount);
         model.addAttribute("locations", cropAdvisoryService.getAllLocations());
         model.addAttribute("seasons", cropAdvisoryService.getAllSeasons());
         model.addAttribute("soilTypes", cropAdvisoryService.getAllSoilTypes());

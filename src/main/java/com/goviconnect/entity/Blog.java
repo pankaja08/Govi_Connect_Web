@@ -78,5 +78,8 @@ public class Blog {
         int wordCount = textContent.trim().split("\\s+").length;
         return Math.max(1, (int) Math.ceil((double) wordCount / 200));
     }
+
+    @ManyToMany(mappedBy = "savedBlogs", fetch = FetchType.LAZY)
+    private java.util.Set<User> savedByUsers = new java.util.HashSet<>();
 }
 

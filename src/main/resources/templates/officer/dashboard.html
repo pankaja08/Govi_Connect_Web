@@ -87,9 +87,14 @@
             </button>
 
             <button onclick="switchTab('forum')" id="tab-forum"
-                class="sidebar-link w-full text-left px-5 py-3.5 text-gray-300 hover:bg-white/10 hover:text-white rounded-lg transition-all flex items-center gap-3 group">
-                <span class="text-xl group-hover:scale-110 transition-transform">💬</span>
-                <span class="text-base tracking-wide font-medium">Discussion Forum</span>
+                class="sidebar-link w-full text-left px-5 py-3.5 text-gray-300 hover:bg-white/10 hover:text-white rounded-lg transition-all flex items-center justify-between group">
+                <div class="flex items-center gap-3">
+                    <span class="text-xl group-hover:scale-110 transition-transform">💬</span>
+                    <span class="text-base tracking-wide font-medium">Discussion Forum</span>
+                </div>
+                <span th:if="${unansweredCount > 0}" 
+                    class="bg-gc-gold/20 text-gc-gold text-xs font-bold py-1 px-2.5 rounded-full"
+                    th:text="${unansweredCount}">0</span>
             </button>
 
             <button onclick="switchTab('crop')" id="tab-crop"
@@ -945,13 +950,15 @@
             }
         });
 
-        // Tab Switching Logic
+        // Tab Switching Logic with Smooth Animations
         function switchTab(tabId) {
-            // Hide all sections
-            document.getElementById('section-write-blogs').classList.add('hidden');
-            document.getElementById('section-my-blogs').classList.add('hidden');
-            document.getElementById('section-forum').classList.add('hidden');
-            document.getElementById('section-crop').classList.add('hidden');
+            // Sections to hide
+            const sectionIds = ['section-write-blogs', 'section-my-blogs', 'section-forum', 'section-crop'];
+            sectionIds.forEach(id => {
+                const session = document.getElementById(id);
+                session.classList.add('hidden');
+                session.classList.remove('section-fade-enter-active', 'section-fade-enter');
+            });
 
             // Remove active styles from tabs
             const tabs = ['tab-write-blogs', 'tab-my-blogs', 'tab-forum', 'tab-crop'];
@@ -962,7 +969,16 @@
             });
 
             // Show active section 
-            document.getElementById('section-' + tabId).classList.remove('hidden');
+            const activeSection = document.getElementById('section-' + tabId);
+            activeSection.classList.remove('hidden');
+            
+            // Apply animation classes
+            activeSection.classList.add('section-fade-enter');
+            // Small timeout to allow the browser to register the hidden removal
+            setTimeout(() => {
+                activeSection.classList.add('section-fade-enter-active');
+            }, 10);
+
             // Add active styles to clicked tab
             const activeTab = document.getElementById('tab-' + tabId);
             activeTab.classList.add('active', 'text-white');

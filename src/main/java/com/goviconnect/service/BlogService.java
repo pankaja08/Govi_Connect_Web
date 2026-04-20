@@ -32,7 +32,7 @@ public class BlogService {
      */
     @Transactional
     public Blog createBlog(User author, String heading, String textContent, MultipartFile image,
-            String locationTag, String seasonTag, String cropTag, String farmingMethodTag) throws IOException {
+            String locationTag, String seasonTag, String cropTag, String farmingMethodTag, java.time.LocalDateTime scheduledDate) throws IOException {
         String imageUrl = null;
 
         if (image != null && !image.isEmpty()) {
@@ -48,6 +48,7 @@ public class BlogService {
                 .seasonTag(seasonTag)
                 .cropTag(cropTag)
                 .farmingMethodTag(farmingMethodTag)
+                .scheduledDate(scheduledDate)
                 .approvalStatus(BlogStatus.PENDING)
                 .build();
 
@@ -58,22 +59,37 @@ public class BlogService {
      * Returns the latest 6 APPROVED blogs for the home page.
      */
     public List<Blog> getLatestBlogs() {
-        return blogRepository.findTop6ByApprovalStatusOrderByCreatedDateDesc(BlogStatus.APPROVED);
+        return blogRepository.findTop6PublicBlogs(BlogStatus.APPROVED);
     }
 
     /**
      * Returns all APPROVED blogs ordered by newest first (public listing).
      */
     public List<Blog> getAllBlogs() {
-        return blogRepository.findByApprovalStatusOrderByCreatedDateDesc(BlogStatus.APPROVED);
+        return blogRepository.findPublicBlogs(BlogStatus.APPROVED);
     }
 
     /**
      * Returns filtered APPROVED blogs based on optional tags.
      */
-    public List<Blog> getFilteredBlogs(String keyword, String location, String season, String crop, String method) {
+    public List<Blog> getFilteredBlogs(String keyword, String location, String season, String crop, String method, boolean savedOnly, Long userId) {
         String pattern = (keyword == null || keyword.trim().isEmpty()) ? null : "%" + keyword.trim().toLowerCase() + "%";
-        return blogRepository.findFilteredBlogs(BlogStatus.APPROVED, pattern, location, season, crop, method);
+        return blogRepository.findFilteredBlogs(BlogStatus.APPROVED, pattern, location, season, crop, method, savedOnly, userId);
+    }
+
+    /**
+     * Toggles a blog's 'Saved' status for a user.
+     */
+    @Transactional
+    public boolean toggleSaveBlog(Long blogId, User user) {
+        Blog blog = getBlogById(blogId);
+        if (user.getSavedBlogs().contains(blog)) {
+            user.getSavedBlogs().remove(blog);
+            return false; // Removed
+        } else {
+            user.getSavedBlogs().add(blog);
+            return true; // Added
+        }
     }
 
     /**
@@ -104,7 +120,7 @@ public class BlogService {
      */
     @Transactional
     public void updateBlog(Long id, User author, String heading, String textContent, MultipartFile image,
-            String locationTag, String seasonTag, String cropTag, String farmingMethodTag)
+            String locationTag, String seasonTag, String cropTag, String farmingMethodTag, java.time.LocalDateTime scheduledDate)
             throws IOException {
         Blog blog = getBlogByIdAndAuthor(id, author);
         blog.setHeading(heading);
@@ -113,6 +129,7 @@ public class BlogService {
         blog.setSeasonTag(seasonTag);
         blog.setCropTag(cropTag);
         blog.setFarmingMethodTag(farmingMethodTag);
+        blog.setScheduledDate(scheduledDate);
         blog.setApprovalStatus(BlogStatus.PENDING);  // re-review after edit
         blog.setRejectionReason(null);
 
