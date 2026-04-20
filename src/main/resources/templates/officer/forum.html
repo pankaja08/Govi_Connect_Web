@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base(content=~{::main}, pageTitle='Expert Dashboard - GOVI CONNECT')}">
+<body>
+<main class="w-full flex-grow py-10 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Expert Forum Dashboard</h1>
+            <a th:href="@{/officer/dashboard}" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-50 flex items-center gap-2">
+                &larr; Back to Dashboard
+            </a>
+        </div>
+
+        <div th:if="${successMessage}" class="mb-6 bg-green-50 text-green-700 p-4 border-l-4 border-green-500 shadow-sm">
+            <p th:text="${successMessage}"></p>
+        </div>
+        <div th:if="${errorMessage}" class="mb-6 bg-red-50 text-red-700 p-4 border-l-4 border-red-500 shadow-sm">
+            <p th:text="${errorMessage}"></p>
+        </div>
+
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+            <div class="px-6 py-5 border-b border-gray-200 bg-gray-50">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">Pending & Active Questions</h3>
+                <p class="mt-1 max-w-2xl text-sm text-gray-500">Provide official answers to farmer inquiries.</p>
+            </div>
+            
+            <div class="p-6">
+                <!-- Start List -->
+                <div class="space-y-8">
+                    <div th:each="question : ${questions}" class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                        <!-- Q -->
+                        <div class="p-6 bg-gray-50 border-b border-gray-200 flex flex-col sm:flex-row gap-4">
+                            <div class="flex-shrink-0 flex items-center justify-center w-12 h-12 bg-green-100 text-green-800 rounded-full font-bold text-xl">Q</div>
+                            <div class="flex-grow">
+                                <div class="flex justify-between items-start">
+                                    <h4 class="text-sm font-bold text-gray-600 mb-2">Asked by <span th:text="${question.author.fullName}">User</span> on <span th:text="${#temporals.format(question.createdDate, 'MMM dd, yyyy')}">Date</span></h4>
+                                </div>
+                                <p class="text-gray-800 font-medium text-lg leading-relaxed" th:text="${question.content}">The question?</p>
+                                
+                                <!-- Question Image (Optional) -->
+                                <div th:if="${question.imageUrl != null}" class="mt-4 overflow-hidden rounded-xl border border-gray-200 bg-white max-w-xl shadow-sm">
+                                    <img th:src="${question.imageUrl}" alt="Question Image" class="w-full h-auto object-cover max-h-[280px]">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Existing Answers -->
+                        <div th:if="${question.answerCount > 0}" class="px-6 py-4 border-b border-gray-100 bg-white">
+                            <h5 class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">Existing Expert Answers</h5>
+                            <div class="space-y-3">
+                                <div th:each="ans : ${question.answers}" class="flex gap-3 bg-yellow-50 p-4 rounded-lg">
+                                    <div class="flex-shrink-0 w-8 h-8 bg-gc-gold rounded-full flex items-center justify-center text-white font-bold text-xs">E</div>
+                                    <div>
+                                        <p class="text-xs font-bold text-gray-800 mb-1" th:text="${ans.officer.fullName}">Expert</p>
+                                        <p class="text-sm text-gray-700" th:text="${ans.content}">Answer.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Answer Input Form -->
+                        <div class="p-6 bg-white">
+                            <form th:action="@{/officer/forum/answer/{id}(id=${question.id})}" method="POST">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Post your official answer</label>
+                                <textarea name="content" rows="3" required class="shadow-sm focus:ring-gc-green focus:border-gc-green block w-full sm:text-sm border-gray-300 rounded-md p-3 border" placeholder="Type your expert advice here..."></textarea>
+                                <div class="mt-4 flex justify-end">
+                                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gc-green hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gc-green">
+                                        Post Answer
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div th:if="${questions.empty}" class="text-center py-12 text-gray-500 font-medium text-lg border-2 border-dashed border-gray-200 rounded-xl">
+                        No questions in the forum right now!
+                    </div>
+                </div>
+                <!-- End List -->
+            </div>
+        </div>
+
+    </div>
+</main>
+</body>
+</html>

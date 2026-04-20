@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+    th:replace="~{layout/base(content=~{::main}, pageTitle=#{advisory.results.title})}">
+
+<body>
+<main class="w-full flex-grow bg-gray-50">
+
+    <!-- ===== PAGE HEADER ===== -->
+    <div class="bg-gradient-to-r from-green-800 to-emerald-700 py-12 px-6">
+        <div class="max-w-7xl mx-auto">
+            <!-- Breadcrumb -->
+            <div class="flex items-center gap-2 text-green-300 text-sm mb-4">
+                <a href="/crop-advisory" class="hover:text-white transition" data-i18n="nav.cropadvisory" th:text="#{nav.cropadvisory}">Smart Crop Advisory</a>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                <span class="text-white font-semibold" th:text="#{advisory.results.search_again}">Recommendations</span>
+            </div>
+
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h1 class="text-3xl font-black text-white mb-2" th:text="#{advisory.results.title}">Your Crop Recommendations</h1>
+                    <!-- Filter summary badges -->
+                    <div class="flex flex-wrap gap-2 mt-3">
+                        <span th:if="${location}" class="bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full border border-white/30">
+                            📍 <span th:text="${location}"></span>
+                        </span>
+                        <span th:if="${season}" class="bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full border border-white/30">
+                            📅 <span th:text="${season}"></span>
+                        </span>
+                        <span class="bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full border border-white/30">
+                            🌱 <span th:text="${soil != null and !soil.isBlank()} ? ${soil} : #{advisory.results.soil.any}"></span>
+                        </span>
+                            <span th:text="${crops != null} ? #{advisory.results.found(${crops.size()})} : #{advisory.results.found(0)}"></span>
+                    </div>
+                </div>
+                <a href="/crop-advisory"
+                    class="flex-shrink-0 border-2 border-white/40 hover:border-white text-white font-bold px-5 py-2.5 rounded-xl transition-all flex items-center gap-2 hover:bg-white/10">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                    <span th:text="#{advisory.results.search_again}">New Search</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== NO RESULTS ===== -->
+    <div th:if="${crops.isEmpty()}" class="max-w-2xl mx-auto text-center py-24 px-6">
+        <div class="text-7xl mb-6">🍃</div>
+        <h2 class="text-2xl font-black text-gray-800 mb-3" th:text="#{advisory.results.none.title}">No Crops Found</h2>
+        <p class="text-gray-500 mb-2" th:text="#{advisory.results.none.desc}">No crops match your selected criteria:</p>
+        <p class="text-gray-400 text-sm mb-8">
+            <strong th:text="${location}"></strong> · <strong th:text="${season}"></strong>
+            <span th:if="${soil != null and !soil.isBlank() and soil != 'Any'}"> · <strong th:text="${soil}"></strong></span>
+        </p>
+        <p class="text-gray-500 text-sm mb-8" th:text="#{advisory.results.none.tip}">Try selecting a different season, location, or set soil type to "Any Soil Type".</p>
+        <a href="/crop-advisory"
+            class="inline-flex items-center gap-2 bg-green-700 hover:bg-green-600 text-white font-bold px-8 py-3 rounded-xl transition-all shadow-lg">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            <span th:text="#{advisory.results.none.button}">Try Again</span>
+        </a>
+    </div>
+
+    <!-- ===== RESULTS GRID ===== -->
+    <div th:unless="${crops.isEmpty()}" class="max-w-7xl mx-auto px-6 py-12">
+
+        <!-- Grid of crop cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+
+            <div th:each="crop, stat : ${crops}"
+                 class="bg-white rounded-3xl shadow-md hover:shadow-2xl border border-gray-100 hover:border-green-200 transition-all duration-300 overflow-hidden group flex flex-col">
+
+                <!-- Top Pick badge for first result -->
+                <div th:if="${stat.index == 0}" class="bg-gradient-to-r from-yellow-400 to-orange-400 text-green-900 text-center text-xs font-black py-2 uppercase tracking-widest" th:text="#{advisory.results.top_pick}">
+                    ⭐ Top Recommended Crop
+                </div>
+
+                <!-- Crop Image -->
+                <div class="relative h-56 bg-gradient-to-br from-green-50 to-emerald-50 overflow-hidden">
+                    <img th:src="@{'/uploads/crop_images/' + ${crop.imageFileName}}"
+                         th:alt="${crop.cropName}"
+                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                         onerror="this.onerror=null; this.src=''; this.closest('.relative').innerHTML='<div class=\'w-full h-full flex items-center justify-center text-7xl\'>🌾</div>'">
+                    <!-- Index badge -->
+                    <div class="absolute top-3 left-3 bg-white/90 backdrop-blur text-green-800 text-xs font-black px-2.5 py-1 rounded-full shadow">
+                        #<span th:text="${stat.index + 1}"></span>
+                    </div>
+                    <!-- Save Button -->
+                    <button th:attr="data-id=${crop.id}, data-name=${crop.cropName}"
+                            onclick="openSaveModal(this.getAttribute('data-id'), this.getAttribute('data-name'))"
+                            class="absolute top-3 right-3 w-10 h-10 bg-white/90 backdrop-blur rounded-full shadow-lg flex items-center justify-center text-green-600 hover:text-white hover:bg-green-600 transition-all duration-300 group/save scale-90 hover:scale-110">
+                        <svg class="w-5 h-5 group-hover/save:animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Card content -->
+                <div class="p-6 flex flex-col flex-1">
+                    <!-- Crop name -->
+                    <h3 class="text-xl font-black text-gray-900 mb-3 leading-tight" th:text="${crop.cropName}"></h3>
+
+                    <!-- Care Instructions -->
+                    <div class="mb-5 flex-1">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="text-green-700 text-xs font-bold uppercase tracking-wide" th:text="#{advisory.results.care}">📋 Care Instructions</span>
+                        </div>
+                        <p class="text-gray-600 text-sm leading-relaxed" th:text="${crop.careInstructions}"></p>
+                    </div>
+
+                    <!-- Fertilizers -->
+                    <div class="mb-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="text-green-700 text-xs font-bold uppercase tracking-widest" th:text="#{advisory.results.fertilizers}">🧪 Recommended Fertilizers</span>
+                        </div>
+                        <div class="flex flex-wrap gap-1.5">
+                            <span th:if="${crop.fertilizers != null}" th:each="fert : ${crop.fertilizers}"
+                                  class="inline-flex items-center text-xs bg-green-50 border border-green-200 text-green-800 px-2.5 py-1 rounded-full font-semibold"
+                                  th:text="${fert.name}"></span>
+                        </div>
+                    </div>
+
+                    <!-- Diseases -->
+                    <div>
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="text-red-600 text-xs font-bold uppercase tracking-widest" th:text="#{advisory.results.diseases}">⚠️ Watch Out For (Diseases)</span>
+                        </div>
+                        <div class="flex flex-wrap gap-1.5">
+                            <span th:if="${crop.diseases != null}" th:each="disease : ${crop.diseases}"
+                                  class="inline-flex items-center text-xs bg-red-50 border border-red-200 text-red-700 px-2.5 py-1 rounded-full font-semibold"
+                                  th:text="${disease.name}"></span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Bottom action -->
+        <div class="text-center mt-14">
+            <a href="/crop-advisory"
+                class="inline-flex items-center gap-3 bg-gradient-to-r from-green-700 to-emerald-600 hover:from-green-600 hover:to-emerald-500 text-white font-black px-10 py-4 rounded-full shadow-xl hover:shadow-green-500/30 transition-all duration-300 text-lg hover:scale-105">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                <span th:text="#{advisory.results.searching_again}">Search Again with Different Criteria</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- ===== SAVE MODAL ===== -->
+    <div id="saveModal" class="fixed inset-0 bg-green-900/40 backdrop-blur-sm z-[150] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-[2rem] shadow-2xl max-w-md w-full overflow-hidden transform transition-all scale-95 opacity-0 duration-300" id="saveModalContent">
+            <div class="bg-gradient-to-br from-green-800 to-emerald-700 p-8 text-center relative">
+                <div class="w-20 h-20 bg-white/20 rounded-3xl flex items-center justify-center mx-auto mb-4 backdrop-blur-lg border border-white/30 rotate-3">
+                    <span class="text-4xl">🔖</span>
+                </div>
+                <h3 class="text-2xl font-black text-white">Save Recommendation</h3>
+                <p class="text-green-100 text-sm mt-1">Give this recommendation a name to find it later.</p>
+                <div class="absolute -top-10 -right-10 w-32 h-32 bg-yellow-400/20 rounded-full blur-3xl"></div>
+            </div>
+            <div class="p-8">
+                <div class="mb-6">
+                    <label class="block text-xs font-black text-green-800 uppercase tracking-widest mb-2 ml-1">Recommendation Name</label>
+                    <input type="text" id="recommendationName" placeholder="e.g. My Maha Season Plan"
+                           class="w-full border-2 border-green-50 rounded-2xl px-5 py-4 text-gray-800 bg-gray-50 focus:outline-none focus:ring-4 focus:ring-green-400/20 focus:border-green-400 transition-all font-bold">
+                </div>
+                <div class="flex flex-col gap-3">
+                    <button type="button" onclick="submitSave(event)"
+                            class="w-full bg-gradient-to-r from-green-700 to-emerald-600 hover:from-green-600 hover:to-emerald-500 text-white font-black py-4 rounded-2xl shadow-lg hover:shadow-green-500/40 transition-all hover:-translate-y-1 active:translate-y-0">
+                        Confirm & Save
+                    </button>
+                    <button type="button" onclick="closeSaveModal()"
+                            class="w-full text-gray-400 font-bold py-2 hover:text-gray-600 transition-colors">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pass search params to JS -->
+    <script th:inline="javascript">
+        let currentCropId = null;
+        const searchLocation = /*[[${location}]]*/ '';
+        const searchSeason = /*[[${season}]]*/ '';
+        const searchSoil = /*[[${soil}]]*/ '';
+
+        function openSaveModal(id, name) {
+            currentCropId = id;
+            document.getElementById('saveModal').classList.remove('hidden');
+            document.getElementById('recommendationName').value = name + " - " + searchSeason;
+            setTimeout(() => {
+                const content = document.getElementById('saveModalContent');
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeSaveModal() {
+            const content = document.getElementById('saveModalContent');
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                document.getElementById('saveModal').classList.add('hidden');
+            }, 300);
+        }
+
+        async function submitSave(event) {
+            if (event) event.preventDefault();
+            const nameField = document.getElementById('recommendationName');
+            const name = nameField ? nameField.value : '';
+            if (!name) return alert('Please enter a name');
+
+            try {
+                // Get CSRF from meta tags (provided in base.html)
+                const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+                const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
+
+                const headers = { 'Content-Type': 'application/json' };
+                if (csrfToken && csrfHeader) {
+                    headers[csrfHeader] = csrfToken;
+                }
+
+                const response = await fetch('/crop-advisory/save', {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify({
+                        cropId: currentCropId,
+                        name: name,
+                        location: searchLocation,
+                        season: searchSeason,
+                        soil: searchSoil
+                    })
+                });
+
+                if (response.ok) {
+                    alert('Successfully saved to your recommendations!');
+                    closeSaveModal();
+                } else {
+                    const err = await response.json().catch(() => ({ error: 'Server error: ' + response.status }));
+                    alert('Error: ' + (err.error || err.message || 'Failed to save'));
+                }
+            } catch (e) {
+                console.error('Save error:', e);
+                alert('Connection error. Please try again.');
+            }
+        }
+    </script>
+</main>
+</body>
+</html>
