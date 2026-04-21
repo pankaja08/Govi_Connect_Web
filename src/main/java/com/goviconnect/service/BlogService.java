@@ -147,6 +147,14 @@ public class BlogService {
     @Transactional
     public void deleteBlog(Long id, User author) {
         Blog blog = getBlogByIdAndAuthor(id, author);
+        
+        // Remove this blog from any user's saved list before deleting
+        // to prevent foreign key constraint violations
+        for (User user : blog.getSavedByUsers()) {
+            user.getSavedBlogs().remove(blog);
+        }
+        blog.getSavedByUsers().clear();
+        
         blogRepository.delete(blog);
     }
 

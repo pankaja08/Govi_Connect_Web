@@ -2,6 +2,8 @@ package com.goviconnect.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "agri_officer_details")
@@ -18,6 +20,7 @@ public class AgriOfficerDetails {
 
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false, unique = true)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @com.fasterxml.jackson.annotation.JsonIgnore
     private User user;
 

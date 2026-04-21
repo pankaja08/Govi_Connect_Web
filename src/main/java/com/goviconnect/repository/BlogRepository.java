@@ -37,16 +37,28 @@ public interface BlogRepository extends JpaRepository<Blog, Long> {
     @EntityGraph(attributePaths = {"author"})
     List<Blog> findByApprovalStatus(BlogStatus approvalStatus);
 
+    @EntityGraph(attributePaths = {"author"})
+    @Query("SELECT b FROM Blog b WHERE b.approvalStatus = :status AND (b.scheduledDate IS NULL OR b.scheduledDate <= CURRENT_TIMESTAMP) ORDER BY b.createdDate DESC")
+    List<Blog> findPublicBlogs(@Param("status") BlogStatus approvalStatus);
+
+    @EntityGraph(attributePaths = {"author"})
+    @Query("SELECT b FROM Blog b WHERE b.approvalStatus = :status AND (b.scheduledDate IS NULL OR b.scheduledDate <= CURRENT_TIMESTAMP) ORDER BY b.createdDate DESC LIMIT 6")
+    List<Blog> findTop6PublicBlogs(@Param("status") BlogStatus approvalStatus);
+
     long countByApprovalStatus(BlogStatus approvalStatus);
 
     @EntityGraph(attributePaths = {"author"})
-    @Query("SELECT b FROM Blog b WHERE " +
+    @Query("SELECT b FROM Blog b " +
+            "LEFT JOIN b.savedByUsers sbu " +
+            "WHERE " +
             "b.approvalStatus = :status AND " +
+            "(b.scheduledDate IS NULL OR b.scheduledDate <= CURRENT_TIMESTAMP) AND " +
             "(:keyword IS NULL OR :keyword = '' OR b.heading LIKE :keyword OR b.textContent LIKE :keyword) AND " +
             "(:location IS NULL OR :location = '' OR b.locationTag = :location) AND " +
             "(:season IS NULL OR :season = '' OR b.seasonTag = :season) AND " +
             "(:crop IS NULL OR :crop = '' OR b.cropTag = :crop) AND " +
-            "(:method IS NULL OR :method = '' OR b.farmingMethodTag = :method) " +
+            "(:method IS NULL OR :method = '' OR b.farmingMethodTag = :method) AND " +
+            "(:savedOnly = false OR sbu.id = :userId) " +
             "ORDER BY b.createdDate DESC")
     List<Blog> findFilteredBlogs(
             @Param("status") BlogStatus status,
@@ -54,5 +66,9 @@ public interface BlogRepository extends JpaRepository<Blog, Long> {
             @Param("location") String location,
             @Param("season") String season,
             @Param("crop") String crop,
-            @Param("method") String method);
+            @Param("method") String method,
+            @Param("savedOnly") boolean savedOnly,
+            @Param("userId") Long userId);
+
+    void deleteByAuthor(User author);
 }

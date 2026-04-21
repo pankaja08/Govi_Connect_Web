@@ -24,8 +24,8 @@
                                 Sri Lanka First all in one<br />
                                 <span class="text-gc-gold">Agriculture Platform</span>
                             </h1>
-                            <p class="text-gray-200 text-base sm:text-lg md:text-xl mb-8 max-w-2xl" data-i18n="hero.description"
-                                th:text="#{home.hero.desc}">
+                            <p class="text-gray-200 text-base sm:text-lg md:text-xl mb-8 max-w-2xl"
+                                data-i18n="hero.description" th:text="#{home.hero.desc}">
                                 Connecting farmers, agricultural officers, and communities across every province of Sri
                                 Lanka.
                             </p>
@@ -48,9 +48,11 @@
                     style="height: 580px; background: linear-gradient(135deg, #166534, #22c55e, #3b82f6);">
                     <div class="absolute inset-0 flex flex-col justify-center items-center text-center px-6">
                         <div class="text-6xl sm:text-8xl mb-4 sm:mb-6 animate-bounce">🌾</div>
-                        <h2 class="text-white font-black text-3xl sm:text-4xl md:text-5xl mb-4" th:text="#{home.hero.expert.title}">
+                        <h2 class="text-white font-black text-3xl sm:text-4xl md:text-5xl mb-4"
+                            th:text="#{home.hero.expert.title}">
                             Expert Agricultural Knowledge</h2>
-                        <p class="text-gray-100 text-lg sm:text-xl max-w-xl" th:text="#{home.hero.expert.desc}">Access insights
+                        <p class="text-gray-100 text-lg sm:text-xl max-w-xl" th:text="#{home.hero.expert.desc}">Access
+                            insights
                             from certified Sri Lankan agricultural
                             officers. Stay informed, stay productive.</p>
                     </div>
@@ -61,9 +63,11 @@
                     style="height: 580px; background: linear-gradient(135deg, #064e3b, #166534, #bbf7d030);">
                     <div class="absolute inset-0 flex flex-col justify-center items-center text-center px-6">
                         <div class="text-6xl sm:text-8xl mb-4 sm:mb-6">🤝</div>
-                        <h2 class="text-white font-black text-3xl sm:text-4xl md:text-5xl mb-4" th:text="#{home.hero.grow.title}">
+                        <h2 class="text-white font-black text-3xl sm:text-4xl md:text-5xl mb-4"
+                            th:text="#{home.hero.grow.title}">
                             Grow Together</h2>
-                        <p class="text-gray-100 text-lg sm:text-xl max-w-xl" th:text="#{home.hero.grow.desc}">Unite farmers and
+                        <p class="text-gray-100 text-lg sm:text-xl max-w-xl" th:text="#{home.hero.grow.desc}">Unite
+                            farmers and
                             experts on one platform designed for Sri
                             Lanka's agricultural future.</p>
                         <a th:href="@{/register}"
@@ -131,26 +135,36 @@
                 <!-- Header -->
                 <div class="flex flex-col md:flex-row md:items-end md:justify-between mb-10 gap-3">
                     <div>
-                        <span class="inline-flex items-center gap-2 bg-gc-green/20 text-gc-green text-xs font-black px-4 py-1.5 rounded-full uppercase tracking-widest mb-3">
-                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19.01 7.38 20 6.18 20C4.98 20 4 19.01 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z"/></svg>
+                        <span
+                            class="inline-flex items-center gap-2 bg-gc-green/20 text-gc-green text-xs font-black px-4 py-1.5 rounded-full uppercase tracking-widest mb-3">
+                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19.01 7.38 20 6.18 20C4.98 20 4 19.01 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z" />
+                            </svg>
                             Live News Feed
                         </span>
                         <h2 class="text-3xl md:text-4xl font-black text-white leading-tight">
                             Global Agriculture <span class="text-gc-green">News</span>
                         </h2>
-                        <p class="text-gray-400 mt-1 text-sm">Latest updates from <a href="https://www.agweb.com/news/crops" target="_blank" rel="noopener" class="text-gc-green hover:underline">AgWeb.com</a></p>
+                        <p class="text-gray-400 mt-1 text-sm">Latest updates from <a
+                                href="https://www.agweb.com/news/crops" target="_blank" rel="noopener"
+                                class="text-gc-green hover:underline">AgWeb.com</a></p>
                     </div>
                     <a href="https://www.agweb.com/news/crops" target="_blank" rel="noopener"
-                       class="self-start md:self-auto inline-flex items-center gap-2 bg-gc-green text-white font-bold px-5 py-2.5 rounded-full text-sm hover:bg-green-500 transition-all shadow-lg hover:shadow-gc-green/30 hover:scale-105">
+                        class="self-start md:self-auto inline-flex items-center gap-2 bg-gc-green text-white font-bold px-5 py-2.5 rounded-full text-sm hover:bg-green-500 transition-all shadow-lg hover:shadow-gc-green/30 hover:scale-105">
                         View All News
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
                     </a>
                 </div>
 
                 <!-- Carousel wrapper -->
                 <div class="relative">
                     <!-- Cards track -->
-                    <div id="news-track" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 transition-all duration-500">
+                    <div id="news-track"
+                        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 transition-all duration-500">
                         <!-- JS will populate these -->
                         <div class="news-skeleton h-72 rounded-2xl bg-gray-800 animate-pulse"></div>
                         <div class="news-skeleton h-72 rounded-2xl bg-gray-800 animate-pulse hidden sm:block"></div>
@@ -172,7 +186,8 @@
 
                 <!-- Error fallback -->
                 <div id="news-error" class="hidden text-center py-10 text-gray-500 text-sm">
-                    Could not load news feed. <a href="https://www.agweb.com/news/crops" target="_blank" rel="noopener" class="text-gc-green hover:underline">Visit AgWeb directly →</a>
+                    Could not load news feed. <a href="https://www.agweb.com/news/crops" target="_blank" rel="noopener"
+                        class="text-gc-green hover:underline">Visit AgWeb directly →</a>
                 </div>
             </div>
         </section>
@@ -194,7 +209,8 @@
             <div class="flex flex-col lg:flex-row gap-8 items-start">
 
                 <!-- Sidebar Filters -->
-                <aside class="w-full lg:w-1/5 bg-white rounded-xl shadow-lg border border-gray-100 p-4 lg:sticky lg:top-24">
+                <aside
+                    class="w-full lg:w-1/5 bg-white rounded-xl shadow-lg border border-gray-100 p-4 lg:sticky lg:top-24">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="font-black text-base text-gray-800 flex items-center gap-1.5">
                             <svg class="w-4 h-4 text-gc-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -210,155 +226,319 @@
                                 th:text="#{home.blogs.filter.reset}">Reset</a>
                             <!-- Mobile filter toggle -->
                             <button id="filter-toggle-btn" onclick="toggleFilters()"
-                                class="lg:hidden text-xs bg-gc-green text-white px-2 py-1 rounded-lg font-bold">▾ Filters</button>
+                                class="lg:hidden text-xs bg-gc-green text-white px-2 py-1 rounded-lg font-bold">▾
+                                Filters</button>
                         </div>
                     </div>
                     <div id="filter-content" class="hidden lg:block">
-                    <form id="filterForm">
-                        <!-- Location -->
-                        <div class="mb-3">
-                            <label class="block text-xs font-bold text-gray-700 mb-1"
-                                th:text="#{home.blogs.filter.location}">Location</label>
-                            <select name="location" onchange="submitFilters()"
-                                class="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-700 focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green bg-gray-50 hover:bg-white transition-all outline-none">
-                                <option value="" th:text="'All ' + #{home.blogs.filter.location}">All Locations</option>
-                                <option value="Western" th:selected="${locationFilter == 'Western'}">Western Province</option>
-                                <option value="Central" th:selected="${locationFilter == 'Central'}">Central Province</option>
-                                <option value="Southern" th:selected="${locationFilter == 'Southern'}">Southern Province</option>
-                                <option value="Northern" th:selected="${locationFilter == 'Northern'}">Northern Province</option>
-                                <option value="Eastern" th:selected="${locationFilter == 'Eastern'}">Eastern Province</option>
-                                <option value="North Western" th:selected="${locationFilter == 'North Western'}">North Western Prov.</option>
-                                <option value="North Central" th:selected="${locationFilter == 'North Central'}">North Central Prov.</option>
-                                <option value="Uva" th:selected="${locationFilter == 'Uva'}">Uva Province</option>
-                                <option value="Sabaragamuwa" th:selected="${locationFilter == 'Sabaragamuwa'}">Sabaragamuwa Prov.</option>
-                            </select>
-                        </div>
-                        <!-- Season -->
-                        <div class="mb-3">
-                            <label class="block text-xs font-bold text-gray-700 mb-1" th:text="#{home.blogs.filter.season}">Season</label>
-                            <select name="season" onchange="submitFilters()"
-                                class="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-700 focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green bg-gray-50 hover:bg-white transition-all outline-none">
-                                <option value="" th:text="'All ' + #{home.blogs.filter.season}">All Seasons</option>
-                                <option value="Yala" th:selected="${seasonFilter == 'Yala'}">Yala Season</option>
-                                <option value="Maha" th:selected="${seasonFilter == 'Maha'}">Maha Season</option>
-                            </select>
-                        </div>
-                        <!-- Crop Type -->
-                        <div class="mb-3">
-                            <label class="block text-xs font-bold text-gray-700 mb-1" th:text="#{home.blogs.filter.crop}">Crop Type</label>
-                            <select name="crop" onchange="submitFilters()"
-                                class="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-700 focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green bg-gray-50 hover:bg-white transition-all outline-none">
-                                <option value="" th:text="'All ' + #{home.blogs.filter.crop}">All Crops</option>
-                                <option value="Paddy" th:selected="${cropFilter == 'Paddy'}">Paddy</option>
-                                <option value="Vegetables" th:selected="${cropFilter == 'Vegetables'}">Vegetables</option>
-                                <option value="Fruits" th:selected="${cropFilter == 'Fruits'}">Fruits</option>
-                                <option value="Grains" th:selected="${cropFilter == 'Grains'}">Grains</option>
-                                <option value="Export Crops" th:selected="${cropFilter == 'Export Crops'}">Export Crops</option>
-                                <option value="Spices" th:selected="${cropFilter == 'Spices'}">Spices</option>
-                                <option value="Other" th:selected="${cropFilter == 'Other'}">Other</option>
-                            </select>
-                        </div>
-                        <!-- Farming Method -->
-                        <div class="mb-1">
-                            <label class="block text-xs font-bold text-gray-700 mb-1" th:text="#{home.blogs.filter.method}">Farming Method</label>
-                            <select name="method" onchange="submitFilters()"
-                                class="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-700 focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green bg-gray-50 hover:bg-white transition-all outline-none">
-                                <option value="" th:text="'All ' + #{home.blogs.filter.method}">All Methods</option>
-                                <option value="Traditional" th:selected="${methodFilter == 'Traditional'}">Traditional</option>
-                                <option value="Organic" th:selected="${methodFilter == 'Organic'}">Organic</option>
-                                <option value="Greenhouse" th:selected="${methodFilter == 'Greenhouse'}">Greenhouse</option>
-                                <option value="Hydroponics" th:selected="${methodFilter == 'Hydroponics'}">Hydroponics</option>
-                                <option value="Smart Farming" th:selected="${methodFilter == 'Smart Farming'}">Smart Farming</option>
-                                <option value="Mixed Farming" th:selected="${methodFilter == 'Mixed Farming'}">Mixed Farming</option>
-                                <option value="Other" th:selected="${methodFilter == 'Other'}">Other</option>
-                            </select>
-                        </div>
-                    </form>
+                        <form id="filterForm">
+                            <!-- Keyword Search -->
+                            <div class="mb-3">
+                                <label class="block text-xs font-bold text-gray-700 mb-1"
+                                    th:text="#{home.blogs.filter.keyword} ?: 'Search'">Search</label>
+                                <div class="relative flex items-center">
+                                    <input type="text" name="keyword" th:value="${keywordFilter}"
+                                        th:placeholder="#{home.blogs.filter.search_placeholder}"
+                                        class="w-full border border-gray-200 rounded-lg pl-8 pr-3 py-2 text-xs text-gray-700 focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green bg-gray-50 hover:bg-white transition-all outline-none"
+                                        onkeypress="if(event.key === 'Enter') { event.preventDefault(); submitFilters(); }">
+                                    <svg class="w-4 h-4 text-gray-400 absolute left-2.5 pointer-events-none" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <!-- Location -->
+                            <div class="mb-3">
+                                <label class="block text-xs font-bold text-gray-700 mb-1"
+                                    th:text="#{home.blogs.filter.location}">Location</label>
+                                <select name="location" onchange="submitFilters()"
+                                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-700 focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green bg-gray-50 hover:bg-white transition-all outline-none">
+                                    <option value="" th:text="'All ' + #{home.blogs.filter.location}">All Locations
+                                    </option>
+                                    <option value="Western" th:selected="${locationFilter == 'Western'}">Western
+                                        Province</option>
+                                    <option value="Central" th:selected="${locationFilter == 'Central'}">Central
+                                        Province</option>
+                                    <option value="Southern" th:selected="${locationFilter == 'Southern'}">Southern
+                                        Province</option>
+                                    <option value="Northern" th:selected="${locationFilter == 'Northern'}">Northern
+                                        Province</option>
+                                    <option value="Eastern" th:selected="${locationFilter == 'Eastern'}">Eastern
+                                        Province</option>
+                                    <option value="North Western" th:selected="${locationFilter == 'North Western'}">
+                                        North Western Prov.</option>
+                                    <option value="North Central" th:selected="${locationFilter == 'North Central'}">
+                                        North Central Prov.</option>
+                                    <option value="Uva" th:selected="${locationFilter == 'Uva'}">Uva Province</option>
+                                    <option value="Sabaragamuwa" th:selected="${locationFilter == 'Sabaragamuwa'}">
+                                        Sabaragamuwa Prov.</option>
+                                </select>
+                            </div>
+                            <!-- Season -->
+                            <div class="mb-3">
+                                <label class="block text-xs font-bold text-gray-700 mb-1"
+                                    th:text="#{home.blogs.filter.season}">Season</label>
+                                <select name="season" onchange="submitFilters()"
+                                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-700 focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green bg-gray-50 hover:bg-white transition-all outline-none">
+                                    <option value="" th:text="'All ' + #{home.blogs.filter.season}">All Seasons</option>
+                                    <option value="Yala" th:selected="${seasonFilter == 'Yala'}">Yala Season</option>
+                                    <option value="Maha" th:selected="${seasonFilter == 'Maha'}">Maha Season</option>
+                                </select>
+                            </div>
+                            <!-- Crop Type -->
+                            <div class="mb-3">
+                                <label class="block text-xs font-bold text-gray-700 mb-1"
+                                    th:text="#{home.blogs.filter.crop}">Crop Type</label>
+                                <select name="crop" onchange="submitFilters()"
+                                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-700 focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green bg-gray-50 hover:bg-white transition-all outline-none">
+                                    <option value="" th:text="'All ' + #{home.blogs.filter.crop}">All Crops</option>
+                                    <option value="Paddy" th:selected="${cropFilter == 'Paddy'}">Paddy</option>
+                                    <option value="Vegetables" th:selected="${cropFilter == 'Vegetables'}">Vegetables
+                                    </option>
+                                    <option value="Fruits" th:selected="${cropFilter == 'Fruits'}">Fruits</option>
+                                    <option value="Grains" th:selected="${cropFilter == 'Grains'}">Grains</option>
+                                    <option value="Export Crops" th:selected="${cropFilter == 'Export Crops'}">Export
+                                        Crops</option>
+                                    <option value="Spices" th:selected="${cropFilter == 'Spices'}">Spices</option>
+                                    <option value="Other" th:selected="${cropFilter == 'Other'}">Other</option>
+                                </select>
+                            </div>
+                            <!-- Farming Method -->
+                            <div class="mb-1">
+                                <label class="block text-xs font-bold text-gray-700 mb-1"
+                                    th:text="#{home.blogs.filter.method}">Farming Method</label>
+                                <select name="method" onchange="submitFilters()"
+                                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-700 focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green bg-gray-50 hover:bg-white transition-all outline-none">
+                                    <option value="" th:text="'All ' + #{home.blogs.filter.method}">All Methods</option>
+                                    <option value="Traditional" th:selected="${methodFilter == 'Traditional'}">
+                                        Traditional</option>
+                                    <option value="Organic" th:selected="${methodFilter == 'Organic'}">Organic</option>
+                                    <option value="Greenhouse" th:selected="${methodFilter == 'Greenhouse'}">Greenhouse
+                                    </option>
+                                    <option value="Hydroponics" th:selected="${methodFilter == 'Hydroponics'}">
+                                        Hydroponics</option>
+                                    <option value="Smart Farming" th:selected="${methodFilter == 'Smart Farming'}">Smart
+                                        Farming</option>
+                                    <option value="Mixed Farming" th:selected="${methodFilter == 'Mixed Farming'}">Mixed
+                                        Farming</option>
+                                    <option value="Other" th:selected="${methodFilter == 'Other'}">Other</option>
+                                </select>
+                            </div>
+                            <!-- Saved Only Toggle (Visible only to logged-in users) -->
+                            <div th:if="${#authorization.expression('isAuthenticated()')}"
+                                class="mt-4 pt-4 border-t border-gray-100">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" name="savedOnly" id="savedOnlyToggle" class="sr-only"
+                                        th:checked="${savedOnlyFilter}" onchange="submitFilters()">
+                                    <div class="toggle-bg">
+                                        <div class="toggle-dot"></div>
+                                    </div>
+                                    <span class="text-xs font-bold text-gray-700"
+                                        th:text="#{home.blogs.filter.saved}">Read Later</span>
+                                </label>
+                            </div>
+                        </form>
                     </div><!-- end filter-content -->
                 </aside>
 
                 <!-- Blog Grid -->
-                <div class="flex-1 w-full lg:w-4/5">
-                    <!-- If blogs exist -->
-                    <div th:if="${blogs != null and !blogs.empty}"
-                        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                        <article th:each="blog : ${blogs}"
-                            class="blog-card group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 flex flex-col h-full">
-                            <!-- Image -->
-                            <div
-                                class="relative h-40 overflow-hidden bg-gradient-to-br from-gc-dark to-gc-green shrink-0">
-                                <img th:if="${blog.imageUrl != null}" th:src="${blog.imageUrl}" th:alt="${blog.heading}"
-                                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                                <div th:unless="${blog.imageUrl != null}"
-                                    class="w-full h-full flex items-center justify-center text-5xl">🌾</div>
-                                <div
-                                    class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent flex items-end p-4">
-                                    <!-- Tags on Image -->
-                                    <div class="flex flex-wrap gap-2">
+                <div class="flex-1 w-full lg:w-4/5" id="blog-grid-container">
+                    <div th:fragment="blog-grid" id="blog-grid-wrapper">
+
+                        <!-- Active Filter Chips -->
+                        <div class="flex flex-wrap items-center gap-2 mb-5"
+                            th:if="${(keywordFilter != null and keywordFilter != '') or (locationFilter != null and locationFilter != '') or (seasonFilter != null and seasonFilter != '') or (cropFilter != null and cropFilter != '') or (methodFilter != null and methodFilter != '')}">
+                            <div th:if="${keywordFilter != null and keywordFilter != ''}"
+                                class="inline-flex items-center gap-1.5 bg-gc-green/10 text-gc-dark text-xs font-bold px-3 py-1.5 rounded-full border border-gc-green/20 shadow-sm transition-all hover:bg-gc-green/20">
+                                <span>Search: [[${keywordFilter}]]</span>
+                                <button type="button" onclick="clearFilter('keyword')"
+                                    class="text-gc-green hover:text-red-500 transition-colors ml-1"
+                                    title="Remove filter"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg></button>
+                            </div>
+                            <div th:if="${locationFilter != null and locationFilter != ''}"
+                                class="inline-flex items-center gap-1.5 bg-gc-green/10 text-gc-dark text-xs font-bold px-3 py-1.5 rounded-full border border-gc-green/20 shadow-sm transition-all hover:bg-gc-green/20">
+                                <span>[[${locationFilter}]]</span>
+                                <button type="button" onclick="clearFilter('location')"
+                                    class="text-gc-green hover:text-red-500 transition-colors ml-1"
+                                    title="Remove filter"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg></button>
+                            </div>
+                            <div th:if="${seasonFilter != null and seasonFilter != ''}"
+                                class="inline-flex items-center gap-1.5 bg-gc-green/10 text-gc-dark text-xs font-bold px-3 py-1.5 rounded-full border border-gc-green/20 shadow-sm transition-all hover:bg-gc-green/20">
+                                <span>[[${seasonFilter}]]</span>
+                                <button type="button" onclick="clearFilter('season')"
+                                    class="text-gc-green hover:text-red-500 transition-colors ml-1"
+                                    title="Remove filter"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg></button>
+                            </div>
+                            <div th:if="${cropFilter != null and cropFilter != ''}"
+                                class="inline-flex items-center gap-1.5 bg-gc-green/10 text-gc-dark text-xs font-bold px-3 py-1.5 rounded-full border border-gc-green/20 shadow-sm transition-all hover:bg-gc-green/20">
+                                <span>[[${cropFilter}]]</span>
+                                <button type="button" onclick="clearFilter('crop')"
+                                    class="text-gc-green hover:text-red-500 transition-colors ml-1"
+                                    title="Remove filter"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg></button>
+                            </div>
+                            <div th:if="${methodFilter != null and methodFilter != ''}"
+                                class="inline-flex items-center gap-1.5 bg-gc-green/10 text-gc-dark text-xs font-bold px-3 py-1.5 rounded-full border border-gc-green/20 shadow-sm transition-all hover:bg-gc-green/20">
+                                <span>[[${methodFilter}]]</span>
+                                <button type="button" onclick="clearFilter('method')"
+                                    class="text-gc-green hover:text-red-500 transition-colors ml-1"
+                                    title="Remove filter"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg></button>
+                            </div>
+                            <button type="button" onclick="window.location.href='/?#blogs'"
+                                class="text-xs text-gray-500 hover:text-gc-dark font-bold ml-2 underline decoration-gray-300 hover:decoration-gc-dark transition-all">Clear
+                                All</button>
+                        </div>
+
+                        <!-- If blogs exist -->
+                        <div th:if="${blogs != null and !blogs.empty}"
+                            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            <article th:each="blog : ${blogs}"
+                                class="blog-card group bg-white rounded-3xl overflow-hidden shadow-[0_10px_40px_-15px_rgba(0,0,0,0.1)] hover:shadow-[0_20px_50px_-15px_rgba(0,101,52,0.2)] transition-all duration-500 hover:-translate-y-2 flex flex-col h-full border border-gray-100/50">
+                                <!-- Image Container -->
+                                <div class="relative aspect-[16/10] overflow-hidden shrink-0">
+                                    <img th:if="${blog.imageUrl != null}" th:src="${blog.imageUrl}"
+                                        th:alt="${blog.heading}"
+                                        class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" />
+                                    <div th:unless="${blog.imageUrl != null}"
+                                        class="w-full h-full flex items-center justify-center text-6xl bg-gradient-to-br from-gc-dark to-gc-green">
+                                        🌾</div>
+
+                                    <!-- Category & Location Overlays -->
+                                    <div class="absolute top-4 left-4 flex flex-col gap-2">
                                         <span th:if="${blog.cropTag != null and blog.cropTag != ''}"
-                                            th:text="${blog.cropTag}"
-                                            class="bg-white/20 backdrop-blur-md border border-white/40 text-white text-xs font-bold px-2 py-1 rounded-md shadow-sm"></span>
+                                            class="bg-white/90 backdrop-blur-md text-gc-dark text-[10px] font-black px-3 py-1 rounded-full shadow-lg uppercase tracking-wider">
+                                            [[${blog.cropTag}]]
+                                        </span>
+                                    </div>
+                                    <div class="absolute bottom-4 left-4">
                                         <span th:if="${blog.locationTag != null and blog.locationTag != ''}"
-                                            th:text="${blog.locationTag}"
-                                            class="bg-gc-gold/90 text-gc-dark text-xs font-black px-2 py-1 rounded-md shadow-sm"></span>
+                                            class="bg-gc-gold text-gc-dark text-[10px] font-black px-3 py-1 rounded-full shadow-lg uppercase tracking-wider flex items-center gap-1">
+                                            <svg class="w-3 h-3 text-gc-dark" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                                </path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                            </svg>
+                                            [[${blog.locationTag}]]
+                                        </span>
                                     </div>
                                 </div>
-                            </div>
-                            <!-- Content -->
-                            <div class="p-4 flex flex-col flex-grow">
-                                <div class="flex items-center gap-2 mb-2">
-                                    <span
-                                        class="w-6 h-6 rounded-full bg-gc-green flex items-center justify-center text-white text-[10px] font-bold shrink-0"
-                                        th:text="${#strings.substring(blog.author.fullName, 0, 1)}">A</span>
-                                    <div>
-                                        <p class="text-xs font-semibold text-gc-dark leading-tight"
-                                            th:text="${blog.author.fullName}">Author</p>
-                                        <p class="text-[10px] text-gray-400"
-                                            th:text="${#temporals.format(blog.createdDate, 'dd MMM yyyy')}">Date</p>
+
+                                <!-- Content Area -->
+                                <div class="p-6 flex flex-col flex-grow">
+                                    <div class="flex items-center justify-between gap-3 mb-4">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-gc-green to-gc-dark flex items-center justify-center text-white text-sm font-black shadow-inner"
+                                                th:text="${#strings.substring(blog.author.fullName, 0, 1).toUpperCase()}">
+                                                A
+                                            </div>
+                                            <div>
+                                                <p class="text-sm font-bold text-gray-900 leading-none mb-1"
+                                                    th:text="${blog.author.fullName}">Author</p>
+                                                <p class="text-[11px] text-gray-400 font-medium uppercase tracking-tighter"
+                                                    th:text="${#temporals.format(blog.createdDate, 'dd MMM yyyy')}">Date
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Relocated Save Bookmark Icon (Visible only to registered users) -->
+                                        <button type="button" sec:authorize="isAuthenticated()"
+                                            th:onclick="'toggleSaveBlog(event, ' + ${blog.id} + ')'"
+                                            th:class="'transition-all duration-300 transform hover:scale-125 ' + (${savedBlogIds != null and savedBlogIds.contains(blog.id)} ? 'text-gc-gold' : 'text-gray-300 hover:text-gc-green')"
+                                            th:id="'save-btn-' + ${blog.id}">
+                                            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                                                <path th:if="${savedBlogIds != null and savedBlogIds.contains(blog.id)}"
+                                                    d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z" />
+                                                <path
+                                                    th:unless="${savedBlogIds != null and savedBlogIds.contains(blog.id)}"
+                                                    fill-rule="evenodd"
+                                                    d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2zM7 5h10v12.62l-5-2.14-5 2.14V5z"
+                                                    clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    </div>
+
+                                    <h3 class="text-xl font-black text-gray-900 mb-3 leading-tight group-hover:text-gc-green transition-colors line-clamp-2"
+                                        th:text="${blog.heading}">Blog Title</h3>
+
+                                    <div class="text-gray-500 text-sm leading-relaxed line-clamp-3 mb-6 flex-grow"
+                                        th:text="${#strings.abbreviate(blog.textContent.replaceAll('<[^>]*>', ''), 120)}">
+                                        Short excerpt...
+                                    </div>
+
+                                    <!-- Card Footer -->
+                                    <div
+                                        class="pt-5 border-t border-gray-100 flex items-center justify-between mt-auto">
+                                        <a th:href="@{/blog/{id}(id=${blog.id})}"
+                                            class="group/link flex items-center gap-2 text-gc-green font-black text-sm transition-all hover:gap-3">
+                                            <span th:text="#{home.blogs.readmore}">Read More</span>
+                                            <svg class="w-5 h-5 transition-transform group-hover/link:translate-x-1"
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                                            </svg>
+                                        </a>
+
+                                        <div class="flex items-center gap-3">
+                                            <div class="px-2 py-1 rounded-lg bg-gray-50 border border-gray-100 flex items-center gap-1.5"
+                                                title="Reading time">
+                                                <span class="text-[10px]">⏱️</span>
+                                                <span class="text-[11px] font-bold text-gray-500"><span
+                                                        th:text="${blog.estimatedReadingTime}">5</span>m</span>
+                                            </div>
+                                            <div class="flex items-center gap-1 text-gray-400" title="Comments">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03-8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
+                                                    </path>
+                                                </svg>
+                                                <span class="text-xs font-bold"
+                                                    th:text="${blog.comments != null ? blog.comments.size() : 0}">0</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <h3 class="font-bold text-sm text-gray-800 mb-2 leading-snug group-hover:text-gc-dark transition-colors line-clamp-2"
-                                    th:text="${blog.heading}">Blog Title</h3>
-                                <div class="text-gray-500 text-xs leading-relaxed line-clamp-2 mb-3 flex-grow"
-                                    th:utext="${#strings.length(blog.textContent) > 100 ? #strings.substring(blog.textContent,0,100)+'...' : blog.textContent}">
-                                    Blog excerpt here...
-                                </div>
+                            </article>
+                        </div>
 
-                                <div class="mt-auto pt-3 border-t border-gray-100 flex items-center justify-between">
-                                    <a th:href="@{/blog/{id}(id=${blog.id})}"
-                                        class="text-gc-green font-bold text-xs flex items-center gap-1 hover:text-gc-dark transition-colors">
-                                        <span th:text="#{home.blogs.readmore}">Read More</span>
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                                        </svg>
-                                    </a>
-                                    <span class="text-gray-400 text-xs flex items-center gap-1.5 font-medium"
-                                        title="Comments">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03-8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
-                                            </path>
-                                        </svg>
-                                        <span th:text="${blog.comments != null ? blog.comments.size() : 0}">0</span>
-                                    </span>
-                                </div>
-                            </div>
-                        </article>
-                    </div>
-
-                    <!-- Empty state -->
-                    <div th:if="${blogs == null or blogs.empty}"
-                        class="text-center py-20 bg-white rounded-2xl shadow-sm border border-gray-100 h-full flex flex-col items-center justify-center">
-                        <div class="text-7xl mb-4 opacity-50">🔍</div>
-                        <h3 class="text-2xl font-bold text-gray-500" th:text="#{home.blogs.none}">No blogs found</h3>
-                        <p class="text-gray-400 mt-2 max-w-sm mx-auto" th:text="#{home.blogs.none.desc}">We couldn't
-                            find any articles matching your filters.
-                            Try adjusting or clearing them to see more.</p>
-                        <button onclick="window.location.href='/?#blogs'"
-                            class="mt-6 px-6 py-2 bg-gc-green/10 text-gc-dark font-bold rounded-lg hover:bg-gc-green/20 transition-colors"
-                            th:text="#{home.blogs.none.clear}">Clear
-                            Filters</button>
+                        <!-- Empty state -->
+                        <div th:if="${blogs == null or blogs.empty}"
+                            class="text-center py-20 bg-white rounded-2xl shadow-sm border border-gray-100 h-full flex flex-col items-center justify-center">
+                            <div class="text-7xl mb-4 opacity-50">🔍</div>
+                            <h3 class="text-2xl font-bold text-gray-500" th:text="#{home.blogs.none}">No blogs found
+                            </h3>
+                            <p class="text-gray-400 mt-2 max-w-sm mx-auto" th:text="#{home.blogs.none.desc}">We couldn't
+                                find any articles matching your filters.
+                                Try adjusting or clearing them to see more.</p>
+                            <button onclick="window.location.href='/?#blogs'"
+                                class="mt-6 px-6 py-2 bg-gc-green/10 text-gc-dark font-bold rounded-lg hover:bg-gc-green/20 transition-colors"
+                                th:text="#{home.blogs.none.clear}">Clear
+                                Filters</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -367,7 +547,7 @@
 
     <div id="scripts">
         <script th:src="@{/js/carousel.js}"></script>
-        <script>
+        <script th:inline="javascript">
             // ===== AGRICULTURE NEWS CAROUSEL =====
             (function () {
                 const CARDS_PER_PAGE = 4; // show 4 at a time
@@ -474,7 +654,7 @@
                     resetAutoSlide();
                 }
 
-                window.slideNews = function(dir) {
+                window.slideNews = function (dir) {
                     goToNewsPage(currentPage + dir);
                 };
 
@@ -568,15 +748,95 @@
                 showSlide(0);
             }
 
-            function submitFilters() {
+            async function submitFilters() {
                 const form = document.getElementById('filterForm');
+                const container = document.getElementById('blog-grid-container');
+                const wrapper = document.getElementById('blog-grid-wrapper');
+
+                // Construct URL
                 const url = new URL(window.location.origin + '/');
-                if (form.location.value) url.searchParams.set('location', form.location.value);
-                if (form.season.value) url.searchParams.set('season', form.season.value);
-                if (form.crop.value) url.searchParams.set('crop', form.crop.value);
-                if (form.method.value) url.searchParams.set('method', form.method.value);
+                const params = new URLSearchParams();
+
+                if (form.keyword && form.keyword.value) params.set('keyword', form.keyword.value);
+                if (form.location.value) params.set('location', form.location.value);
+                if (form.season.value) params.set('season', form.season.value);
+                if (form.crop.value) params.set('crop', form.crop.value);
+                if (form.method.value) params.set('method', form.method.value);
+                if (form.savedOnly && form.savedOnly.checked) params.set('savedOnly', 'true');
+
+                params.forEach((val, key) => url.searchParams.set(key, val));
                 url.hash = 'blogs';
-                window.location.href = url.toString();
+
+                // Update URL without reload
+                window.history.pushState({}, '', url.toString());
+
+                // Show Skeletons
+                const skeletonHtml = `
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        ${Array(6).fill(0).map(() => `
+                            <div class="rounded-3xl border border-gray-100 overflow-hidden bg-white h-[450px] shadow-sm">
+                                <div class="aspect-[16/10] skeleton"></div>
+                                <div class="p-6">
+                                    <div class="flex items-center gap-3 mb-4">
+                                        <div class="w-10 h-10 rounded-full skeleton"></div>
+                                        <div class="flex-1">
+                                            <div class="h-3 w-24 skeleton mb-2"></div>
+                                            <div class="h-2 w-16 skeleton"></div>
+                                        </div>
+                                    </div>
+                                    <div class="h-6 w-full skeleton mb-3"></div>
+                                    <div class="h-6 w-2/3 skeleton mb-6"></div>
+                                    <div class="h-3 w-full skeleton mb-2"></div>
+                                    <div class="h-3 w-full skeleton mb-2"></div>
+                                    <div class="h-3 w-4/5 skeleton"></div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+
+                // Fade out current content
+                wrapper.style.opacity = '0.5';
+                wrapper.style.pointerEvents = 'none';
+
+                try {
+                    const response = await fetch(url.toString(), {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+
+                    if (response.ok) {
+                        const html = await response.text();
+                        // Brief delay for skeleton visibility
+                        container.innerHTML = skeletonHtml;
+
+                        setTimeout(() => {
+                            container.innerHTML = html;
+                            // Smooth reveal
+                            const newWrapper = document.getElementById('blog-grid-wrapper');
+                            newWrapper.style.opacity = '0';
+                            newWrapper.style.transform = 'translateY(10px)';
+                            newWrapper.style.transition = 'all 0.4s ease';
+
+                            requestAnimationFrame(() => {
+                                newWrapper.style.opacity = '1';
+                                newWrapper.style.transform = 'translateY(0)';
+                            });
+                        }, 400);
+                    }
+                } catch (err) {
+                    console.error("Filter fetch failed:", err);
+                    window.location.href = url.toString(); // Fallback to full reload
+                }
+            }
+
+            function clearFilter(filterName) {
+                const form = document.getElementById('filterForm');
+                if (form[filterName]) {
+                    form[filterName].value = '';
+                }
+                submitFilters();
             }
 
             function toggleFilters() {
@@ -593,17 +853,67 @@
 
             window.addEventListener('DOMContentLoaded', () => {
                 const urlParams = new URLSearchParams(window.location.search);
-                if ((urlParams.has('location') || urlParams.has('season') || urlParams.has('crop') || urlParams.has('method')) && !window.location.hash) {
+                if ((urlParams.has('keyword') || urlParams.has('location') || urlParams.has('season') || urlParams.has('crop') || urlParams.has('method')) && !window.location.hash) {
                     window.location.hash = 'blogs';
                 }
             });
+
+            async function toggleSaveBlog(event, blogId) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                // Auth Check
+                const isAuth = /*[[${#authorization.expression('isAuthenticated()')}]]*/ false;
+                if (!isAuth) {
+                    Swal.fire({
+                        title: 'Sign In Required',
+                        text: 'Please log in to save blogs for later reading.',
+                        icon: 'info',
+                        showCancelButton: true,
+                        confirmButtonText: 'Log In Now',
+                        confirmButtonColor: '#166534',
+                        cancelButtonText: 'Maybe Later',
+                        showClass: { popup: 'animate__animated animate__fadeInDown' },
+                        hideClass: { popup: 'animate__animated animate__fadeOutUp' }
+                    }).then((result) => {
+                        if (result.isConfirmed) window.location.href = '/login';
+                    });
+                    return;
+                }
+
+                const btn = document.getElementById('save-btn-' + blogId);
+                const token = document.querySelector('input[name="_csrf"]')?.value;
+
+                try {
+                    const response = await fetch(`/api/blog/${blogId}/save`, {
+                        method: 'POST',
+                        headers: { 'X-CSRF-TOKEN': token }
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.saved) {
+                            btn.classList.add('saved', 'bg-gc-gold', 'text-gc-dark');
+                            btn.classList.remove('bg-black/20', 'text-white');
+                            // Visual feedback
+                            btn.classList.add('animate-pop');
+                            setTimeout(() => btn.classList.remove('animate-pop'), 400);
+                        } else {
+                            btn.classList.remove('saved', 'bg-gc-gold', 'text-gc-dark');
+                            btn.classList.add('bg-black/20', 'text-white');
+                        }
+
+                        // If we are in "Saved Only" view, we should Refresh grid
+                        if (document.getElementById('savedOnlyToggle').checked) {
+                            submitFilters();
+                        }
+                    }
+                } catch (err) {
+                    console.error("Save toggle failed:", err);
+                }
+            }
         </script>
     </div>
-</body>
-
-</html>
-de(0);
-</script>
 </body>
 
 </html>
