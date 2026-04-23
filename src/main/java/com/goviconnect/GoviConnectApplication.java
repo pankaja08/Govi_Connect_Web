@@ -22,7 +22,8 @@ public class GoviConnectApplication {
     }
 
     /**
-     * Runs FIRST — patches the `role` ENUM column in MySQL to include BLOG_MODERATOR.
+     * Runs FIRST — patches the `role` ENUM column in MySQL to include
+     * BLOG_MODERATOR.
      * Hibernate ddl-auto=update does NOT modify existing ENUM column definitions,
      * so we do it manually once here. Safe to run multiple times.
      */
@@ -32,9 +33,8 @@ public class GoviConnectApplication {
         return args -> {
             try {
                 jdbcTemplate.execute(
-                    "ALTER TABLE users MODIFY COLUMN role " +
-                    "ENUM('USER','AGRI_OFFICER','ADMIN','BLOG_MODERATOR') NOT NULL"
-                );
+                        "ALTER TABLE users MODIFY COLUMN role " +
+                                "ENUM('USER','AGRI_OFFICER','ADMIN','BLOG_MODERATOR') NOT NULL");
                 System.out.println("✅  users.role ENUM column updated to include BLOG_MODERATOR.");
             } catch (Exception e) {
                 // Already includes BLOG_MODERATOR or column is VARCHAR — safe to ignore

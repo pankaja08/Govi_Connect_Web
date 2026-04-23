@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -34,19 +35,50 @@ public class HomeController {
             @RequestParam(value = "season", required = false) String season,
             @RequestParam(value = "crop", required = false) String crop,
             @RequestParam(value = "method", required = false) String method,
+            @RequestParam(value = "savedOnly", defaultValue = "false") boolean savedOnly,
+            @RequestHeader(value = "X-Requested-With", required = false) String requestedWith,
+            Authentication authentication,
             Model model) {
-        model.addAttribute("blogs", blogService.getFilteredBlogs(keyword, location, season, crop, method));
+        
+        User user = null;
+        if (authentication != null && authentication.isAuthenticated()) {
+            user = userService.findByUsername(authentication.getName());
+            model.addAttribute("savedBlogIds", user.getSavedBlogs().stream().map(Blog::getId).collect(java.util.stream.Collectors.toSet()));
+        }
+
+        Long userId = (user != null) ? user.getId() : null;
+        model.addAttribute("blogs", blogService.getFilteredBlogs(keyword, location, season, crop, method, savedOnly, userId));
         model.addAttribute("farmerCount", userService.getFarmerCount());
         model.addAttribute("expertCount", userService.getExpertCount());
-
-        // Pass filter parameters back to the view to show active state
         model.addAttribute("keywordFilter", keyword);
         model.addAttribute("locationFilter", location);
         model.addAttribute("seasonFilter", season);
         model.addAttribute("cropFilter", crop);
         model.addAttribute("methodFilter", method);
+        model.addAttribute("savedOnlyFilter", savedOnly);
+
+        if ("XMLHttpRequest".equals(requestedWith)) {
+            return "index :: blog-grid";
+        }
 
         return "index";
+    }
+
+    @PostMapping("/api/blog/{id}/save")
+    @ResponseBody
+    public java.util.Map<String, Object> toggleSaveBlog(@PathVariable("id") Long id, Authentication authentication) {
+        java.util.Map<String, Object> response = new java.util.HashMap<>();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            response.put("error", "Unauthorized");
+            return response;
+        }
+
+        User user = userService.findByUsername(authentication.getName());
+        boolean saved = blogService.toggleSaveBlog(id, user);
+        userService.saveUser(user); // Persistence
+
+        response.put("saved", saved);
+        return response;
     }
 
     @GetMapping("/access-denied")
@@ -134,6 +166,26 @@ public class HomeController {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "An error occurred while posting your reply.");
+        }
+
+        return "redirect:/blog/" + blogId;
+    }
+
+    @PostMapping("/blog/{blogId}/comment/{commentId}/delete")
+    public String deleteComment(@PathVariable("blogId") Long blogId,
+            @PathVariable("commentId") Long commentId,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return "redirect:/login";
+        }
+
+        try {
+            User user = userService.findByUsername(authentication.getName());
+            commentService.deleteComment(commentId, user);
+            redirectAttributes.addFlashAttribute("successMessage", "Comment deleted successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to delete comment: " + e.getMessage());
         }
 
         return "redirect:/blog/" + blogId;
