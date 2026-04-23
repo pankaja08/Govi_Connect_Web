@@ -3,6 +3,7 @@ package com.goviconnect.controller;
 import com.goviconnect.entity.AgriOfficerDetails;
 import com.goviconnect.entity.User;
 import com.goviconnect.enums.Role;
+import java.time.LocalDate;
 import com.goviconnect.service.CropService;
 import com.goviconnect.service.MarketProductService;
 import com.goviconnect.service.UserService;
@@ -15,11 +16,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin")
@@ -31,7 +30,6 @@ public class AdminController {
     private final UserService userService;
     private final MarketProductService marketProductService;
     private final CropService cropService;
-    private final org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
@@ -63,9 +61,11 @@ public class AdminController {
 
     @PostMapping("/approve/{id}")
     public String approve(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
+        log.info("Received approval request for officer ID: {}", id);
         try {
             userService.approveOfficer(id);
-            redirectAttributes.addFlashAttribute("successMessage", "Officer approved successfully.");
+            log.info("Officer ID {} approved successfully", id);
+            redirectAttributes.addFlashAttribute("successMessage", "Officer approved and notified by email.");
         } catch (Exception e) {
             log.error("Failed to approve officer ID: {}", id, e);
             redirectAttributes.addFlashAttribute("errorMessage", "Failed to approve: " + e.getMessage());
@@ -75,8 +75,10 @@ public class AdminController {
 
     @PostMapping("/reject/{id}")
     public String reject(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
+        log.info("Received rejection request for officer ID: {}", id);
         try {
             userService.rejectOfficer(id);
+            log.info("Officer ID {} rejected successfully", id);
             redirectAttributes.addFlashAttribute("successMessage", "Officer registration rejected.");
         } catch (Exception e) {
             log.error("Failed to reject officer ID: {}", id, e);
@@ -87,9 +89,11 @@ public class AdminController {
 
     @PostMapping("/product/approve/{id}")
     public String approveProduct(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
+        log.info("Received approval request for product ID: {}", id);
         try {
             marketProductService.approveProduct(id);
-            redirectAttributes.addFlashAttribute("successMessage", "Product approved successfully.");
+            log.info("Product ID {} approved successfully", id);
+            redirectAttributes.addFlashAttribute("successMessage", "Product approved and notified by email.");
         } catch (Exception e) {
             log.error("Failed to approve product ID: {}", id, e);
             redirectAttributes.addFlashAttribute("errorMessage", "Failed to approve product: " + e.getMessage());
@@ -99,8 +103,10 @@ public class AdminController {
 
     @PostMapping("/product/reject/{id}")
     public String rejectProduct(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
+        log.info("Received rejection request for product ID: {}", id);
         try {
             marketProductService.rejectProduct(id);
+            log.info("Product ID {} rejected successfully", id);
             redirectAttributes.addFlashAttribute("successMessage", "Product listing rejected.");
         } catch (Exception e) {
             log.error("Failed to reject product ID: {}", id, e);
@@ -115,12 +121,15 @@ public class AdminController {
             StringBuilder csvBuilder = new StringBuilder();
             csvBuilder.append("ID,Full Name,Username,Email,NIC,Role,Account Status,District,Province,Contact Number\n");
 
-            Role[] roles = {Role.ADMIN, Role.AGRI_OFFICER, Role.BLOG_MODERATOR, Role.USER};
-            String[] sectionHeaders = {"ADMINISTRATORS", "AGRI OFFICERS / EXPERTS", "BLOG MODERATORS", "FARMERS / USERS"};
+            // Define roles in order of priority
+            Role[] roles = { Role.ADMIN, Role.AGRI_OFFICER, Role.BLOG_MODERATOR, Role.USER };
+            String[] sectionHeaders = { "ADMINISTRATORS", "AGRI OFFICERS / EXPERTS", "BLOG MODERATORS",
+                    "FARMERS / USERS" };
 
             for (int i = 0; i < roles.length; i++) {
                 Role role = roles[i];
                 List<User> usersInRole = userService.getUsersByRole(role);
+
                 if (!usersInRole.isEmpty()) {
                     csvBuilder.append("\n--- ").append(sectionHeaders[i]).append(" ---\n");
                     for (User user : usersInRole) {
@@ -130,7 +139,8 @@ public class AdminController {
                                 .append(escapeCsv(user.getEmail())).append(",")
                                 .append(escapeCsv(user.getNic())).append(",")
                                 .append(user.getRole() != null ? user.getRole().name() : "").append(",")
-                                .append(user.getAccountStatus() != null ? user.getAccountStatus().name() : "").append(",")
+                                .append(user.getAccountStatus() != null ? user.getAccountStatus().name() : "")
+                                .append(",")
                                 .append(escapeCsv(user.getDistrict())).append(",")
                                 .append(escapeCsv(user.getProvince())).append(",")
                                 .append(escapeCsv(user.getContactNumber())).append("\n");
@@ -139,6 +149,7 @@ public class AdminController {
             }
 
             byte[] csvBytes = csvBuilder.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8);
+
             org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
             headers.setContentType(org.springframework.http.MediaType.parseMediaType("text/csv"));
             headers.setContentDispositionFormData("attachment", "goviconnect_users_organized.csv");
@@ -151,12 +162,16 @@ public class AdminController {
     }
 
     private String escapeCsv(String value) {
-        if (value == null) return "";
+        if (value == null) {
+            return "";
+        }
         if (value.contains(",") || value.contains("\"") || value.contains("\n")) {
             return "\"" + value.replace("\"", "\"\"") + "\"";
         }
         return value;
     }
+
+    // --- CRUD API Endpoints ---
 
     @GetMapping("/api/user/{id}")
     @ResponseBody
@@ -209,28 +224,38 @@ public class AdminController {
             @RequestParam(value = "startDate", required = false) String startDateStr,
             @RequestParam(value = "endDate", required = false) String endDateStr) {
         try {
-            LocalDate startDate = (startDateStr != null && !startDateStr.isEmpty()) ? LocalDate.parse(startDateStr) : null;
+            LocalDate startDate = (startDateStr != null && !startDateStr.isEmpty()) ? LocalDate.parse(startDateStr)
+                    : null;
             LocalDate endDate = (endDateStr != null && !endDateStr.isEmpty()) ? LocalDate.parse(endDateStr) : null;
 
-            Map<String, List<Map<String, Object>>> bestCrops = cropService.calculateBestCropsPerSeason(province, null, null, startDate, endDate);
-            Map<String, Double> distribution = cropService.calculateCropDistribution(province, null, null, startDate, endDate);
-            
+            Map<String, List<Map<String, Object>>> bestCrops = cropService.calculateBestCropsPerSeason(province, null,
+                    null, startDate, endDate);
+            Map<String, Double> distribution = cropService.calculateCropDistribution(province, null, null, startDate,
+                    endDate);
+
+            // Add user counts based on same filters
             List<User> filteredUsers = userService.getAllUsers().stream()
-                .filter(u -> province == null || province.equalsIgnoreCase("all") || (u.getProvince() != null && u.getProvince().equalsIgnoreCase(province)))
-                .filter(u -> {
-                    if (startDate == null && endDate == null) return true;
-                    if (u.getCreatedAt() == null) return true;
-                    if (startDate != null && u.getCreatedAt().isBefore(startDate)) return false;
-                    if (endDate != null && u.getCreatedAt().isAfter(endDate)) return false;
-                    return true;
-                })
-                .toList();
-            
+                    .filter(u -> province == null || province.equalsIgnoreCase("all")
+                            || (u.getProvince() != null && u.getProvince().equalsIgnoreCase(province)))
+                    .filter(u -> {
+                        if (startDate == null && endDate == null)
+                            return true;
+                        if (u.getCreatedAt() == null)
+                            return true; // Include old users if they have no date
+                        if (startDate != null && u.getCreatedAt().isBefore(startDate))
+                            return false;
+                        if (endDate != null && u.getCreatedAt().isAfter(endDate))
+                            return false;
+                        return true;
+                    })
+                    .toList();
+
             Map<String, Long> userCounts = new HashMap<>();
             userCounts.put("farmers", filteredUsers.stream().filter(u -> u.getRole() == Role.USER).count());
             userCounts.put("officers", filteredUsers.stream().filter(u -> u.getRole() == Role.AGRI_OFFICER).count());
             userCounts.put("admins", filteredUsers.stream().filter(u -> u.getRole() == Role.ADMIN).count());
 
+            // Pre-populate with all districts to ensure stable chart axis
             Map<String, Long> districtCounts = new HashMap<>();
             userService.getAllDistricts().forEach(d -> {
                 String normalized = toTitleCase(d);
@@ -238,12 +263,13 @@ public class AdminController {
             });
 
             filteredUsers.stream()
-                .filter(u -> u.getRole() == Role.USER)
-                .forEach(u -> {
-                    String d = toTitleCase(u.getDistrict());
-                    districtCounts.put(d, districtCounts.getOrDefault(d, 0L) + 1);
-                });
+                    .filter(u -> u.getRole() == Role.USER)
+                    .forEach(u -> {
+                        String d = toTitleCase(u.getDistrict());
+                        districtCounts.put(d, districtCounts.getOrDefault(d, 0L) + 1);
+                    });
 
+            // Remove "Unknown" if it has zero counts to clean up the chart
             if (districtCounts.containsKey("Unknown") && districtCounts.get("Unknown") == 0) {
                 districtCounts.remove("Unknown");
             }
@@ -253,7 +279,7 @@ public class AdminController {
             response.put("distribution", distribution);
             response.put("userCounts", userCounts);
             response.put("districtCounts", districtCounts);
-            
+
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("Failed to fetch crop analytics", e);
@@ -261,55 +287,22 @@ public class AdminController {
         }
     }
 
-    @GetMapping("/api/favorite-analytics")
-    @ResponseBody
-    public ResponseEntity<List<Map<String, Object>>> getFavoriteAnalytics() {
-        try {
-            return ResponseEntity.ok(marketProductService.getMonthlyFavoriteAnalytics());
-        } catch (Exception e) {
-            log.error("Failed to fetch favorite analytics", e);
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    @GetMapping("/api/seed-favorites")
-    @ResponseBody
-    public String seedFavorites() {
-        try {
-            List<Long> productIds = jdbcTemplate.queryForList("SELECT id FROM market_products", Long.class);
-            List<Long> userIds = jdbcTemplate.queryForList("SELECT id FROM users", Long.class);
-            if (productIds.isEmpty() || userIds.isEmpty()) return "Need users and products in DB.";
-
-            int count = 0;
-            for (int i = 0; i < Math.min(productIds.size(), 10); i++) {
-                for (int j = 0; j < Math.min(userIds.size(), 5); j++) {
-                    int month = (i % 5) + 1;
-                    String date = "2024-0" + month + "-10";
-                    try {
-                        jdbcTemplate.update("INSERT INTO product_favorite (product_id, user_id, created_date) VALUES (?, ?, ?)",
-                            productIds.get(i), userIds.get(j), date);
-                        count++;
-                    } catch (Exception e) {}
-                }
-            }
-            return "Seeded " + count + " favorites.";
-        } catch (Exception e) { return "Error: " + e.getMessage(); }
-    }
-
     @PostMapping("/user/update/{id}")
     public String updateUser(@PathVariable("id") Long id,
             @RequestParam("fullName") String fullName,
             @RequestParam("nic") String nic,
             @RequestParam("email") String email,
-            @RequestParam("contactNumber") String contactNumber,
+            @RequestParam(value = "contactNumber", required = false) String contactNumber,
             @RequestParam(value = "address", required = false) String address,
             @RequestParam(value = "district", required = false) String district,
             @RequestParam(value = "province", required = false) String province,
             @RequestParam(value = "dob", required = false) String dob,
             @RequestParam(value = "accountStatus", required = false) String accountStatus,
             RedirectAttributes redirectAttributes) {
+        log.info("Updating user ID: {}", id);
         try {
-            userService.updateUser(id, fullName, nic, email, contactNumber, address, district, province, dob, accountStatus);
+            userService.updateUser(id, fullName, nic, email, contactNumber, address, district, province, dob,
+                    accountStatus);
             redirectAttributes.addFlashAttribute("successMessage", "User details updated successfully.");
         } catch (Exception e) {
             log.error("Failed to update user ID: {}", id, e);
@@ -320,6 +313,7 @@ public class AdminController {
 
     @PostMapping("/user/delete/{id}")
     public String deleteUser(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
+        log.info("Deleting user ID: {}", id);
         try {
             userService.deleteUser(id);
             redirectAttributes.addFlashAttribute("successMessage", "User deleted successfully.");
@@ -342,20 +336,56 @@ public class AdminController {
             @RequestParam(value = "district", required = false) String district,
             @RequestParam(value = "province", required = false) String province,
             @RequestParam(value = "dob", required = false) String dob,
+            // Agri Officer fields
             @RequestParam(value = "registrationNumber", required = false) String registrationNumber,
             @RequestParam(value = "designation", required = false) String designation,
             @RequestParam(value = "specializationArea", required = false) String specializationArea,
             @RequestParam(value = "assignedArea", required = false) String assignedArea,
             @RequestParam(value = "officialEmail", required = false) String officialEmail,
             RedirectAttributes redirectAttributes) {
+        log.info("Creating user: {} with role: {}", username, roleStr);
         try {
+            // 1. Basic Validation
             if (fullName.isBlank() || username.isBlank() || email.isBlank() || nic.isBlank() || password.isBlank()) {
                 redirectAttributes.addFlashAttribute("errorMessage", "Required fields are missing.");
                 return "redirect:/admin/dashboard";
             }
+
+            // 2. Age Validation (Min 16)
+            if (dob != null && !dob.isBlank()) {
+                LocalDate birthDate = LocalDate.parse(dob);
+                LocalDate sixteenYearsAgo = LocalDate.now().minusYears(16);
+                if (birthDate.isAfter(sixteenYearsAgo)) {
+                    redirectAttributes.addFlashAttribute("errorMessage", "User must be at least 16 years old.");
+                    return "redirect:/admin/dashboard";
+                }
+            } else {
+                redirectAttributes.addFlashAttribute("errorMessage", "Date of birth is required.");
+                return "redirect:/admin/dashboard";
+            }
+
+            // 3. Contact Validation
+            if (contactNumber != null && !contactNumber.isBlank()) {
+                if (!java.util.regex.Pattern.matches("^0\\d{9}$", contactNumber.trim())) {
+                    redirectAttributes.addFlashAttribute("errorMessage",
+                            "Enter valid contact number (10 digits starting with 0).");
+                    return "redirect:/admin/dashboard";
+                }
+            }
+
+            // 4. NIC Validation
+            if (!nic.trim().matches("^([0-9]{9}[a-zA-Z]|[0-9]{12})$")) {
+                redirectAttributes.addFlashAttribute("errorMessage",
+                        "Invalid NIC format. Must be 12 digits or 10 characters (9 digits + 1 letter).");
+                return "redirect:/admin/dashboard";
+            }
+
             Role role = Role.valueOf(roleStr);
-            userService.createUser(fullName, username, email, nic, password, role, contactNumber, address, district, province, 
-                    LocalDate.parse(dob), registrationNumber, designation, specializationArea, assignedArea, officialEmail);
+            userService.createUser(fullName, username, email, nic, password, role, contactNumber, address, district,
+                    province,
+                    LocalDate.parse(dob), registrationNumber, designation, specializationArea, assignedArea,
+                    officialEmail);
+
             redirectAttributes.addFlashAttribute("successMessage", "User created successfully.");
         } catch (Exception e) {
             log.error("Failed to create user: {}", username, e);
@@ -365,12 +395,16 @@ public class AdminController {
     }
 
     private String toTitleCase(String str) {
-        if (str == null || str.isBlank()) return "Unknown";
+        if (str == null || str.isBlank())
+            return "Unknown";
         String[] words = str.trim().split("\\s+");
         StringBuilder sb = new StringBuilder();
         for (String word : words) {
-            if (word.isEmpty()) continue;
-            sb.append(Character.toUpperCase(word.charAt(0))).append(word.substring(1).toLowerCase()).append(" ");
+            if (word.isEmpty())
+                continue;
+            sb.append(Character.toUpperCase(word.charAt(0)))
+                    .append(word.substring(1).toLowerCase())
+                    .append(" ");
         }
         return sb.toString().trim();
     }
