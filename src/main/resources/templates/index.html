@@ -215,6 +215,18 @@
                     </div>
                     <div id="filter-content" class="hidden lg:block">
                     <form id="filterForm">
+                        <!-- Keyword Search -->
+                        <div class="mb-3">
+                            <label class="block text-xs font-bold text-gray-700 mb-1" th:text="#{home.blogs.filter.keyword} ?: 'Search'">Search</label>
+                            <div class="relative flex items-center">
+                                <input type="text" name="keyword" th:value="${keywordFilter}" th:placeholder="#{home.blogs.filter.search_placeholder}"
+                                    class="w-full border border-gray-200 rounded-lg pl-8 pr-3 py-2 text-xs text-gray-700 focus:ring-2 focus:ring-gc-green/50 focus:border-gc-green bg-gray-50 hover:bg-white transition-all outline-none"
+                                    onkeypress="if(event.key === 'Enter') { event.preventDefault(); submitFilters(); }">
+                                <svg class="w-4 h-4 text-gray-400 absolute left-2.5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                            </div>
+                        </div>
                         <!-- Location -->
                         <div class="mb-3">
                             <label class="block text-xs font-bold text-gray-700 mb-1"
@@ -279,6 +291,32 @@
 
                 <!-- Blog Grid -->
                 <div class="flex-1 w-full lg:w-4/5">
+                    
+                    <!-- Active Filter Chips -->
+                    <div class="flex flex-wrap items-center gap-2 mb-5" th:if="${(keywordFilter != null and keywordFilter != '') or (locationFilter != null and locationFilter != '') or (seasonFilter != null and seasonFilter != '') or (cropFilter != null and cropFilter != '') or (methodFilter != null and methodFilter != '')}">
+                        <div th:if="${keywordFilter != null and keywordFilter != ''}" class="inline-flex items-center gap-1.5 bg-gc-green/10 text-gc-dark text-xs font-bold px-3 py-1.5 rounded-full border border-gc-green/20 shadow-sm transition-all hover:bg-gc-green/20">
+                            <span>Search: [[${keywordFilter}]]</span>
+                            <button type="button" onclick="clearFilter('keyword')" class="text-gc-green hover:text-red-500 transition-colors ml-1" title="Remove filter"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                        </div>
+                        <div th:if="${locationFilter != null and locationFilter != ''}" class="inline-flex items-center gap-1.5 bg-gc-green/10 text-gc-dark text-xs font-bold px-3 py-1.5 rounded-full border border-gc-green/20 shadow-sm transition-all hover:bg-gc-green/20">
+                            <span>[[${locationFilter}]]</span>
+                            <button type="button" onclick="clearFilter('location')" class="text-gc-green hover:text-red-500 transition-colors ml-1" title="Remove filter"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                        </div>
+                        <div th:if="${seasonFilter != null and seasonFilter != ''}" class="inline-flex items-center gap-1.5 bg-gc-green/10 text-gc-dark text-xs font-bold px-3 py-1.5 rounded-full border border-gc-green/20 shadow-sm transition-all hover:bg-gc-green/20">
+                            <span>[[${seasonFilter}]]</span>
+                            <button type="button" onclick="clearFilter('season')" class="text-gc-green hover:text-red-500 transition-colors ml-1" title="Remove filter"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                        </div>
+                        <div th:if="${cropFilter != null and cropFilter != ''}" class="inline-flex items-center gap-1.5 bg-gc-green/10 text-gc-dark text-xs font-bold px-3 py-1.5 rounded-full border border-gc-green/20 shadow-sm transition-all hover:bg-gc-green/20">
+                            <span>[[${cropFilter}]]</span>
+                            <button type="button" onclick="clearFilter('crop')" class="text-gc-green hover:text-red-500 transition-colors ml-1" title="Remove filter"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                        </div>
+                        <div th:if="${methodFilter != null and methodFilter != ''}" class="inline-flex items-center gap-1.5 bg-gc-green/10 text-gc-dark text-xs font-bold px-3 py-1.5 rounded-full border border-gc-green/20 shadow-sm transition-all hover:bg-gc-green/20">
+                            <span>[[${methodFilter}]]</span>
+                            <button type="button" onclick="clearFilter('method')" class="text-gc-green hover:text-red-500 transition-colors ml-1" title="Remove filter"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                        </div>
+                        <button type="button" onclick="window.location.href='/?#blogs'" class="text-xs text-gray-500 hover:text-gc-dark font-bold ml-2 underline decoration-gray-300 hover:decoration-gc-dark transition-all">Clear All</button>
+                    </div>
+
                     <!-- If blogs exist -->
                     <div th:if="${blogs != null and !blogs.empty}"
                         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -333,15 +371,20 @@
                                                 d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                                         </svg>
                                     </a>
-                                    <span class="text-gray-400 text-xs flex items-center gap-1.5 font-medium"
-                                        title="Comments">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03-8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
-                                            </path>
-                                        </svg>
-                                        <span th:text="${blog.comments != null ? blog.comments.size() : 0}">0</span>
-                                    </span>
+                                    <div class="flex items-center justify-end gap-3 flex-wrap">
+                                        <span class="text-gray-500 text-[10px] flex items-center gap-1 font-semibold bg-gray-50 px-2 py-1 rounded-md border border-gray-100" title="Estimated reading time">
+                                            ⏱ <span th:text="${blog.estimatedReadingTime}">1</span> min
+                                        </span>
+                                        <span class="text-gray-400 text-[11px] flex items-center gap-1.5 font-medium"
+                                            title="Comments">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03-8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
+                                                </path>
+                                            </svg>
+                                            <span th:text="${blog.comments != null ? blog.comments.size() : 0}">0</span>
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </article>
@@ -571,12 +614,21 @@
             function submitFilters() {
                 const form = document.getElementById('filterForm');
                 const url = new URL(window.location.origin + '/');
+                if (form.keyword && form.keyword.value) url.searchParams.set('keyword', form.keyword.value);
                 if (form.location.value) url.searchParams.set('location', form.location.value);
                 if (form.season.value) url.searchParams.set('season', form.season.value);
                 if (form.crop.value) url.searchParams.set('crop', form.crop.value);
                 if (form.method.value) url.searchParams.set('method', form.method.value);
                 url.hash = 'blogs';
                 window.location.href = url.toString();
+            }
+
+            function clearFilter(filterName) {
+                const form = document.getElementById('filterForm');
+                if (form[filterName]) {
+                    form[filterName].value = '';
+                }
+                submitFilters();
             }
 
             function toggleFilters() {
@@ -593,17 +645,12 @@
 
             window.addEventListener('DOMContentLoaded', () => {
                 const urlParams = new URLSearchParams(window.location.search);
-                if ((urlParams.has('location') || urlParams.has('season') || urlParams.has('crop') || urlParams.has('method')) && !window.location.hash) {
+                if ((urlParams.has('keyword') || urlParams.has('location') || urlParams.has('season') || urlParams.has('crop') || urlParams.has('method')) && !window.location.hash) {
                     window.location.hash = 'blogs';
                 }
             });
         </script>
     </div>
-</body>
-
-</html>
-de(0);
-</script>
 </body>
 
 </html>

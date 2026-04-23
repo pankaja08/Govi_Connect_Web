@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+    th:replace="~{layout/base(content=~{::main}, pageTitle=${pageTitle})}">
+
+<body>
+    <main class="w-full flex-grow bg-slate-50 relative overflow-hidden">
+        
+        <!-- ===== HERO SECTION ===== -->
+        <section class="relative pt-16 pb-32 sm:pt-24 sm:pb-48 bg-gc-dark overflow-hidden">
+            <!-- Animated Background Elements -->
+            <div class="absolute inset-0 z-0">
+                <div class="absolute top-0 left-0 w-full h-full opacity-10" 
+                     style="background-image: url('https://www.transparenttextures.com/patterns/leaf.png');"></div>
+                <div class="absolute -top-24 -left-24 w-96 h-96 bg-gc-green rounded-full blur-[120px] opacity-20"></div>
+                <div class="absolute -bottom-24 -right-24 w-96 h-96 bg-gc-gold rounded-full blur-[120px] opacity-20"></div>
+            </div>
+
+            <div class="relative z-10 max-w-7xl mx-auto px-6 text-center">
+                <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full text-xs font-black text-gc-gold uppercase tracking-widest mb-6 shadow-xl">
+                    <span class="flex h-2 w-2 relative">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-gc-gold opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-gc-gold"></span>
+                    </span>
+                    AI-Powered Diagnostics
+                </div>
+                <h1 class="text-4xl md:text-6xl font-black text-white mb-6 leading-tight drop-shadow-lg">
+                    Plant Disease <span class="text-gc-gold">Predictor</span>
+                </h1>
+                <p class="text-lg md:text-xl text-green-100 max-w-2xl mx-auto leading-relaxed">
+                    Instantly identify paddy leaf diseases and get expert treatment advice using our advanced CNN-based Artificial Intelligence.
+                </p>
+            </div>
+
+            <!-- Wave Shape Divider -->
+            <div class="absolute bottom-0 left-0 w-full overflow-hidden leading-[0]">
+                <svg class="relative block w-[calc(100%+1.3px)] h-16" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                    <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V95.8C58.47,112,123.67,113,184.14,92.83c45.32-15.14,84.15-42.87,137.25-36.39Z" class="fill-slate-50"></path>
+                </svg>
+            </div>
+        </section>
+
+        <!-- ===== UPLOAD & RESULTS SECTION ===== -->
+        <section class="relative z-20 -mt-24 pb-24 px-6">
+            <div id="layoutContainer" class="max-w-4xl mx-auto flex flex-col lg:flex-row gap-8 items-start transition-all duration-700 ease-in-out">
+                
+                <!-- Upload Card -->
+                <div id="uploadPanel" class="w-full bg-white rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.08)] p-8 md:p-10 border border-gray-100 transition-all duration-500 hover:shadow-[0_20px_60px_rgba(0,0,0,0.12)] shrink-0">
+                    <div class="text-center mb-8">
+                        <h2 class="text-2xl font-black text-slate-800 mb-2">Upload Leaf Image</h2>
+                        <p class="text-slate-500 font-medium">Capture or select a clear photo of the affected paddy leaf</p>
+                    </div>
+
+                    <form id="predictionForm" class="space-y-6">
+                        <!-- Custom Drag & Drop Area -->
+                        <div id="dropZone" class="relative group cursor-pointer">
+                            <input type="file" id="fileInput" name="file" accept="image/*" class="hidden">
+                            <div class="border-4 border-dashed border-slate-100 rounded-3xl p-8 text-center transition-all group-hover:border-gc-green/50 group-hover:bg-green-50/50">
+                                <div id="uploadPlaceholder">
+                                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl transform transition-transform group-hover:scale-110 group-hover:rotate-6">
+                                        📸
+                                    </div>
+                                    <p class="text-base font-bold text-slate-700 group-hover:text-gc-dark">Click here or drag image to upload</p>
+                                    <p class="text-sm text-slate-400 mt-2 font-medium">Supports JPG, PNG (Max 5MB)</p>
+                                </div>
+                                <!-- Image Preview Container -->
+                                <div id="previewContainer" class="hidden">
+                                    <img id="imagePreview" src="#" alt="Preview" class="max-h-60 mx-auto rounded-2xl shadow-lg border-4 border-white">
+                                    <button type="button" id="removeBtn" class="mt-4 text-red-500 font-bold text-sm hover:underline flex items-center gap-1 mx-auto">
+                                        <span>✕</span> Remove and change
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="analyzeBtn" disabled
+                                class="w-full bg-gc-dark text-white font-black py-4 rounded-xl text-lg shadow-xl hover:bg-gc-green transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-3">
+                            <span id="btnText">Analyze Image Now</span>
+                            <div id="btnLoader" class="hidden w-5 h-5 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        </button>
+                    </form>
+
+                    <!-- Error Message Alert -->
+                    <div id="errorMessage" class="hidden mt-6 bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 font-bold flex items-center gap-3 animate-shake">
+                        <span class="text-xl">⚠️</span>
+                        <p id="errorText" class="text-sm text-center">An error occurred during prediction.</p>
+                    </div>
+                </div>
+
+                <!-- Results Display (Hidden by default) -->
+                <div id="resultsContent" class="hidden w-full lg:w-2/3 opacity-0 transition-opacity duration-500">
+                    
+                    <!-- Main Result Card -->
+                    <div class="bg-white rounded-[2.5rem] shadow-2xl p-8 md:p-12 border-t-[12px] border-gc-gold" id="resultCard">
+                        <div class="flex flex-col md:flex-row gap-10">
+                            <!-- Left: Score Ring -->
+                            <div class="md:w-1/3 flex flex-col items-center justify-center">
+                                <div class="relative w-48 h-48 flex items-center justify-center mb-4">
+                                    <svg class="w-full h-full transform -rotate-90">
+                                        <circle cx="96" cy="96" r="88" stroke="currentColor" stroke-width="12" fill="transparent" class="text-slate-100" />
+                                        <circle cx="96" cy="96" r="88" stroke="currentColor" stroke-width="12" fill="transparent" 
+                                                stroke-dasharray="552.92" stroke-dashoffset="552.92" 
+                                                class="text-gc-green transition-all duration-1000 ease-out" id="confidenceCircle" />
+                                    </svg>
+                                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                        <span class="text-4xl font-black text-slate-800 leading-none" id="confidenceValue">0%</span>
+                                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Confidence</span>
+                                    </div>
+                                </div>
+                                <div id="paddyConfidence" class="text-xs font-bold text-slate-500 text-center">
+                                    AI is <span id="paddyScore">0%</span> sure this is a paddy leaf.
+                                </div>
+                            </div>
+
+                            <!-- Right: Result Info -->
+                            <div class="md:w-2/3">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <span class="px-3 py-1 bg-gc-gold/20 text-gc-dark text-[10px] font-black rounded-full uppercase tracking-wider">Detection Result</span>
+                                    <span id="severityBadge" class="px-3 py-1 bg-red-100 text-red-700 text-[10px] font-black rounded-full uppercase tracking-wider">Unknown Severity</span>
+                                </div>
+                                <h3 id="diseaseName" class="text-3xl md:text-5xl font-black text-slate-800 mb-6 leading-tight">Analyzing...</h3>
+                                
+                                <div id="warningBox" class="hidden bg-amber-50 border-l-4 border-amber-400 p-4 mb-8 rounded-r-xl">
+                                    <p class="text-amber-800 text-sm font-bold flex items-center gap-2">
+                                        <span class="text-lg">⚠️</span> <span id="warningText">Notice</span>
+                                    </p>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="bg-slate-50 p-4 rounded-2xl">
+                                        <p class="text-[10px] text-slate-400 font-black uppercase mb-1">Pathogen Type</p>
+                                        <p id="pathogenType" class="font-bold text-slate-700">Checking...</p>
+                                    </div>
+                                    <div class="bg-slate-50 p-4 rounded-2xl">
+                                        <p class="text-[10px] text-slate-400 font-black uppercase mb-1">Diagnostic Status</p>
+                                        <p id="imageStatus" class="font-bold text-slate-700">Verified</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Symptoms & Treatment Breakdown -->
+                        <div class="mt-12 grid md:grid-cols-2 gap-8 border-t border-slate-100 pt-10">
+                            <div>
+                                <h4 class="flex items-center gap-3 text-lg font-black text-slate-800 mb-4">
+                                    <span class="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center text-sm">🔍</span>
+                                    Observed Symptoms
+                                </h4>
+                                <ul id="symptomsList" class="space-y-2">
+                                    <!-- Populated by JS -->
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="flex items-center gap-3 text-lg font-black text-slate-800 mb-4">
+                                    <span class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center text-sm">💊</span>
+                                    Treatment & Recovery
+                                </h4>
+                                <ul id="treatmentList" class="space-y-2">
+                                    <!-- Populated by JS -->
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Prevention Footer -->
+                        <div class="mt-8 bg-gc-dark/5 p-6 rounded-3xl border border-gc-dark/10">
+                            <h4 class="font-black text-gc-dark mb-2 text-sm uppercase tracking-wider flex items-center gap-2">
+                                <span class="text-lg">🛡️</span> Prevention Strategy
+                            </h4>
+                            <p id="preventionText" class="text-slate-600 text-sm leading-relaxed">
+                                Loading prevention advice...
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center pt-8">
+                        <button onclick="resetAnalysis()" class="px-8 py-4 bg-white border-2 border-slate-200 text-slate-600 font-black rounded-2xl hover:bg-slate-50 transition-all flex items-center justify-center gap-2">
+                            <span>↺</span> Start New Analysis
+                        </button>
+                        <a href="/forum" class="px-8 py-4 bg-gc-green text-white font-black rounded-2xl shadow-lg hover:shadow-gc-green/30 transition-all flex items-center justify-center gap-2">
+                            <span>💬</span> Ask Community Forums
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ===== GUIDE SECTION ===== -->
+        <section class="py-24 bg-white px-6">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4">Tips for Best Results</h2>
+                    <p class="text-slate-500 max-w-xl mx-auto font-medium">Follow these guidelines to ensure the highest accuracy during AI analysis</p>
+                </div>
+
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="p-8 bg-slate-50 rounded-[2rem] border border-gray-100 transition-all hover:bg-white hover:shadow-xl hover:-translate-y-2 group text-center">
+                        <div class="w-16 h-16 bg-white rounded-2xl shadow-md flex items-center justify-center text-3xl mx-auto mb-6 group-hover:scale-110 transition-transform">🔆</div>
+                        <h3 class="font-black text-slate-800 mb-3">Good Lighting</h3>
+                        <p class="text-slate-500 text-sm leading-relaxed font-medium">Ensure the leaf is well-lit, preferably with natural daylight.</p>
+                    </div>
+                    <div class="p-8 bg-slate-50 rounded-[2rem] border border-gray-100 transition-all hover:bg-white hover:shadow-xl hover:-translate-y-2 group text-center">
+                        <div class="w-16 h-16 bg-white rounded-2xl shadow-md flex items-center justify-center text-3xl mx-auto mb-6 group-hover:scale-110 transition-transform">🎯</div>
+                        <h3 class="font-black text-slate-800 mb-3">Keep it Focused</h3>
+                        <p class="text-slate-500 text-sm leading-relaxed font-medium">The camera should be focused squarely on the infected area of the leaf.</p>
+                    </div>
+                    <div class="p-8 bg-slate-50 rounded-[2rem] border border-gray-100 transition-all hover:bg-white hover:shadow-xl hover:-translate-y-2 group text-center">
+                        <div class="w-16 h-16 bg-white rounded-2xl shadow-md flex items-center justify-center text-3xl mx-auto mb-6 group-hover:scale-110 transition-transform">📄</div>
+                        <h3 class="font-black text-slate-800 mb-3">Plain Background</h3>
+                        <p class="text-slate-500 text-sm leading-relaxed font-medium">Try to place the leaf on a plain white or neutral surface.</p>
+                    </div>
+                    <div class="p-8 bg-slate-50 rounded-[2rem] border border-gray-100 transition-all hover:bg-white hover:shadow-xl hover:-translate-y-2 group text-center">
+                        <div class="w-16 h-16 bg-white rounded-2xl shadow-md flex items-center justify-center text-3xl mx-auto mb-6 group-hover:scale-110 transition-transform">🌡️</div>
+                        <h3 class="font-black text-slate-800 mb-3">Live Sample</h3>
+                        <p class="text-slate-500 text-sm leading-relaxed font-medium">Analyze leaves directly on the plant for the best diagnostic accuracy.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Script for Prediction Integration -->
+        <script>
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('fileInput');
+            const predictionForm = document.getElementById('predictionForm');
+            const previewContainer = document.getElementById('previewContainer');
+            const uploadPlaceholder = document.getElementById('uploadPlaceholder');
+            const imagePreview = document.getElementById('imagePreview');
+            const removeBtn = document.getElementById('removeBtn');
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            const btnText = document.getElementById('btnText');
+            const btnLoader = document.getElementById('btnLoader');
+            const resultsContent = document.getElementById('resultsContent');
+            const errorMessage = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+
+            // Handle Drag and Drop
+            dropZone.addEventListener('click', () => fileInput.click());
+            
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('bg-green-50');
+            });
+
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('bg-green-50');
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('bg-green-50');
+                if (e.dataTransfer.files.length) {
+                    fileInput.files = e.dataTransfer.files;
+                    handleFileChange();
+                }
+            });
+
+            fileInput.addEventListener('change', handleFileChange);
+
+            function handleFileChange() {
+                const file = fileInput.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        imagePreview.src = e.target.result;
+                        uploadPlaceholder.classList.add('hidden');
+                        previewContainer.classList.remove('hidden');
+                        analyzeBtn.disabled = false;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+
+            removeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                resetAnalysis();
+            });
+
+            function resetAnalysis() {
+                fileInput.value = '';
+                uploadPlaceholder.classList.remove('hidden');
+                previewContainer.classList.add('hidden');
+                analyzeBtn.disabled = true;
+                
+                const layoutContainer = document.getElementById('layoutContainer');
+                const uploadPanel = document.getElementById('uploadPanel');
+                layoutContainer.classList.remove('max-w-7xl');
+                layoutContainer.classList.add('max-w-4xl');
+                uploadPanel.classList.remove('lg:w-1/3');
+                uploadPanel.classList.add('lg:w-full');
+
+                resultsContent.classList.add('hidden');
+                resultsContent.classList.add('opacity-0');
+                errorMessage.classList.add('hidden');
+                btnText.textContent = "Analyze Image Now";
+                btnLoader.classList.add('hidden');
+            }
+
+            // AJAX Submission
+            predictionForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                // UI Loading State
+                btnText.textContent = "Processing Image...";
+                btnLoader.classList.remove('hidden');
+                analyzeBtn.disabled = true;
+                errorMessage.classList.add('hidden');
+                resultsContent.classList.add('hidden');
+                resultsContent.classList.add('opacity-0');
+
+                const formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+
+                try {
+                    const response = await fetch('/api/disease-predict', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok) throw new Error(data.solution || "Server analysis failed");
+
+                    displayResults(data);
+
+                } catch (err) {
+                    errorText.textContent = err.message || "The AI Service is currently offline. Please ensure the Python backend is running on port 8000.";
+                    errorMessage.classList.remove('hidden');
+                } finally {
+                    btnText.textContent = "Analyze Image Now";
+                    btnLoader.classList.add('hidden');
+                    analyzeBtn.disabled = false;
+                }
+            });
+
+            function displayResults(data) {
+                // Main Info
+                document.getElementById('diseaseName').textContent = data.disease;
+                document.getElementById('confidenceValue').textContent = Math.round(data.confidence) + '%';
+                document.getElementById('pathogenType').textContent = data.pathogen || 'Unknown';
+                document.getElementById('imageStatus').textContent = data.image_status || 'Analyzed';
+                
+                // Progress Circle Animation
+                const circle = document.getElementById('confidenceCircle');
+                const radius = circle.r.baseVal.value;
+                const circumference = 2 * Math.PI * radius;
+                const offset = circumference - (data.confidence / 100) * circumference;
+                circle.style.strokeDasharray = `${circumference} ${circumference}`;
+                circle.style.strokeDashoffset = offset;
+
+                // Paddy Confidence
+                const paddyScore = Math.round(data.paddy_confidence * 100);
+                document.getElementById('paddyScore').textContent = paddyScore + '%';
+                
+                // Severity Color Logic
+                const severity = (data.severity || 'UNKNOWN').toUpperCase();
+                const badge = document.getElementById('severityBadge');
+                const card = document.getElementById('resultCard');
+                
+                badge.textContent = severity + ' SEVERITY';
+                
+                if (severity === 'NORMAL' || severity === 'HEALTHY') {
+                    badge.className = 'px-3 py-1 bg-green-100 text-green-700 text-[10px] font-black rounded-full uppercase tracking-wider';
+                    card.style.borderTopColor = '#22c55e';
+                    circle.className.baseVal = "text-green-500 transition-all duration-100 thickness-animate";
+                } else if (severity === 'MODERATE') {
+                    badge.className = 'px-3 py-1 bg-amber-100 text-amber-700 text-[10px] font-black rounded-full uppercase tracking-wider';
+                    card.style.borderTopColor = '#f59e0b';
+                    circle.className.baseVal = "text-amber-500 transition-all duration-100 thickness-animate";
+                } else {
+                    badge.className = 'px-3 py-1 bg-red-100 text-red-700 text-[10px] font-black rounded-full uppercase tracking-wider';
+                    card.style.borderTopColor = '#ef4444';
+                    circle.className.baseVal = "text-red-500 transition-all duration-100 thickness-animate";
+                }
+
+                // Warning
+                const warningBox = document.getElementById('warningBox');
+                if (data.warning) {
+                    warningBox.classList.remove('hidden');
+                    document.getElementById('warningText').textContent = data.warning;
+                } else {
+                    warningBox.classList.add('hidden');
+                }
+
+                // List Populators
+                populateList('symptomsList', data.symptoms, '🔍');
+                populateList('treatmentList', data.treatment, '✔️');
+                
+                document.getElementById('preventionText').textContent = data.prevention || "To prevent this disease in the future, ensure proper crop rotation, use resistant seeds, and maintain optimal irrigation levels as advised by your local agriculture officer.";
+
+                // Show Content
+                const layoutContainer = document.getElementById('layoutContainer');
+                const uploadPanel = document.getElementById('uploadPanel');
+                layoutContainer.classList.remove('max-w-4xl');
+                layoutContainer.classList.add('max-w-7xl');
+                uploadPanel.classList.remove('lg:w-full');
+                uploadPanel.classList.add('lg:w-1/3');
+
+                resultsContent.classList.remove('hidden');
+                setTimeout(() => {
+                    resultsContent.classList.remove('opacity-0');
+                    resultsContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+            }
+
+            function populateList(id, items, emoji) {
+                const list = document.getElementById(id);
+                list.innerHTML = '';
+                
+                if (!items || (Array.isArray(items) && items.length === 0)) {
+                    list.innerHTML = `<li class="text-slate-400 text-xs italic">No data available</li>`;
+                    return;
+                }
+
+                const itemsArray = Array.isArray(items) ? items : [items];
+                itemsArray.forEach(item => {
+                    const li = document.createElement('li');
+                    li.className = "flex items-start gap-2 text-sm text-slate-600 font-medium";
+                    li.innerHTML = `<span class="mt-1">${emoji}</span> <span>${item}</span>`;
+                    list.appendChild(li);
+                });
+            }
+        </script>
+        
+        <style>
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-5px); }
+                75% { transform: translateX(5px); }
+            }
+            .animate-shake { animation: shake 0.4s ease-in-out 0s 2; }
+            .thickness-animate { transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1); }
+        </style>
+    </main>
+</body>
+
+</html>

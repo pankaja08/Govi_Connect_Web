@@ -1,0 +1,109 @@
+{
+  "blast": {
+    "display_name": "Rice Blast",
+    "pathogen": "Fungal \u2014 Magnaporthe oryzae",
+    "severity": "High",
+    "symptoms": [
+      "Diamond or eye-shaped lesions on leaves",
+      "Gray or white center with dark brown borders",
+      "Lesions on leaf collar, neck, and panicle",
+      "Severe: neck rot causes entire panicle to die"
+    ],
+    "causes": [
+      "High humidity (>90%) with temperatures 24\u201328\u00b0C",
+      "Excessive nitrogen fertilization",
+      "Susceptible rice varieties"
+    ],
+    "treatment": [
+      "Apply Tricyclazole or Isoprothiolane fungicide immediately",
+      "Remove and burn infected plant material",
+      "Avoid excess nitrogen \u2014 use split application",
+      "Maintain proper water levels"
+    ],
+    "prevention": [
+      "Plant certified blast-resistant varieties",
+      "Treat seeds with fungicide before planting",
+      "Avoid planting during high-humidity periods",
+      "Practice crop rotation"
+    ]
+  },
+  "brown_spot": {
+    "display_name": "Brown Spot",
+    "pathogen": "Fungal \u2014 Bipolaris oryzae",
+    "severity": "Moderate",
+    "symptoms": [
+      "Small oval to circular brown spots on leaves",
+      "Dark brown borders with gray/white centers",
+      "Spots on glumes and grains",
+      "Infected leaves turn yellow and die"
+    ],
+    "causes": [
+      "Nutrient-poor soils \u2014 nitrogen and potassium deficiency",
+      "Waterlogged or drought-stressed conditions",
+      "High humidity and warm temperatures"
+    ],
+    "treatment": [
+      "Apply Mancozeb or Iprodione fungicide",
+      "Correct soil nutrients with balanced fertilizer",
+      "Improve field drainage if waterlogged",
+      "Remove and burn infected debris"
+    ],
+    "prevention": [
+      "Use certified seeds treated with fungicide",
+      "Maintain soil fertility \u2014 nitrogen and potassium",
+      "Ensure adequate irrigation",
+      "Use resistant varieties where available"
+    ]
+  },
+  "bacterial_leaf_blight": {
+    "display_name": "Bacterial Leaf Blight",
+    "pathogen": "Bacterial \u2014 Xanthomonas oryzae pv. oryzae",
+    "severity": "High",
+    "symptoms": [
+      "Water-soaked lesions from leaf tips or margins",
+      "Lesions turn yellow to white as they enlarge",
+      "Affected leaves dry out and die",
+      "Yellow bacterial ooze in humid conditions"
+    ],
+    "causes": [
+      "Heavy rain or flooding causing leaf wounds",
+      "High nitrogen fertilization",
+      "Dense planting causing high humidity",
+      "Infected seeds or irrigation water"
+    ],
+    "treatment": [
+      "Apply copper-based bactericide to slow spread",
+      "Drain flooded fields immediately",
+      "Avoid overhead irrigation",
+      "Remove and destroy infected plants"
+    ],
+    "prevention": [
+      "Plant resistant varieties (IR64, IRBB series)",
+      "Use certified disease-free seeds",
+      "Reduce nitrogen \u2014 avoid excess",
+      "Maintain proper spacing for air circulation"
+    ]
+  },
+  "normal": {
+    "display_name": "Healthy Plant",
+    "pathogen": "None",
+    "severity": "None",
+    "symptoms": [
+      "Leaves uniformly green with no spots or lesions",
+      "No discoloration, wilting, or abnormal growth"
+    ],
+    "causes": [
+      "No disease detected"
+    ],
+    "treatment": [
+      "No treatment required",
+      "Continue standard agronomic practices"
+    ],
+    "prevention": [
+      "Maintain balanced fertilization schedule",
+      "Monitor regularly for early disease signs",
+      "Keep field clean from weeds",
+      "Use certified seeds next season"
+    ]
+  }
+}
